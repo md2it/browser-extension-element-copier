@@ -1,4 +1,4 @@
-# Canonical rules: SHARED/extension.gitignore (catalog layout)
+# Canonical rules: lib/extension.gitignore (catalog layout)
 node_modules/
 .DS_Store
 dist/

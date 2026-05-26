@@ -1,6 +1,6 @@
 # SPECIFICATION RU: ELEMENT COPIER
 
-> [!IMPORTANT] Учитываем общие правила тоже SHARED/RULES.md
+> [!IMPORTANT] Учитываем общие правила тоже lib/README.md
 
 ---
 
