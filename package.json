@@ -1,0 +1,12 @@
+{
+  "name": "element-copier",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "icons:manifest": "node ../lib/scripts/generate-manifest-icons.mjs",
+    "build": "node scripts/build.mjs",
+    "watch": "node scripts/build.mjs --watch",
+    "dist": "npm run build && node ../lib/scripts/pack-extension.mjs element-copier --no-build",
+    "typecheck": "node ../lib/node_modules/typescript/bin/tsc --noEmit -p tsconfig.json"
+  }
+}
