@@ -33,7 +33,14 @@
     }
   ],
   "commands": {
-    "_execute_action": {}
+    "_execute_action": {},
+    "activate-deactivate": {
+      "description": "__MSG_commandToggleCopy__",
+      "suggested_key": {
+        "default": "Ctrl+Shift+X",
+        "mac": "Command+Shift+X"
+      }
+    }
   },
   "browser_specific_settings": {
     "gecko": {

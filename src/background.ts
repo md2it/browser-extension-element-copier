@@ -8,6 +8,11 @@ import {
   setTabActiveState,
   syncIconForTab,
 } from "./extension-icon-state";
+import {
+  registerBackgroundHotkeys,
+  shouldSuppressToolbarClickAfterHotkeyCommand,
+} from "./hotkeys";
+import { registerPrefixHintBadgeListeners } from "../../lib/src/hotkeys";
 import type { BgToContent, ContentActivationResponse, ContentToBg } from "./messages";
 import {
   canOperateOnTab,
@@ -29,6 +34,7 @@ const BADGE_RUNNING_TEXT = "✓";
 const BADGE_BLOCKED_TEXT = "✕";
 
 const tabBlockedBadge = new Map<number, boolean>();
+const tabPrefixBadgeShown = new Map<number, boolean>();
 const blockedBadgeClearTimers = new Map<number, ReturnType<typeof setTimeout>>();
 
 function clearBlockedBadgeTimer(tabId: number): void {
@@ -91,6 +97,8 @@ async function setToolbarBadge(tabId: number, text: string): Promise<void> {
 }
 
 async function syncToolbarBadge(tabId: number): Promise<void> {
+  if (tabPrefixBadgeShown.get(tabId)) return;
+
   if (tabBlockedBadge.get(tabId)) {
     await setToolbarBadge(tabId, BADGE_BLOCKED_TEXT);
     return;
@@ -203,6 +211,49 @@ async function deactivateTab(tabId: number, windowId?: number): Promise<void> {
   await setTabActive(tabId, false, windowId);
 }
 
+async function toggleTab(tabId: number, windowId?: number): Promise<void> {
+  const now = Date.now();
+  if (tabId === lastToggleTabId && now - lastToggleAt < TOGGLE_DEBOUNCE_MS) {
+    return;
+  }
+  lastToggleTabId = tabId;
+  lastToggleAt = now;
+
+  const next = !getTabActiveState(tabId);
+  if (!next) {
+    await deactivateTab(tabId, windowId);
+    return;
+  }
+
+  if (!(await canOperateOnTab(tabId))) {
+    setTabActiveState(tabId, false);
+    await syncIconForTab(tabId);
+    await showBlockedPageFeedback(tabId, windowId);
+    return;
+  }
+
+  setTabActiveState(tabId, true);
+  clearBlockedBadgeState(tabId);
+  await syncIconForTab(tabId);
+  await syncToolbarBadge(tabId);
+  await setTabActive(tabId, true, windowId);
+}
+
+function getActiveCommandTab(): Promise<chrome.tabs.Tab | undefined> {
+  return new Promise((resolve) => {
+    ext.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
+      const tab = tabs[0];
+      if (tab?.id !== undefined) {
+        resolve(tab);
+        return;
+      }
+      ext.tabs.query({ active: true, currentWindow: true }, (fallback) => {
+        resolve(fallback[0]);
+      });
+    });
+  });
+}
+
 async function handleToolbarClick(tabId: number, windowId?: number): Promise<void> {
   const now = Date.now();
   if (tabId === lastToggleTabId && now - lastToggleAt < TOGGLE_DEBOUNCE_MS) {
@@ -221,7 +272,14 @@ async function handleToolbarClick(tabId: number, windowId?: number): Promise<voi
 
 ext.action.onClicked.addListener((tab) => {
   if (tab.id === undefined) return;
+  if (shouldSuppressToolbarClickAfterHotkeyCommand()) return;
   void handleToolbarClick(tab.id, tab.windowId);
+});
+
+registerBackgroundHotkeys({
+  getActiveCommandTab,
+  toggleTab,
+  sendToTab: (tabId, message) => sendWithInject(tabId, message),
 });
 
 ext.runtime.onMessage.addListener(
@@ -257,7 +315,21 @@ ext.runtime.onMessage.addListener(
 ext.tabs.onRemoved.addListener((tabId) => {
   clearBlockedBadgeTimer(tabId);
   tabBlockedBadge.delete(tabId);
+  tabPrefixBadgeShown.delete(tabId);
   stopWelcomePinWatcher(tabId);
+});
+
+registerPrefixHintBadgeListeners({
+  badgeBackgroundColor: COPIER_ACTIVE_COLOR,
+  onShow: (tabId) => {
+    if (tabId === undefined) return;
+    tabPrefixBadgeShown.set(tabId, true);
+  },
+  onHide: (tabId) => {
+    if (tabId === undefined) return;
+    tabPrefixBadgeShown.set(tabId, false);
+    void syncToolbarBadge(tabId);
+  },
 });
 
 registerExtensionIconStateListeners();

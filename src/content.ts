@@ -1,4 +1,8 @@
 import { ext } from "./api";
+import {
+  armCopierPrefixToggle,
+  registerCopierStartHotkey,
+} from "./hotkeys";
 import { bootstrapPanelPopupPageIfNeeded } from "./panel-popup/page";
 import { bootstrapPanelTabPageIfNeeded } from "./panel-tab";
 import type {
@@ -41,6 +45,13 @@ function notifyBackgroundActive(isActive: boolean): void {
   });
 }
 
+function requestToggle(): void {
+  const msg: ContentToBg = { type: "TOGGLE_REQUEST" };
+  void ext.runtime.sendMessage(msg).catch(() => {
+    /* extension reloaded */
+  });
+}
+
 function attachMessageHandler(state: ContentState): void {
   const prev = window.__ecMessageHandler;
   if (prev) {
@@ -77,6 +88,9 @@ function attachMessageHandler(state: ContentState): void {
       deactivate();
       return;
     }
+    if (message.type === "PREFIX_ARM_TOGGLE") {
+      armCopierPrefixToggle(message.hint);
+    }
   };
 
   window.__ecMessageHandler = handler;
@@ -92,6 +106,7 @@ if (window.__ecRuntimeId !== undefined && window.__ecRuntimeId !== runtimeId) {
 
 window.__ecRuntimeId = runtimeId;
 attachMessageHandler(state);
+registerCopierStartHotkey(requestToggle);
 
 void bootstrapPanelTabPageIfNeeded();
 void bootstrapPanelPopupPageIfNeeded();
