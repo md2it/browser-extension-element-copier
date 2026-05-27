@@ -8,15 +8,14 @@ export type Strings = {
   titleSettings: string;
   startBodyLead: string;
   startBodyAction: string;
-  startSettings: string;
-  startHistory: string;
-  startButtonComingSoon: string;
   copiedTitle: string;
   copiedSubtitle: string;
   menuPageStart: string;
   menuPageSettings: string;
   menuPageHistory: string;
-  menuPageInfo: string;
+  menuPageAbout: string;
+  pageSettingsTitle: string;
+  pageHistoryTitle: string;
   pagePlaceholderTodo: string;
   tabAbout: string;
   welcomePin: string;
@@ -24,6 +23,11 @@ export type Strings = {
   welcomePinStep2: string;
   welcomePinStep3: string;
   aboutBullets: readonly string[];
+  aboutHotkeyHeading: string;
+  aboutHotkeyStepPress: string;
+  aboutHotkeyStepOnMac: string;
+  aboutHotkeyStepRelease: string;
+  aboutHotkeyStepThenPress: string;
 };
 
 export function isLocale(value: unknown): value is Locale {

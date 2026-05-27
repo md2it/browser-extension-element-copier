@@ -5,9 +5,11 @@ import type { PanelMenuTab, PanelPopupTab } from "./constants";
 import { PANEL_MENU_TABS } from "./constants";
 import { bindDismissOnLeave, type DismissOnLeaveHandle } from "./dismiss-on-leave";
 import {
+  buildAboutPanelBody,
   buildCopiedPanelBody,
   buildPlaceholderPanelBody,
   buildStartPanelBody,
+  PANEL_BODY_CENTERED_CLASS,
 } from "./panel-body";
 import type { PanelMenuHandle } from "./panel-menu";
 
@@ -74,6 +76,9 @@ export class CopierPanelWindow {
 
     const strings = t(this.host.getLocale());
 
+    const centered = tab === "start" || tab === "copied";
+    this.body.classList.toggle(PANEL_BODY_CENTERED_CLASS, centered);
+
     switch (tab) {
       case "start":
         buildStartPanelBody(this.body, strings);
@@ -83,8 +88,10 @@ export class CopierPanelWindow {
         break;
       case "settings":
       case "history":
-      case "info":
-        buildPlaceholderPanelBody(this.body, strings);
+        buildPlaceholderPanelBody(this.body, tab, strings);
+        break;
+      case "about":
+        buildAboutPanelBody(this.body, strings);
         break;
     }
 

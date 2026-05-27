@@ -113,6 +113,7 @@ U = user, E = extension
 
 ### Приветственное окно
 - Cтандартное
+- Текст копируем из ABOUT, но без хоткеев
 
 ### Вертикальное меню
 - Прямоугольник чуть темнее фона
@@ -132,24 +133,34 @@ U = user, E = extension
       - Учесть, что в момент появления окно может быть не под курсором
       - Чтобы "увести" курсор с окна, сначала пользователь "наводит" на окно
    - Содержат меню
+   - Заголовки отцентрованы по горизонтали
 - *START*
    - "To copy:"
    - "HOVER and CLICK"
-   - Эти два текста близко друг к другу по высоте
+   - Текст отцентрован и по вертикали, и по горизонтали
+- *SETTINGS*
+   - Title: "SETTINGS"
+   - Text: "TODO"
+- *HISTORY*
+   - Title: "HISTORY"
+   - Text: "TODO"
+- *ABOUT*
+   - Title: "ABOUT"
+   - <circle-power> On/Off with one click
+   - <shield-check> Doesn't use the network
+   - <shield-check> Doesn't collect data
+   - <keyboard> Hotkey:
+      - 1. Press: `Ctrl+Shift+X`
+           On Mac: `Cmd+Shift+X`
+      - 2. Release the keys
+      - 3. Then press `C`
 - *COPIED*
    - "Copied!". Крупный, зелёный, центрованный
    - "Saved to your clipboard". Просто центрованный, обычный
    - Эта страница не может быть вызвана из меню
-- *SETTINGS*
-   - "TODO"
-- *HISTORY*
-   - "TODO"
-- *INFO*
-   - "TODO"
 
 ---
 
 ## НЕ ОБРАЩАТЬ ВНИМАНИЯ, НИЖЕ ЧЕРНОВИК
 
-- Стандартный header
-- Стандартный footer, всегда внизу окна
+- 

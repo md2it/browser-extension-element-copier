@@ -11,13 +11,13 @@ export const PANEL_POPUP_SESSION_TAB_KEY = "panelPopupTab";
 export const PANEL_POPUP_DISMISS_DELAY_MS = 1000;
 export const PANEL_POPUP_PROBE_WIDTH = "20rem";
 
-export type PanelMenuTab = "start" | "settings" | "history" | "info";
+export type PanelMenuTab = "start" | "settings" | "history" | "about";
 
 export const PANEL_MENU_TABS: readonly PanelMenuTab[] = [
   "start",
   "settings",
   "history",
-  "info",
+  "about",
 ];
 
 export type PanelPopupTab = PanelMenuTab | "copied";

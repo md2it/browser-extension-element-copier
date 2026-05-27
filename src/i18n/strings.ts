@@ -3,20 +3,19 @@ import type { Locale, Strings } from "./types";
 const MESSAGES: Record<Locale, Strings> = {
   en: {
     restrictedPageNotice:
-      "Browser extensions don't work on this page or site.",
+      "Browser extensions don't work on system pages and protected sites. Try another site.",
     panelSubtitle: "browser extension",
     titleSettings: "Start",
     startBodyLead: "To copy:",
     startBodyAction: "HOVER and CLICK",
-    startSettings: "Settings",
-    startHistory: "History",
-    startButtonComingSoon: "Coming soon",
     copiedTitle: "Copied!",
     copiedSubtitle: "Saved to your clipboard",
     menuPageStart: "Start",
     menuPageSettings: "Settings",
     menuPageHistory: "History",
-    menuPageInfo: "Info",
+    menuPageAbout: "About",
+    pageSettingsTitle: "SETTINGS",
+    pageHistoryTitle: "HISTORY",
     pagePlaceholderTodo: "TODO",
     tabAbout: "ABOUT",
     welcomePin: "To keep the extension handy:",
@@ -24,10 +23,15 @@ const MESSAGES: Record<Locale, Strings> = {
     welcomePinStep2: "In the list, find:",
     welcomePinStep3: "Click the pin button:",
     aboutBullets: [
-      "Copies page content in one click,",
-      "Doesn't use the network,",
-      "Doesn't collect data.",
+      "On/Off with one click",
+      "Doesn't use the network",
+      "Doesn't collect data",
     ],
+    aboutHotkeyHeading: "Hotkey:",
+    aboutHotkeyStepPress: "Press:",
+    aboutHotkeyStepOnMac: "On Mac:",
+    aboutHotkeyStepRelease: "Release the keys",
+    aboutHotkeyStepThenPress: "Then press",
   },
 };
 

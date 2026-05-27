@@ -218,7 +218,7 @@ async function setTabActive(
       tabId,
       windowId ?? "",
     );
-    await syncToolbarBadge(tabId);
+    await showBlockedPageFeedback(tabId, windowId, "setTabActive:activationFailed");
     return;
   }
 

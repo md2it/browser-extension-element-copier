@@ -4,9 +4,11 @@ import { PANEL_POPUP_PROBE_WIDTH } from "./constants";
 import type { PanelPopupTab } from "./constants";
 import { PANEL_POPUP_TABS } from "./constants";
 import {
+  buildAboutPanelBody,
   buildCopiedPanelBody,
   buildPlaceholderPanelBody,
   buildStartPanelBody,
+  PANEL_BODY_CENTERED_CLASS,
 } from "./panel-body";
 
 let cachedMaxPopupHeightPx: number | null = null;
@@ -34,6 +36,8 @@ function measurePanelBodyHeight(
 }
 
 function fillPanelTabBody(body: HTMLDivElement, tab: PanelPopupTab, strings: ReturnType<typeof t>): void {
+  body.classList.toggle(PANEL_BODY_CENTERED_CLASS, tab === "start" || tab === "copied");
+
   switch (tab) {
     case "start":
       buildStartPanelBody(body, strings);
@@ -43,8 +47,10 @@ function fillPanelTabBody(body: HTMLDivElement, tab: PanelPopupTab, strings: Ret
       break;
     case "settings":
     case "history":
-    case "info":
-      buildPlaceholderPanelBody(body, strings);
+      buildPlaceholderPanelBody(body, tab, strings);
+      break;
+    case "about":
+      buildAboutPanelBody(body, strings);
       break;
   }
 }

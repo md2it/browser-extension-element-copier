@@ -1,4 +1,7 @@
+import circlePowerSvg from "../icons/circle-power.svg";
 import filesSvg from "../icons/files.svg";
+import keyboardSvg from "../icons/keyboard.svg";
+import shieldCheckSvg from "../icons/shield-check.svg";
 
 export {
   ARROW_UP,
@@ -79,10 +82,12 @@ function lucideUiIcon(raw: string): string {
 }
 
 export const ABOUT_BULLET_ICONS: readonly string[] = [
-  lucideUiIcon(filesSvg),
-  lucideUiIcon(filesSvg),
-  lucideUiIcon(filesSvg),
+  lucideUiIcon(circlePowerSvg),
+  lucideUiIcon(shieldCheckSvg),
+  lucideUiIcon(shieldCheckSvg),
 ];
+
+export const KEYBOARD = lucideUiIcon(keyboardSvg);
 
 export type ToolbarIconVariant = "inactive" | "active";
 

@@ -14,7 +14,7 @@ const MENU_ITEMS: readonly MenuItemDef[] = [
   { tab: "start", iconSvg: FILES, label: (s) => s.menuPageStart },
   { tab: "settings", iconSvg: SETTINGS, label: (s) => s.menuPageSettings },
   { tab: "history", iconSvg: HISTORY, label: (s) => s.menuPageHistory },
-  { tab: "info", iconSvg: INFO, label: (s) => s.menuPageInfo },
+  { tab: "about", iconSvg: INFO, label: (s) => s.menuPageAbout },
 ];
 
 export type PanelMenuHandle = {
