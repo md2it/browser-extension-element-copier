@@ -1,5 +1,6 @@
 import { buildAboutListItems } from "../about";
 import type { Strings } from "../i18n";
+import { PANEL_FOOTER_LINKEDIN_URL } from "../../../lib/src/panel-footer/constants";
 import {
   ABOUT_PREFIX_CHORD_MAC_DISPLAY,
   ABOUT_PREFIX_CHORD_WIN_DISPLAY,
@@ -84,6 +85,19 @@ function buildAboutHotkeyListItem(strings: Strings): HTMLLIElement {
   return li;
 }
 
+function createAboutCopyright(strings: Strings): HTMLAnchorElement {
+  const credit = document.createElement("a");
+  credit.className = "ec-about-credit";
+  credit.href = PANEL_FOOTER_LINKEDIN_URL;
+  credit.target = "_blank";
+  credit.rel = "noopener noreferrer";
+  credit.textContent = strings.aboutCopyright;
+  credit.addEventListener("click", (e: MouseEvent) => {
+    e.stopPropagation();
+  });
+  return credit;
+}
+
 export function buildStartPanelBody(body: HTMLDivElement, strings: Strings): void {
   body.replaceChildren();
 
@@ -152,7 +166,7 @@ export function buildAboutPanelBody(body: HTMLDivElement, strings: Strings): voi
   }
 
   list.appendChild(buildAboutHotkeyListItem(strings));
-  page.append(title, list);
+  page.append(title, list, createAboutCopyright(strings));
   body.append(page);
 }
 

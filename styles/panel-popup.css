@@ -1,4 +1,6 @@
 :host(.ec-panel-popup) {
+  display: flex;
+  flex-direction: column;
   position: relative;
   inset: auto;
   width: 100%;
@@ -47,8 +49,10 @@
 }
 
 .ec-panel--surface-popup {
+  flex: 1 1 auto;
   width: 100%;
   min-height: 0;
+  height: 100%;
   max-height: none;
   border-radius: 0;
   border: none;
@@ -68,6 +72,10 @@
   min-width: 0;
 }
 
+.ec-panel--surface-popup > .ec-panel-main {
+  align-items: stretch;
+}
+
 .ec-panel-menu {
   flex: 0 0 auto;
   display: flex;
@@ -77,6 +85,13 @@
   padding: 0.35rem;
   border-radius: 0.5rem;
   background: rgba(1, 34, 146, 0.06);
+}
+
+.ec-panel--surface-popup .ec-panel-menu {
+  align-self: stretch;
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-right: 0;
 }
 
 .ec-panel-content {
@@ -182,6 +197,7 @@
   font-size: 0.95rem;
   font-weight: 500;
   color: #6b7280;
+  text-align: left;
 }
 
 /* Как в welcome: --welcome-gap (12px) между header и разделителем */
@@ -260,10 +276,34 @@
   color: #374151;
 }
 
+.ec-panel--surface-popup .ec-panel-body:has(.ec-panel-page--about) {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
 .ec-panel-page--about {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+}
+
+.ec-about-credit {
+  display: block;
+  margin-top: auto;
+  padding-top: 0.75rem;
+  text-align: center;
+  font-size: 0.75rem;
+  color: #999;
+  text-decoration: none;
+}
+
+.ec-about-credit:hover,
+.ec-about-credit:focus-visible {
+  color: #012292;
 }
 
 .ec-panel-page--about .ec-panel-page-title {
@@ -273,10 +313,11 @@
 
 .ec-about-list {
   list-style: none;
-  width: fit-content;
+  width: 100%;
   max-width: 100%;
   margin: 0 0 0.85rem;
   padding: 0;
+  text-align: left;
 }
 
 .ec-about-item {
@@ -301,6 +342,11 @@
 .ec-about-hotkey-content {
   flex: 1;
   min-width: 0;
+  text-align: left;
+}
+
+.ec-about-text {
+  text-align: left;
 }
 
 .ec-about-item--hotkey .ec-about-text {
@@ -313,6 +359,7 @@
   font-size: inherit;
   line-height: inherit;
   color: inherit;
+  text-align: left;
 }
 
 .ec-about-steps li {

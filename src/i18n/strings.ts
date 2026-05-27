@@ -32,6 +32,7 @@ const MESSAGES: Record<Locale, Strings> = {
     aboutHotkeyStepOnMac: "On Mac:",
     aboutHotkeyStepRelease: "Release the keys",
     aboutHotkeyStepThenPress: "Then press",
+    aboutCopyright: "© Alex T",
   },
 };
 

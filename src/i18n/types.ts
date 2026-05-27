@@ -28,6 +28,7 @@ export type Strings = {
   aboutHotkeyStepOnMac: string;
   aboutHotkeyStepRelease: string;
   aboutHotkeyStepThenPress: string;
+  aboutCopyright: string;
 };
 
 export function isLocale(value: unknown): value is Locale {

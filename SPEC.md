@@ -117,6 +117,7 @@ U = user, E = extension
 
 ### Вертикальное меню
 - Прямоугольник чуть темнее фона
+- Заполянет материнский элементе по высоте
 - Пункты меню:
    - Без подписей, только lucide иконки
    - Список:
@@ -150,10 +151,11 @@ U = user, E = extension
    - <shield-check> Doesn't use the network
    - <shield-check> Doesn't collect data
    - <keyboard> Hotkey:
-      - 1. Press: `Ctrl+Shift+X`
+      - 1. Press:  `Ctrl+Shift+X`
            On Mac: `Cmd+Shift+X`
       - 2. Release the keys
       - 3. Then press `C`
+   - Внизу по центру "© Alex T", серая ссылка на https://www.linkedin.com/in/alex-terekhov/
 - *COPIED*
    - "Copied!". Крупный, зелёный, центрованный
    - "Saved to your clipboard". Просто центрованный, обычный
