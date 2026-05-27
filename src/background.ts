@@ -24,13 +24,31 @@ import {
   refreshRestrictedNoticeCache,
   showRestrictedNotice,
 } from "./page-operability";
-import { openPanelFromSender } from "./panel-popup";
+import { openPanelFromSender, openStartPanelFromToolbar } from "./panel-popup";
 import { ensureLocaleInStorage } from "./storage";
 import { showWelcome, stopWelcomePinWatcher, watchWelcomePinStatus } from "./welcome";
 
 const TOGGLE_DEBOUNCE_MS = 80;
 /** Pick UI runs in the top document only (content_scripts use all_frames). */
 const MAIN_FRAME_ID = 0;
+
+/** Sync pre-check: skip START popup so blocked-notice keeps the toolbar user gesture. */
+function isLikelyNonOperableTabUrl(url: string | undefined): boolean {
+  if (!url) return false;
+  try {
+    const { protocol } = new URL(url);
+    return (
+      protocol === "chrome:" ||
+      protocol === "chrome-extension:" ||
+      protocol === "moz-extension:" ||
+      protocol === "edge:" ||
+      protocol === "about:" ||
+      protocol === "devtools:"
+    );
+  } catch {
+    return false;
+  }
+}
 let lastToggleTabId: number | undefined;
 let lastToggleAt = 0;
 
@@ -221,7 +239,11 @@ async function deactivateTab(tabId: number, windowId?: number): Promise<void> {
   await setTabActive(tabId, false, windowId);
 }
 
-async function toggleTab(tabId: number, windowId?: number): Promise<void> {
+async function toggleTab(
+  tabId: number,
+  windowId?: number,
+  tabUrl?: string,
+): Promise<void> {
   const now = Date.now();
   if (tabId === lastToggleTabId && now - lastToggleAt < TOGGLE_DEBOUNCE_MS) {
     return;
@@ -237,6 +259,13 @@ async function toggleTab(tabId: number, windowId?: number): Promise<void> {
     await syncToolbarBadge(tabId);
     await setTabActive(tabId, false, windowId);
     return;
+  }
+
+  const skipStartPanelForBlockedUrl =
+    tabUrl !== undefined && isLikelyNonOperableTabUrl(tabUrl);
+  if (!skipStartPanelForBlockedUrl) {
+    // Sync before first await — action.openPopup needs the toolbar user gesture.
+    openStartPanelFromToolbar({ id: tabId, windowId } as chrome.tabs.Tab);
   }
 
   if (!(await canOperateOnTab(tabId))) {
@@ -275,7 +304,7 @@ ext.action.onClicked.addListener((tab) => {
     return;
   }
   console.log("[Element Copier] toolbar click → toggleTab", tab.id);
-  void toggleTab(tab.id, tab.windowId);
+  void toggleTab(tab.id, tab.windowId, tab.url);
 });
 
 registerBackgroundHotkeys({
