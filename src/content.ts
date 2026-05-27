@@ -7,6 +7,11 @@ import {
 import { registerDocumentOperabilityProbeListener } from "../../lib/src/page-operability";
 import { bootstrapPanelPopupPageIfNeeded } from "./panel-popup/page";
 import { bootstrapPanelTabPageIfNeeded } from "./panel-tab";
+import {
+  CopierPickUI,
+  notifyElementPicked,
+  PICK_ROOT_ID,
+} from "./pick-mode";
 import type {
   BgToContent,
   ContentActivationResponse,
@@ -15,6 +20,7 @@ import type {
 
 type ContentState = {
   active: boolean;
+  pick: CopierPickUI | null;
 };
 
 declare global {
@@ -31,13 +37,19 @@ declare global {
 
 function getState(): ContentState {
   if (!window.__ecState) {
-    window.__ecState = { active: false };
+    window.__ecState = { active: false, pick: null };
   }
   return window.__ecState;
 }
 
 function resetState(state: ContentState): void {
+  if (state.active) {
+    state.pick?.deactivate();
+  }
+  unmountCopierContentHotkeys();
   state.active = false;
+  state.pick = null;
+  document.getElementById(PICK_ROOT_ID)?.remove();
 }
 
 function notifyBackgroundActive(isActive: boolean): void {
@@ -68,7 +80,14 @@ function attachMessageHandler(state: ContentState): void {
     if (!state.active) return;
     state.active = false;
     unmountCopierContentHotkeys();
+    state.pick?.deactivate();
     notifyBackgroundActive(false);
+  };
+
+  const ensurePick = (): CopierPickUI => {
+    if (state.pick) return state.pick;
+    state.pick = new CopierPickUI((element) => notifyElementPicked(element));
+    return state.pick;
   };
 
   const hotkeysHost = {
@@ -78,10 +97,24 @@ function attachMessageHandler(state: ContentState): void {
 
   const activate = (): boolean => {
     if (state.active) return true;
-    state.active = true;
-    mountCopierContentHotkeys(hotkeysHost);
-    notifyBackgroundActive(true);
-    return true;
+    if (typeof window !== "undefined" && window.top !== window) return false;
+
+    try {
+      const pick = ensurePick();
+      state.active = true;
+      mountCopierContentHotkeys(hotkeysHost);
+      pick.activate();
+      const ok = document.getElementById(PICK_ROOT_ID)?.isConnected === true;
+      if (!ok) {
+        deactivate();
+        return false;
+      }
+      notifyBackgroundActive(true);
+      return true;
+    } catch {
+      deactivate();
+      return false;
+    }
   };
 
   const handler = (

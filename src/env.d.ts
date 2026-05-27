@@ -2,6 +2,7 @@ declare const process: {
   env: {
     PANEL_CSS_CONTENT: string;
     PANEL_HEADER_CSS: string;
+    PICK_CSS_CONTENT: string;
   };
 };
 

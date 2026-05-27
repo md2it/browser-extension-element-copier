@@ -7,6 +7,12 @@ export type ContentToBg =
   | { type: "OPEN_PANEL"; tab: "start" }
   | { type: "WATCH_PIN_STATUS" }
   | { type: "TOGGLE_REQUEST" }
+  | {
+      type: "ELEMENT_PICKED";
+      tagName: string;
+      id: string;
+      className: string;
+    }
   | PrefixHintContentToBg;
 
 export type BgToWelcome = { type: "PIN_STATUS_CHANGED"; pinned: boolean };

@@ -316,6 +316,14 @@ ext.runtime.onMessage.addListener(
     if (contentMessage.type === "WATCH_PIN_STATUS" && sender.tab?.id !== undefined) {
       watchWelcomePinStatus(sender.tab.id);
     }
+    if (contentMessage.type === "ELEMENT_PICKED") {
+      const label = contentMessage.id
+        ? `${contentMessage.tagName}#${contentMessage.id}`
+        : contentMessage.className
+          ? `${contentMessage.tagName}.${contentMessage.className.trim().split(/\s+/).slice(0, 3).join(".")}`
+          : contentMessage.tagName;
+      console.log("[Element Copier] element picked:", label);
+    }
   },
 );
 
