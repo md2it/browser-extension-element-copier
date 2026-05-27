@@ -24,11 +24,13 @@ import {
   refreshRestrictedNoticeCache,
   showRestrictedNotice,
 } from "./page-operability";
-import { openPanelFromSender, openStartPanelFromToolbar } from "./panel-popup";
+import { openPanelFromSender } from "./panel-popup";
 import { ensureLocaleInStorage } from "./storage";
 import { showWelcome, stopWelcomePinWatcher, watchWelcomePinStatus } from "./welcome";
 
 const TOGGLE_DEBOUNCE_MS = 80;
+/** Pick UI runs in the top document only (content_scripts use all_frames). */
+const MAIN_FRAME_ID = 0;
 let lastToggleTabId: number | undefined;
 let lastToggleAt = 0;
 
@@ -74,7 +76,9 @@ function scheduleClearBlockedBadge(tabId: number, dismissMs: number): void {
 async function showBlockedPageFeedback(
   tabId: number,
   windowId?: number,
+  reason?: string,
 ): Promise<void> {
+  console.warn("[Element Copier] page blocked:", reason ?? "unknown", tabId);
   tabBlockedBadge.set(tabId, true);
   await syncToolbarBadge(tabId);
   const dismissMs = await getRestrictedNoticeDismissMs();
@@ -118,9 +122,7 @@ async function syncToolbarBadge(tabId: number): Promise<void> {
 async function injectContent(tabId: number, frameId?: number): Promise<boolean> {
   try {
     const target =
-      frameId !== undefined && frameId !== 0
-        ? { tabId, frameIds: [frameId] }
-        : { tabId, allFrames: true };
+      frameId === undefined ? { tabId } : { tabId, frameIds: [frameId] };
     await ext.scripting.executeScript({
       target,
       files: ["content.js"],
@@ -149,9 +151,9 @@ async function sendToTab(
 ): Promise<boolean> {
   try {
     const response =
-      frameId !== undefined && frameId !== 0
-        ? await ext.tabs.sendMessage(tabId, message, { frameId })
-        : await ext.tabs.sendMessage(tabId, message);
+      frameId === undefined
+        ? await ext.tabs.sendMessage(tabId, message)
+        : await ext.tabs.sendMessage(tabId, message, { frameId });
     return isActivationSuccess(message, response);
   } catch (err) {
     console.warn("[Element Copier] sendToTab failed:", err);
@@ -177,19 +179,24 @@ async function setTabActive(
   if (active && !(await canOperateOnTab(tabId))) {
     setTabActiveState(tabId, false);
     await syncIconForTab(tabId);
-    await showBlockedPageFeedback(tabId, windowId);
+    await showBlockedPageFeedback(tabId, windowId, "canOperateOnTab:setTabActive");
     return;
   }
 
   const reached = active
-    ? await sendWithInject(tabId, { type: "SET_ACTIVE", active: true })
-    : await sendToTab(tabId, { type: "SET_ACTIVE", active: false });
+    ? await sendWithInject(tabId, { type: "SET_ACTIVE", active: true }, MAIN_FRAME_ID)
+    : await sendToTab(tabId, { type: "SET_ACTIVE", active: false }, MAIN_FRAME_ID);
 
   if (active && !reached) {
     setTabActiveState(tabId, false);
     await syncIconForTab(tabId);
-    await sendToTab(tabId, { type: "SET_ACTIVE", active: false });
-    await showBlockedPageFeedback(tabId, windowId);
+    await sendToTab(tabId, { type: "SET_ACTIVE", active: false }, MAIN_FRAME_ID);
+    console.warn(
+      "[Element Copier] pick mode activation failed on tab",
+      tabId,
+      windowId ?? "",
+    );
+    await syncToolbarBadge(tabId);
     return;
   }
 
@@ -224,14 +231,18 @@ async function toggleTab(tabId: number, windowId?: number): Promise<void> {
 
   const next = !getTabActiveState(tabId);
   if (!next) {
-    await deactivateTab(tabId, windowId);
+    setTabActiveState(tabId, false);
+    clearBlockedBadgeState(tabId);
+    await syncIconForTab(tabId);
+    await syncToolbarBadge(tabId);
+    await setTabActive(tabId, false, windowId);
     return;
   }
 
   if (!(await canOperateOnTab(tabId))) {
     setTabActiveState(tabId, false);
     await syncIconForTab(tabId);
-    await showBlockedPageFeedback(tabId, windowId);
+    await showBlockedPageFeedback(tabId, windowId, "canOperateOnTab:toggleTab");
     return;
   }
 
@@ -257,26 +268,14 @@ function getActiveCommandTab(): Promise<chrome.tabs.Tab | undefined> {
   });
 }
 
-async function handleToolbarClick(tabId: number, windowId?: number): Promise<void> {
-  const now = Date.now();
-  if (tabId === lastToggleTabId && now - lastToggleAt < TOGGLE_DEBOUNCE_MS) {
-    return;
-  }
-  lastToggleTabId = tabId;
-  lastToggleAt = now;
-
-  if (getTabActiveState(tabId)) {
-    await deactivateTab(tabId, windowId);
-    return;
-  }
-
-  openStartPanelFromToolbar({ id: tabId, windowId } as chrome.tabs.Tab);
-}
-
 ext.action.onClicked.addListener((tab) => {
   if (tab.id === undefined) return;
-  if (shouldSuppressToolbarClickAfterHotkeyCommand()) return;
-  void handleToolbarClick(tab.id, tab.windowId);
+  if (shouldSuppressToolbarClickAfterHotkeyCommand()) {
+    console.log("[Element Copier] toolbar click suppressed (after _execute_action)");
+    return;
+  }
+  console.log("[Element Copier] toolbar click → toggleTab", tab.id);
+  void toggleTab(tab.id, tab.windowId);
 });
 
 registerBackgroundHotkeys({
@@ -286,7 +285,8 @@ registerBackgroundHotkeys({
 
 registerPrefixHintOperabilityListeners({
   canOperateOnTab,
-  onBlockedOnTab: showBlockedPageFeedback,
+  onBlockedOnTab: (tabId, windowId) =>
+    showBlockedPageFeedback(tabId, windowId, "prefixHint"),
 });
 
 ext.runtime.onMessage.addListener(

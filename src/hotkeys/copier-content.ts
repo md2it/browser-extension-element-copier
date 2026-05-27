@@ -1,6 +1,6 @@
 import {
   notifyPrefixHintBlockedOnBackground,
-  queryPrefixHintCanShowInContent,
+  queryPrefixHintCanShowFromBackground,
   registerPrefixStartHotkey,
 } from "../../../lib/src/hotkeys";
 import { isEscHotkeyEvent } from "./keys";
@@ -27,7 +27,7 @@ export function registerCopierStartHotkey(requestToggle: () => void): void {
     namespace: HOTKEY_NAMESPACE,
     hintLetter: PREFIX_ACTION_KEY,
     isEnabled: getStartHotkeyEnabled,
-    canShowPrefixHint: queryPrefixHintCanShowInContent,
+    canShowPrefixHint: queryPrefixHintCanShowFromBackground,
     onPrefixHintBlocked: notifyPrefixHintBlockedOnBackground,
     onAction: requestToggle,
   });

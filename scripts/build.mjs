@@ -55,5 +55,5 @@ if (watch) {
 } else {
   await ctx.rebuild();
   await ctx.dispose();
-  console.log("build ok");
+  console.log("build ok → dist/ updated (load unpacked from element-copier/dist)");
 }

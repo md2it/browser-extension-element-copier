@@ -21,6 +21,7 @@ import type {
 type ContentState = {
   active: boolean;
   pick: CopierPickUI | null;
+  pickInit: Promise<CopierPickUI> | null;
 };
 
 declare global {
@@ -37,19 +38,15 @@ declare global {
 
 function getState(): ContentState {
   if (!window.__ecState) {
-    window.__ecState = { active: false, pick: null };
+    window.__ecState = { active: false, pick: null, pickInit: null };
   }
   return window.__ecState;
 }
 
 function resetState(state: ContentState): void {
-  if (state.active) {
-    state.pick?.deactivate();
-  }
   unmountCopierContentHotkeys();
   state.active = false;
-  state.pick = null;
-  document.getElementById(PICK_ROOT_ID)?.remove();
+  tearDownPick(state);
 }
 
 function notifyBackgroundActive(isActive: boolean): void {
@@ -66,6 +63,50 @@ function requestToggle(): void {
   });
 }
 
+function waitForDomRoot(timeoutMs = 5000): Promise<void> {
+  if (document.documentElement ?? document.body) {
+    return Promise.resolve();
+  }
+
+  return new Promise((resolve) => {
+    const deadline = Date.now() + timeoutMs;
+    const done = (): void => {
+      observer.disconnect();
+      resolve();
+    };
+    const observer = new MutationObserver(() => {
+      if (document.documentElement ?? document.body) {
+        done();
+      } else if (Date.now() >= deadline) {
+        done();
+      }
+    });
+    observer.observe(document, { childList: true, subtree: true });
+    if (document.documentElement ?? document.body) {
+      done();
+    }
+  });
+}
+
+function waitForNextFrame(): Promise<void> {
+  return new Promise((resolve) => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => resolve());
+    });
+  });
+}
+
+function tearDownPick(state: ContentState): void {
+  state.pick?.deactivate();
+  state.pick = null;
+  state.pickInit = null;
+  document.getElementById(PICK_ROOT_ID)?.remove();
+}
+
+function isPickRootConnected(): boolean {
+  return document.getElementById(PICK_ROOT_ID)?.isConnected === true;
+}
+
 function attachMessageHandler(state: ContentState): void {
   const prev = window.__ecMessageHandler;
   if (prev) {
@@ -77,17 +118,35 @@ function attachMessageHandler(state: ContentState): void {
   }
 
   const deactivate = (): void => {
-    if (!state.active) return;
+    const wasActive = state.active;
     state.active = false;
     unmountCopierContentHotkeys();
-    state.pick?.deactivate();
-    notifyBackgroundActive(false);
+    tearDownPick(state);
+    if (wasActive) {
+      notifyBackgroundActive(false);
+    }
   };
 
-  const ensurePick = (): CopierPickUI => {
-    if (state.pick) return state.pick;
-    state.pick = new CopierPickUI((element) => notifyElementPicked(element));
-    return state.pick;
+  const ensurePick = async (): Promise<CopierPickUI> => {
+    if (state.pick?.isHostConnected() && isPickRootConnected()) {
+      return state.pick;
+    }
+    tearDownPick(state);
+    if (!state.pickInit) {
+      state.pickInit = (async () => {
+        await waitForDomRoot();
+        await waitForNextFrame();
+        const pick = new CopierPickUI((element) => notifyElementPicked(element));
+        state.pick = pick;
+        return pick;
+      })();
+    }
+    try {
+      return await state.pickInit;
+    } catch (error) {
+      state.pickInit = null;
+      throw error;
+    }
   };
 
   const hotkeysHost = {
@@ -95,23 +154,34 @@ function attachMessageHandler(state: ContentState): void {
     deactivate,
   };
 
-  const activate = (): boolean => {
-    if (state.active) return true;
+  const activate = async (): Promise<boolean> => {
     if (typeof window !== "undefined" && window.top !== window) return false;
 
+    if (state.active) {
+      if (state.pick?.isHostConnected() && isPickRootConnected()) {
+        state.pick.activate();
+        mountCopierContentHotkeys(hotkeysHost);
+        notifyBackgroundActive(true);
+        return true;
+      }
+      state.active = false;
+      tearDownPick(state);
+    }
+
     try {
-      const pick = ensurePick();
+      const pick = await ensurePick();
       state.active = true;
       mountCopierContentHotkeys(hotkeysHost);
       pick.activate();
-      const ok = document.getElementById(PICK_ROOT_ID)?.isConnected === true;
+      const ok = pick.isHostConnected() && isPickRootConnected();
       if (!ok) {
         deactivate();
         return false;
       }
       notifyBackgroundActive(true);
       return true;
-    } catch {
+    } catch (err) {
+      console.warn("[Element Copier] activate failed:", err);
       deactivate();
       return false;
     }
@@ -123,9 +193,12 @@ function attachMessageHandler(state: ContentState): void {
     sendResponse: (response: ContentActivationResponse) => void,
   ): boolean | void => {
     if (message.type === "SET_ACTIVE") {
-      if (message.active) {
-        sendResponse({ ok: activate() });
+      if (typeof window !== "undefined" && window.top !== window) {
         return;
+      }
+      if (message.active) {
+        void activate().then((ok) => sendResponse({ ok }));
+        return true;
       }
       deactivate();
       return;

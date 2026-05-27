@@ -23,17 +23,22 @@ export class CopierPickUI {
     this.boundClick = (e) => this.handleClick(e);
 
     const existing = document.getElementById(PICK_ROOT_ID);
-    if (existing) {
+    if (existing?.isConnected) {
       this.host = existing;
       this.shadow =
         existing.shadowRoot ?? existing.attachShadow({ mode: "open" });
     } else {
+      existing?.remove();
+      const root = document.documentElement ?? document.body;
+      if (!root) {
+        throw new Error("document has no mount root");
+      }
       this.host = document.createElement("div");
       this.host.id = PICK_ROOT_ID;
       this.host.setAttribute(PICK_HOST_ATTR, "true");
       this.host.style.cssText =
         "position:fixed;inset:0;z-index:2147483645;pointer-events:none;";
-      document.documentElement.appendChild(this.host);
+      root.appendChild(this.host);
       this.shadow = this.host.attachShadow({ mode: "open" });
     }
 
@@ -62,6 +67,10 @@ export class CopierPickUI {
       existingLabel instanceof HTMLElement ? existingLabel : null,
       existingFrame instanceof HTMLElement ? existingFrame : null,
     );
+  }
+
+  isHostConnected(): boolean {
+    return this.host.isConnected;
   }
 
   isOurNode(node: Node | null): boolean {
