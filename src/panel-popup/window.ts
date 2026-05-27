@@ -5,8 +5,6 @@ import { createPanelDivider, createPanelHeader } from "../../../lib/src/panel-he
 import { isRtlLocale, t, type Locale } from "../i18n";
 import { PANEL_POPUP_HOST_ATTR } from "./constants";
 
-const START_BODY_TEXT = "Hello world!";
-
 export type StartPanelHost = {
   shadow: ShadowRoot;
   surface?: "popup";
@@ -14,7 +12,24 @@ export type StartPanelHost = {
   getLocale: () => Locale;
 };
 
+function createStartActionButton(
+  label: string,
+  comingSoonLabel: string,
+): HTMLButtonElement {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "ec-start-action";
+  button.textContent = label;
+  button.disabled = true;
+  button.setAttribute("aria-disabled", "true");
+  button.title = comingSoonLabel;
+  button.setAttribute("aria-label", `${label} (${comingSoonLabel})`);
+  return button;
+}
+
 export class StartPanelWindow {
+  private dismissListeners: (() => void) | null = null;
+
   constructor(private readonly host: StartPanelHost) {}
 
   openStartPanel(): void {
@@ -38,17 +53,48 @@ export class StartPanelWindow {
 
     const body = document.createElement("div");
     body.className = "ec-panel-body";
+
     const message = document.createElement("p");
     message.className = "ec-start-message";
-    message.textContent = START_BODY_TEXT;
-    body.append(message);
+    message.textContent = strings.startBodyText;
 
+    const actions = document.createElement("div");
+    actions.className = "ec-start-actions";
+    actions.append(
+      createStartActionButton(strings.startSettings, strings.startButtonComingSoon),
+      createStartActionButton(strings.startHistory, strings.startButtonComingSoon),
+    );
+
+    body.append(message, actions);
     panelRoot.append(header, createPanelDivider(), body);
     panelRoot.setAttribute(PANEL_POPUP_HOST_ATTR, "true");
     this.host.shadow.appendChild(panelRoot);
+    this.bindDismissOnLeave(panelRoot);
+  }
+
+  private bindDismissOnLeave(panel: HTMLElement): void {
+    let hasEntered = false;
+
+    const onEnter = (): void => {
+      hasEntered = true;
+    };
+    const onLeave = (): void => {
+      if (!hasEntered) return;
+      this.close();
+    };
+
+    panel.addEventListener("mouseenter", onEnter);
+    panel.addEventListener("mouseleave", onLeave);
+    this.dismissListeners = () => {
+      panel.removeEventListener("mouseenter", onEnter);
+      panel.removeEventListener("mouseleave", onLeave);
+    };
   }
 
   close(): void {
+    this.dismissListeners?.();
+    this.dismissListeners = null;
+
     const panelRoots = Array.from(
       this.host.shadow.querySelectorAll<HTMLElement>(".ec-panel"),
     );

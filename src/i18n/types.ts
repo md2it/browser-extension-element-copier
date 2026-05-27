@@ -6,6 +6,10 @@ export type Strings = {
   restrictedPageNotice: string;
   panelSubtitle: string;
   titleSettings: string;
+  startBodyText: string;
+  startSettings: string;
+  startHistory: string;
+  startButtonComingSoon: string;
   tabAbout: string;
   welcomePin: string;
   welcomePinStep1: string;

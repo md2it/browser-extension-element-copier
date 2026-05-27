@@ -6,6 +6,11 @@ const MESSAGES: Record<Locale, Strings> = {
       "Browser extensions don't work on this page or site.",
     panelSubtitle: "browser extension",
     titleSettings: "Start",
+    startBodyText:
+      "Simply select any text block on the page and click on it.",
+    startSettings: "Settings",
+    startHistory: "History",
+    startButtonComingSoon: "Coming soon",
     tabAbout: "ABOUT",
     welcomePin: "To keep the extension handy:",
     welcomePinStep1: "The top bar has an extensions list",
