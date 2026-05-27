@@ -41,6 +41,14 @@ export function buildStartPanelBody(body: HTMLDivElement, strings: Strings): voi
   body.append(instruction, actions);
 }
 
+export function buildPlaceholderPanelBody(body: HTMLDivElement, strings: Strings): void {
+  body.replaceChildren();
+  const placeholder = document.createElement("p");
+  placeholder.className = "ec-panel-placeholder";
+  placeholder.textContent = strings.pagePlaceholderTodo;
+  body.append(placeholder);
+}
+
 export function buildCopiedPanelBody(body: HTMLDivElement, strings: Strings): void {
   body.replaceChildren();
 

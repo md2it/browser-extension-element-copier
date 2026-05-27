@@ -1,8 +1,11 @@
 import { t, type Locale } from "../i18n";
 import { createPanelSurface } from "./build-panel-surface";
 import { PANEL_POPUP_PROBE_WIDTH } from "./constants";
+import type { PanelPopupTab } from "./constants";
+import { PANEL_POPUP_TABS } from "./constants";
 import {
   buildCopiedPanelBody,
+  buildPlaceholderPanelBody,
   buildStartPanelBody,
 } from "./panel-body";
 
@@ -30,20 +33,38 @@ function measurePanelBodyHeight(
   return height;
 }
 
-/** Max toolbar popup height across START and COPIED (cached). */
+function fillPanelTabBody(body: HTMLDivElement, tab: PanelPopupTab, strings: ReturnType<typeof t>): void {
+  switch (tab) {
+    case "start":
+      buildStartPanelBody(body, strings);
+      break;
+    case "copied":
+      buildCopiedPanelBody(body, strings);
+      break;
+    case "settings":
+    case "history":
+    case "info":
+      buildPlaceholderPanelBody(body, strings);
+      break;
+  }
+}
+
+/** Max toolbar popup height across all panel tabs (cached). */
 export function getMaxActionPopupHeightPx(locale: Locale): number {
   if (cachedMaxPopupHeightPx !== null) {
     return cachedMaxPopupHeightPx;
   }
 
   const strings = t(locale);
-  cachedMaxPopupHeightPx = Math.max(
-    measurePanelBodyHeight(locale, (body) => {
-      buildStartPanelBody(body, strings);
-    }),
-    measurePanelBodyHeight(locale, (body) => {
-      buildCopiedPanelBody(body, strings);
-    }),
+  cachedMaxPopupHeightPx = PANEL_POPUP_TABS.reduce(
+    (max, tab) =>
+      Math.max(
+        max,
+        measurePanelBodyHeight(locale, (body) => {
+          fillPanelTabBody(body, tab, strings);
+        }),
+      ),
+    0,
   );
   return cachedMaxPopupHeightPx;
 }

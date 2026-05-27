@@ -3,9 +3,13 @@ import filesSvg from "../icons/files.svg";
 export {
   ARROW_UP,
   COG,
+  FILES,
   HEART,
+  HISTORY,
+  INFO,
   PIN,
   PUZZLE,
+  SETTINGS,
 } from "../../lib/src/icons";
 
 const INACTIVE_BG = "#012292";

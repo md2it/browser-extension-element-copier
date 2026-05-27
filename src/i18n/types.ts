@@ -13,6 +13,11 @@ export type Strings = {
   startButtonComingSoon: string;
   copiedTitle: string;
   copiedSubtitle: string;
+  menuPageStart: string;
+  menuPageSettings: string;
+  menuPageHistory: string;
+  menuPageInfo: string;
+  pagePlaceholderTodo: string;
   tabAbout: string;
   welcomePin: string;
   welcomePinStep1: string;

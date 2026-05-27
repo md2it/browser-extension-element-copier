@@ -6,10 +6,12 @@ import { createPanelDivider, createPanelHeader } from "../../../lib/src/panel-he
 import { isRtlLocale, t, type Locale } from "../i18n";
 import { PANEL_FOOTER_CONFIG } from "../ui-config";
 import { PANEL_POPUP_HOST_ATTR } from "./constants";
+import { createPanelMenu, type PanelMenuHandle } from "./panel-menu";
 
 export type PanelSurfaceParts = {
   panelRoot: HTMLDivElement;
   body: HTMLDivElement;
+  menu: PanelMenuHandle | null;
 };
 
 export function createPanelSurface(
@@ -35,15 +37,27 @@ export function createPanelSurface(
   body.className = "ec-panel-body";
 
   const footer = createPanelFooter(PANEL_FOOTER_CONFIG);
+  const topDivider = createPanelDivider();
+  const bottomDivider = createPanelDivider();
 
-  panelRoot.append(
-    header,
-    createPanelDivider(),
-    body,
-    createPanelDivider(),
-    footer,
-  );
+  let menu: PanelMenuHandle | null = null;
+
+  if (surface === "popup") {
+    menu = createPanelMenu(strings);
+    const main = document.createElement("div");
+    main.className = "ec-panel-main";
+
+    const content = document.createElement("div");
+    content.className = "ec-panel-content";
+    content.append(topDivider, body, bottomDivider);
+
+    main.append(menu.root, content);
+    panelRoot.append(header, main, footer);
+  } else {
+    panelRoot.append(header, topDivider, body, bottomDivider, footer);
+  }
+
   panelRoot.setAttribute(PANEL_POPUP_HOST_ATTR, "true");
 
-  return { panelRoot, body };
+  return { panelRoot, body, menu };
 }

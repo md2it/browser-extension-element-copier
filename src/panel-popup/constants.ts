@@ -11,9 +11,21 @@ export const PANEL_POPUP_SESSION_TAB_KEY = "panelPopupTab";
 export const PANEL_POPUP_DISMISS_DELAY_MS = 1000;
 export const PANEL_POPUP_PROBE_WIDTH = "20rem";
 
-export type PanelPopupTab = "start" | "copied";
+export type PanelMenuTab = "start" | "settings" | "history" | "info";
 
-export const PANEL_POPUP_TABS: readonly PanelPopupTab[] = ["start", "copied"];
+export const PANEL_MENU_TABS: readonly PanelMenuTab[] = [
+  "start",
+  "settings",
+  "history",
+  "info",
+];
+
+export type PanelPopupTab = PanelMenuTab | "copied";
+
+export const PANEL_POPUP_TABS: readonly PanelPopupTab[] = [
+  ...PANEL_MENU_TABS,
+  "copied",
+];
 
 export const PANEL_PAGE_CONFIG: PanelPageConfig = {
   pageHtml: PANEL_POPUP_PAGE,
