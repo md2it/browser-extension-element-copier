@@ -19,4 +19,5 @@ export const LOCALE_USER_SELECTED_KEY = "localeUserSelected";
 export const LOCALE_DETECT_VERSION_KEY = "localeDetectVersion";
 export const LOCALE_DETECT_VERSION = 1;
 export const START_HOTKEY_ENABLED_KEY = "startHotkeyEnabled";
+export const ESC_HOTKEY_ENABLED_KEY = "escHotkeyEnabled";
 export const DEFAULT_NOTIFICATION_SECONDS = 4;

@@ -1,5 +1,9 @@
 import { ext } from "./api";
-import { registerCopierStartHotkey } from "./hotkeys";
+import {
+  mountCopierContentHotkeys,
+  registerCopierStartHotkey,
+  unmountCopierContentHotkeys,
+} from "./hotkeys";
 import { registerDocumentOperabilityProbeListener } from "../../lib/src/page-operability";
 import { bootstrapPanelPopupPageIfNeeded } from "./panel-popup/page";
 import { bootstrapPanelTabPageIfNeeded } from "./panel-tab";
@@ -63,12 +67,19 @@ function attachMessageHandler(state: ContentState): void {
   const deactivate = (): void => {
     if (!state.active) return;
     state.active = false;
+    unmountCopierContentHotkeys();
     notifyBackgroundActive(false);
+  };
+
+  const hotkeysHost = {
+    isActive: () => state.active,
+    deactivate,
   };
 
   const activate = (): boolean => {
     if (state.active) return true;
     state.active = true;
+    mountCopierContentHotkeys(hotkeysHost);
     notifyBackgroundActive(true);
     return true;
   };

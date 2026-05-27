@@ -36,6 +36,9 @@
     "_execute_action": {},
     "activate-deactivate": {
       "description": "__MSG_commandToggleCopy__"
+    },
+    "deactivate-copy-mode": {
+      "description": "__MSG_commandDeactivateCopy__"
     }
   },
   "browser_specific_settings": {
