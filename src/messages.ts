@@ -1,8 +1,6 @@
 import type { PrefixHintContentToBg } from "../../lib/src/hotkeys/prefix-hint-messages";
 
-export type BgToContent =
-  | { type: "SET_ACTIVE"; active: boolean }
-  | { type: "PREFIX_ARM_TOGGLE"; hint: string };
+export type BgToContent = { type: "SET_ACTIVE"; active: boolean };
 
 export type ContentToBg =
   | { type: "ACTIVE_CHANGED"; active: boolean }

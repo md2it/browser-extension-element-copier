@@ -4,7 +4,7 @@ export {
   PREFIX_ACTION_KEY,
 } from "./commands";
 export { registerBackgroundHotkeys, shouldSuppressToolbarClickAfterHotkeyCommand, type BackgroundHotkeysHost } from "./background";
-export { armCopierPrefixToggle, registerCopierStartHotkey } from "./copier-content";
+export { registerCopierStartHotkey } from "./copier-content";
 export {
   getStartHotkeyActionLabel,
   getStartHotkeyAriaLabel,

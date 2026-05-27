@@ -12,7 +12,10 @@ import {
   registerBackgroundHotkeys,
   shouldSuppressToolbarClickAfterHotkeyCommand,
 } from "./hotkeys";
-import { registerPrefixHintBadgeListeners } from "../../lib/src/hotkeys";
+import {
+  registerPrefixHintBadgeListeners,
+  registerPrefixHintOperabilityListeners,
+} from "../../lib/src/hotkeys";
 import type { BgToContent, ContentActivationResponse, ContentToBg } from "./messages";
 import {
   canOperateOnTab,
@@ -279,7 +282,11 @@ ext.action.onClicked.addListener((tab) => {
 registerBackgroundHotkeys({
   getActiveCommandTab,
   toggleTab,
-  sendToTab: (tabId, message) => sendWithInject(tabId, message),
+});
+
+registerPrefixHintOperabilityListeners({
+  canOperateOnTab,
+  onBlockedOnTab: showBlockedPageFeedback,
 });
 
 ext.runtime.onMessage.addListener(
@@ -321,6 +328,7 @@ ext.tabs.onRemoved.addListener((tabId) => {
 
 registerPrefixHintBadgeListeners({
   badgeBackgroundColor: COPIER_ACTIVE_COLOR,
+  canShowPrefixBadgeOnTab: canOperateOnTab,
   onShow: (tabId) => {
     if (tabId === undefined) return;
     tabPrefixBadgeShown.set(tabId, true);

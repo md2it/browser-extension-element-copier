@@ -1,25 +1,21 @@
 import {
+  notifyPrefixHintBlockedOnBackground,
+  queryPrefixHintCanShowInContent,
   registerPrefixStartHotkey,
-  type PrefixModeController,
 } from "../../../lib/src/hotkeys";
 import { PREFIX_ACTION_KEY } from "./commands";
 import { getStartHotkeyEnabled } from "./settings";
 
 const HOTKEY_NAMESPACE = "elementCopier";
 
-let prefixController: PrefixModeController | undefined;
-
-/** Ctrl/Cmd+Shift+X → C page fallback (top frame only). */
+/** Ctrl/Cmd+Shift+X → C (top frame; no manifest suggested_key). */
 export function registerCopierStartHotkey(requestToggle: () => void): void {
-  prefixController = registerPrefixStartHotkey({
+  registerPrefixStartHotkey({
     namespace: HOTKEY_NAMESPACE,
     hintLetter: PREFIX_ACTION_KEY,
     isEnabled: getStartHotkeyEnabled,
+    canShowPrefixHint: queryPrefixHintCanShowInContent,
+    onPrefixHintBlocked: notifyPrefixHintBlockedOnBackground,
     onAction: requestToggle,
   });
-}
-
-/** Wait for prefix release, then arm (manifest chord). */
-export function armCopierPrefixToggle(hint = PREFIX_ACTION_KEY): void {
-  prefixController?.prepareAwaitAction(hint);
 }
