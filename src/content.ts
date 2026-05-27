@@ -64,6 +64,13 @@ function requestToggle(): void {
   });
 }
 
+function requestCopiedPanel(): void {
+  const msg: ContentToBg = { type: "OPEN_PANEL", tab: "copied" };
+  void ext.runtime.sendMessage(msg).catch(() => {
+    /* extension reloaded */
+  });
+}
+
 function waitForDomRoot(timeoutMs = 5000): Promise<void> {
   if (document.documentElement ?? document.body) {
     return Promise.resolve();
@@ -140,6 +147,7 @@ function attachMessageHandler(state: ContentState): void {
         return;
       }
       notifyElementPicked(element);
+      requestCopiedPanel();
       deactivate();
     } finally {
       pickCopyInFlight = false;

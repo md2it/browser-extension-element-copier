@@ -24,7 +24,11 @@ import {
   refreshRestrictedNoticeCache,
   showRestrictedNotice,
 } from "./page-operability";
-import { openPanelFromSender, openStartPanelFromToolbar } from "./panel-popup";
+import {
+  openCopiedPanelFromCopy,
+  openPanelFromSender,
+  openStartPanelFromToolbar,
+} from "./panel-popup";
 import { ensureLocaleInStorage } from "./storage";
 import { showWelcome, stopWelcomePinWatcher, watchWelcomePinStatus } from "./welcome";
 
@@ -334,6 +338,10 @@ ext.runtime.onMessage.addListener(
       void syncToolbarBadge(tabId);
     }
     if (contentMessage.type === "OPEN_PANEL") {
+      if (contentMessage.tab === "copied") {
+        openCopiedPanelFromCopy(sender.tab);
+        return;
+      }
       void (async () => {
         const tabId = sender.tab?.id;
         if (tabId !== undefined && getTabActiveState(tabId)) {

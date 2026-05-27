@@ -1,7 +1,12 @@
-/** Sizes the toolbar action popup to the mounted panel host (no extra min-height). */
-export function fitActionPopupToHost(host: HTMLElement): void {
+import type { Locale } from "../i18n";
+import { getMaxActionPopupHeightPx } from "./panel-heights";
+
+/** Sizes the toolbar action popup to the tallest panel variant (START / COPIED). */
+export function fitActionPopupToHost(host: HTMLElement, locale: Locale): void {
   const apply = (): void => {
-    const height = Math.ceil(host.getBoundingClientRect().height);
+    const measured = Math.ceil(host.getBoundingClientRect().height);
+    const maxVariant = getMaxActionPopupHeightPx(locale);
+    const height = Math.max(measured, maxVariant);
     if (height <= 0) return;
     const px = `${height}px`;
     document.documentElement.style.height = px;

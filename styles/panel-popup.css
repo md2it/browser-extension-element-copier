@@ -125,3 +125,30 @@
   opacity: 0.62;
   cursor: not-allowed;
 }
+
+.ec-copied {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  text-align: center;
+}
+
+.ec-copied-title,
+.ec-copied-subtitle {
+  margin: 0;
+  line-height: 1.25;
+}
+
+.ec-copied-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #15803d;
+}
+
+.ec-copied-subtitle {
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: #374151;
+}

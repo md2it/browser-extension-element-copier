@@ -39,3 +39,8 @@ export function openPanelFromSender(
 export function openStartPanelFromToolbar(senderTab: chrome.tabs.Tab | undefined): void {
   openPanelFromSender("start", senderTab);
 }
+
+/** After a successful page pick + copy — opened from background on content message. */
+export function openCopiedPanelFromCopy(senderTab: chrome.tabs.Tab | undefined): void {
+  openPanelFromSender("copied", senderTab);
+}

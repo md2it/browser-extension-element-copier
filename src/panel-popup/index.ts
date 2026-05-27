@@ -7,6 +7,7 @@ export {
   type PanelPopupTab,
 } from "./constants";
 export {
+  openCopiedPanelFromCopy,
   openPanelFromSender,
   openPanelInActionPopup,
   openStartPanelFromToolbar,

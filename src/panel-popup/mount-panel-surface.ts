@@ -7,7 +7,7 @@ import {
   type PanelPopupTab,
 } from "./constants";
 import { fitActionPopupToHost } from "./fit-popup-height";
-import { StartPanelWindow } from "./window";
+import { CopierPanelWindow } from "./window";
 
 export type PanelMountSurface = {
   hostStyle: string;
@@ -15,7 +15,7 @@ export type PanelMountSurface = {
 };
 
 export async function mountPanelSurface(
-  _initialTab: PanelPopupTab,
+  initialTab: PanelPopupTab,
   { hostStyle, surface }: PanelMountSurface,
 ): Promise<void> {
   let locale: Locale = "en";
@@ -30,15 +30,15 @@ export async function mountPanelSurface(
 
   locale = await getLocale();
 
-  const panelWindow = new StartPanelWindow({
+  const panelWindow = new CopierPanelWindow({
     shadow,
     surface,
     onClose: () => window.close(),
     getLocale: () => locale,
   });
 
-  panelWindow.openStartPanel();
+  panelWindow.openPanel(initialTab);
   if (surface === "popup") {
-    fitActionPopupToHost(host);
+    fitActionPopupToHost(host, locale);
   }
 }

@@ -4,7 +4,7 @@ export type BgToContent = { type: "SET_ACTIVE"; active: boolean };
 
 export type ContentToBg =
   | { type: "ACTIVE_CHANGED"; active: boolean }
-  | { type: "OPEN_PANEL"; tab: "start" }
+  | { type: "OPEN_PANEL"; tab: "start" | "copied" }
   | { type: "WATCH_PIN_STATUS" }
   | { type: "TOGGLE_REQUEST" }
   | {

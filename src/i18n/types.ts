@@ -11,6 +11,8 @@ export type Strings = {
   startSettings: string;
   startHistory: string;
   startButtonComingSoon: string;
+  copiedTitle: string;
+  copiedSubtitle: string;
   tabAbout: string;
   welcomePin: string;
   welcomePinStep1: string;

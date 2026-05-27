@@ -11,6 +11,8 @@ const MESSAGES: Record<Locale, Strings> = {
     startSettings: "Settings",
     startHistory: "History",
     startButtonComingSoon: "Coming soon",
+    copiedTitle: "Copied!",
+    copiedSubtitle: "Saved to your clipboard",
     tabAbout: "ABOUT",
     welcomePin: "To keep the extension handy:",
     welcomePinStep1: "The top bar has an extensions list",
