@@ -88,18 +88,20 @@
 }
 
 .ec-panel--surface-popup .ec-panel-menu {
-  --ec-menu-gap: 0.35rem;
+  --ec-menu-gap: 0.3rem;
+  flex: 0 0 2.85rem;
+  width: 2.85rem;
   align-self: stretch;
   justify-content: flex-start;
   gap: var(--ec-menu-gap);
-  margin-top: 2mm;
-  margin-bottom: 2mm;
-  margin-inline-start: 2mm;
-  margin-inline-end: 0;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  margin-inline-start: 0.5rem;
+  margin-inline-end: 0.3rem;
   padding-block-start: var(--ec-menu-gap);
   padding-inline-end: var(--ec-menu-gap);
-  padding-block-end: 0;
-  padding-inline-start: 0;
+  padding-block-end: var(--ec-menu-gap);
+  padding-inline-start: var(--ec-menu-gap);
 }
 
 .ec-panel-content {
@@ -108,6 +110,11 @@
   flex-direction: column;
   min-width: 0;
   min-height: 0;
+}
+
+.ec-panel--surface-popup .ec-panel-content {
+  flex: 1 1 0;
+  min-width: 0;
 }
 
 .ec-panel--surface-popup .ec-panel-content > .dd-panel-divider {
@@ -188,6 +195,20 @@
   margin: 0;
 }
 
+.ec-panel--surface-popup .ec-panel-body:has(.ec-panel-page--start) {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.ec-panel-page--start {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+}
+
 .ec-panel-page-title {
   margin: 0 0 0.5rem;
   font-size: 1rem;
@@ -200,12 +221,39 @@
   text-align: center;
 }
 
+.ec-panel-page-divider {
+  margin: 0 0 0.5rem;
+}
+
 .ec-panel-page-text {
   margin: 0;
   font-size: 0.95rem;
   font-weight: 500;
   color: #6b7280;
   text-align: left;
+}
+
+.ec-panel-page--shortcuts {
+  width: 100%;
+}
+
+.ec-shortcuts-heading {
+  margin: 0.5rem 0 0;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  font-weight: 700;
+  color: #374151;
+}
+
+.ec-shortcuts-note {
+  margin: 0.2rem 0 0;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: #374151;
+}
+
+.ec-shortcuts-divider {
+  margin: 0.55rem 0 0.35rem;
 }
 
 /* Как в welcome: --welcome-gap (12px) между header и разделителем */
@@ -226,12 +274,19 @@
 
 .ec-panel--surface-popup .ec-panel-content .ec-panel-body {
   flex: 1 1 auto;
+  padding: 1rem 0.95rem;
+}
+
+.ec-panel--surface-popup .ec-panel-page-divider {
+  width: 100%;
 }
 
 .ec-start-instruction {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: center;
+  flex: 1 1 auto;
   gap: 0.12rem;
   margin: 0;
   text-align: center;
@@ -261,6 +316,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  flex: 1 1 auto;
   gap: 0.5rem;
   margin: 0;
   text-align: center;
@@ -361,23 +418,27 @@
   display: block;
 }
 
+.ec-shortcuts-steps,
 .ec-about-steps {
   margin: 0.2rem 0 0;
   padding-left: 1.15rem;
-  font-size: inherit;
-  line-height: inherit;
-  color: inherit;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: #374151;
   text-align: left;
 }
 
+.ec-shortcuts-steps li,
 .ec-about-steps li {
   margin-bottom: 0.2rem;
 }
 
+.ec-shortcuts-steps li:last-child,
 .ec-about-steps li:last-child {
   margin-bottom: 0;
 }
 
+.ec-shortcuts-step-press-grid,
 .ec-about-step-press-grid {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -385,22 +446,26 @@
   align-items: start;
 }
 
+.ec-shortcuts-step-press-label,
 .ec-about-step-press-label {
   grid-column: 1;
   grid-row: 1;
 }
 
+.ec-shortcuts-step-press-chords,
 .ec-about-step-press-chords {
   grid-column: 2;
   grid-row: 1;
   min-width: 0;
 }
 
+.ec-shortcuts-step-press-mac-label,
 .ec-about-step-press-mac-label {
   grid-column: 1;
   grid-row: 2;
 }
 
+.ec-shortcuts-step-press-mac-chords,
 .ec-about-step-press-mac-chords {
   grid-column: 2;
   grid-row: 2;

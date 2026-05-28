@@ -294,8 +294,16 @@ async function resolvePickModeTabId(
   return tab?.id;
 }
 
-function isPickModeMenuTab(tab: PanelPopupTab): tab is "settings" | "history" | "about" {
-  return tab === "settings" || tab === "history" || tab === "about";
+function isPickModeMenuTab(
+  tab: PanelPopupTab,
+): tab is "settings" | "history" | "shortcuts" | "language" | "about" {
+  return (
+    tab === "settings" ||
+    tab === "history" ||
+    tab === "shortcuts" ||
+    tab === "language" ||
+    tab === "about"
+  );
 }
 
 async function syncPickModeForPanelTab(

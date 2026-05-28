@@ -10,8 +10,19 @@ export type Strings = {
   startBodyAction: string;
   copiedTitle: string;
   copiedSubtitle: string;
+  pageSavedTitle: string;
   pageSettingsTitle: string;
   pageHistoryTitle: string;
+  tabShortcuts: string;
+  tabLanguage: string;
+  shortcutsRunStopHeading: string;
+  shortcutsStepPress: string;
+  shortcutsStepOnMac: string;
+  shortcutsStepRelease: string;
+  shortcutsStepThenPress: string;
+  shortcutsStopHeading: string;
+  shortcutsSafetyLine1: string;
+  shortcutsSafetyLine2: string;
   pagePlaceholderTodo: string;
   tabAbout: string;
   welcomePin: string;
@@ -19,11 +30,6 @@ export type Strings = {
   welcomePinStep2: string;
   welcomePinStep3: string;
   aboutBullets: readonly string[];
-  aboutHotkeyHeading: string;
-  aboutHotkeyStepPress: string;
-  aboutHotkeyStepOnMac: string;
-  aboutHotkeyStepRelease: string;
-  aboutHotkeyStepThenPress: string;
   aboutCopyright: string;
 };
 

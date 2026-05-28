@@ -7,8 +7,9 @@
 .ec-panel-divider,
 .dd-panel-divider {
   flex: 0 0 auto;
+  width: 90%;
   height: 1px;
-  margin-inline: 1.125rem;
+  margin-inline: auto;
   background: #012292;
 }
 

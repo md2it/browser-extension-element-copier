@@ -83,6 +83,8 @@ function lucideUiIcon(raw: string): string {
 
 export const ABOUT_BULLET_ICONS: readonly string[] = [
   lucideUiIcon(circlePowerSvg),
+  lucideUiIcon(keyboardSvg),
+  lucideUiIcon(filesSvg),
   lucideUiIcon(shieldCheckSvg),
   lucideUiIcon(shieldCheckSvg),
 ];

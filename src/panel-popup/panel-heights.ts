@@ -8,6 +8,7 @@ import {
   buildCopiedPanelBody,
   buildPlaceholderPanelBody,
   buildStartPanelBody,
+  buildShortcutsPanelBody,
   PANEL_BODY_CENTERED_CLASS,
 } from "./panel-body";
 
@@ -48,6 +49,9 @@ function fillPanelTabBody(body: HTMLDivElement, tab: PanelPopupTab, strings: Ret
     case "settings":
     case "history":
       buildPlaceholderPanelBody(body, tab, strings);
+      break;
+    case "shortcuts":
+      buildShortcutsPanelBody(body, strings);
       break;
     case "about":
       buildAboutPanelBody(body, strings);

@@ -7,8 +7,10 @@ import { bindDismissOnLeave, type DismissOnLeaveHandle } from "./dismiss-on-leav
 import {
   buildAboutPanelBody,
   buildCopiedPanelBody,
+  buildLanguagePanelBody,
   buildPlaceholderPanelBody,
   buildStartPanelBody,
+  buildShortcutsPanelBody,
   PANEL_BODY_CENTERED_CLASS,
 } from "./panel-body";
 import type { PanelMenuHandle } from "./panel-menu";
@@ -83,7 +85,7 @@ export class CopierPanelWindow {
 
     const strings = t(this.host.getLocale());
 
-    const centered = tab === "start" || tab === "copied";
+    const centered = tab === "start";
     this.body.classList.toggle(PANEL_BODY_CENTERED_CLASS, centered);
 
     switch (tab) {
@@ -96,6 +98,12 @@ export class CopierPanelWindow {
       case "settings":
       case "history":
         buildPlaceholderPanelBody(this.body, tab, strings);
+        break;
+      case "shortcuts":
+        buildShortcutsPanelBody(this.body, strings);
+        break;
+      case "language":
+        buildLanguagePanelBody(this.body, strings);
         break;
       case "about":
         buildAboutPanelBody(this.body, strings);

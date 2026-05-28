@@ -6,11 +6,16 @@ import {
   ABOUT_PREFIX_CHORD_WIN_DISPLAY,
 } from "../hotkeys/keys";
 import { PREFIX_ACTION_KEY } from "../hotkeys/commands";
-import { KEYBOARD } from "../icons";
 
 export const PANEL_BODY_CENTERED_CLASS = "ec-panel-body--centered";
 
 export type PlaceholderPanelTab = "settings" | "history";
+
+function createPageDivider(): HTMLDivElement {
+  const divider = document.createElement("div");
+  divider.className = "dd-panel-divider ec-panel-page-divider";
+  return divider;
+}
 
 function createAboutIcon(iconHtml: string): HTMLSpanElement {
   const mark = document.createElement("span");
@@ -27,62 +32,46 @@ function createKbd(text: string): HTMLElement {
   return kbd;
 }
 
-function buildAboutHotkeySteps(strings: Strings): HTMLOListElement {
+function buildShortcutsSteps(strings: Strings): HTMLOListElement {
   const steps = document.createElement("ol");
-  steps.className = "ec-about-steps";
+  steps.className = "ec-shortcuts-steps";
 
   const step1 = document.createElement("li");
-  step1.className = "ec-about-step--press";
+  step1.className = "ec-shortcuts-step--press";
 
   const pressGrid = document.createElement("div");
-  pressGrid.className = "ec-about-step-press-grid";
+  pressGrid.className = "ec-shortcuts-step-press-grid";
 
   const pressLabel = document.createElement("span");
-  pressLabel.className = "ec-about-step-press-label";
-  pressLabel.textContent = strings.aboutHotkeyStepPress;
+  pressLabel.className = "ec-shortcuts-step-press-label";
+  pressLabel.textContent = strings.shortcutsStepPress;
 
   const pressChords = document.createElement("div");
-  pressChords.className = "ec-about-step-press-chords";
+  pressChords.className = "ec-shortcuts-step-press-chords";
   pressChords.append(createKbd(ABOUT_PREFIX_CHORD_WIN_DISPLAY));
 
   const pressMacLabel = document.createElement("span");
-  pressMacLabel.className = "ec-about-step-press-mac-label";
-  pressMacLabel.textContent = strings.aboutHotkeyStepOnMac;
+  pressMacLabel.className = "ec-shortcuts-step-press-mac-label";
+  pressMacLabel.textContent = strings.shortcutsStepOnMac;
 
   const pressMacChords = document.createElement("div");
-  pressMacChords.className = "ec-about-step-press-mac-chords";
+  pressMacChords.className = "ec-shortcuts-step-press-mac-chords";
   pressMacChords.append(createKbd(ABOUT_PREFIX_CHORD_MAC_DISPLAY));
 
   pressGrid.append(pressLabel, pressChords, pressMacLabel, pressMacChords);
   step1.append(pressGrid);
 
   const step2 = document.createElement("li");
-  step2.textContent = strings.aboutHotkeyStepRelease;
+  step2.textContent = strings.shortcutsStepRelease;
 
   const step3 = document.createElement("li");
   step3.append(
-    document.createTextNode(`${strings.aboutHotkeyStepThenPress} `),
+    document.createTextNode(`${strings.shortcutsStepThenPress} `),
     createKbd(PREFIX_ACTION_KEY.toUpperCase()),
   );
 
   steps.append(step1, step2, step3);
   return steps;
-}
-
-function buildAboutHotkeyListItem(strings: Strings): HTMLLIElement {
-  const li = document.createElement("li");
-  li.className = "ec-about-item ec-about-item--hotkey";
-
-  const content = document.createElement("div");
-  content.className = "ec-about-hotkey-content";
-
-  const label = document.createElement("span");
-  label.className = "ec-about-text";
-  label.textContent = strings.aboutHotkeyHeading;
-
-  content.append(label, buildAboutHotkeySteps(strings));
-  li.append(createAboutIcon(KEYBOARD), content);
-  return li;
 }
 
 function createAboutCopyright(strings: Strings): HTMLAnchorElement {
@@ -101,6 +90,13 @@ function createAboutCopyright(strings: Strings): HTMLAnchorElement {
 export function buildStartPanelBody(body: HTMLDivElement, strings: Strings): void {
   body.replaceChildren();
 
+  const page = document.createElement("div");
+  page.className = "ec-panel-page ec-panel-page--start";
+
+  const title = document.createElement("h2");
+  title.className = "ec-panel-page-title";
+  title.textContent = strings.titleSettings.toUpperCase();
+
   const instruction = document.createElement("div");
   instruction.className = "ec-start-instruction";
 
@@ -113,7 +109,8 @@ export function buildStartPanelBody(body: HTMLDivElement, strings: Strings): voi
   action.textContent = strings.startBodyAction;
 
   instruction.append(lead, action);
-  body.append(instruction);
+  page.append(title, createPageDivider(), instruction);
+  body.append(page);
 }
 
 export function buildPlaceholderPanelBody(
@@ -135,7 +132,7 @@ export function buildPlaceholderPanelBody(
   text.className = "ec-panel-page-text";
   text.textContent = strings.pagePlaceholderTodo;
 
-  page.append(title, text);
+  page.append(title, createPageDivider(), text);
   body.append(page);
 }
 
@@ -165,13 +162,78 @@ export function buildAboutPanelBody(body: HTMLDivElement, strings: Strings): voi
     list.appendChild(li);
   }
 
-  list.appendChild(buildAboutHotkeyListItem(strings));
-  page.append(title, list, createAboutCopyright(strings));
+  page.append(title, createPageDivider(), list, createAboutCopyright(strings));
+  body.append(page);
+}
+
+export function buildShortcutsPanelBody(body: HTMLDivElement, strings: Strings): void {
+  body.replaceChildren();
+
+  const page = document.createElement("div");
+  page.className = "ec-panel-page ec-panel-page--shortcuts";
+
+  const title = document.createElement("h2");
+  title.className = "ec-panel-page-title";
+  title.textContent = strings.tabShortcuts;
+
+  const runStopHeading = document.createElement("p");
+  runStopHeading.className = "ec-shortcuts-heading";
+  runStopHeading.textContent = strings.shortcutsRunStopHeading;
+
+  const stopHeading = document.createElement("p");
+  stopHeading.className = "ec-shortcuts-heading";
+  stopHeading.append(
+    document.createTextNode(`${strings.shortcutsStopHeading} `),
+    createKbd("Esc"),
+  );
+
+  const divider = document.createElement("div");
+  divider.className = "dd-panel-divider ec-shortcuts-divider";
+
+  const safetyLine1 = document.createElement("p");
+  safetyLine1.className = "ec-shortcuts-note";
+  safetyLine1.textContent = strings.shortcutsSafetyLine1;
+
+  const safetyLine2 = document.createElement("p");
+  safetyLine2.className = "ec-shortcuts-note";
+  safetyLine2.textContent = strings.shortcutsSafetyLine2;
+
+  page.append(
+    title,
+    createPageDivider(),
+    runStopHeading,
+    buildShortcutsSteps(strings),
+    stopHeading,
+    divider,
+    safetyLine1,
+    safetyLine2,
+  );
+  body.append(page);
+}
+
+export function buildLanguagePanelBody(body: HTMLDivElement, strings: Strings): void {
+  body.replaceChildren();
+
+  const page = document.createElement("div");
+  page.className = "ec-panel-page";
+
+  const title = document.createElement("h2");
+  title.className = "ec-panel-page-title";
+  title.textContent = strings.tabLanguage;
+
+  page.append(title, createPageDivider());
   body.append(page);
 }
 
 export function buildCopiedPanelBody(body: HTMLDivElement, strings: Strings): void {
   body.replaceChildren();
+
+  const page = document.createElement("div");
+  page.className = "ec-panel-page ec-panel-page--saved";
+
+  const heading = document.createElement("h2");
+  heading.className = "ec-panel-page-title";
+  heading.textContent = strings.pageSavedTitle;
 
   const copied = document.createElement("div");
   copied.className = "ec-copied";
@@ -185,5 +247,6 @@ export function buildCopiedPanelBody(body: HTMLDivElement, strings: Strings): vo
   subtitle.textContent = strings.copiedSubtitle;
 
   copied.append(title, subtitle);
-  body.append(copied);
+  page.append(heading, createPageDivider(), copied);
+  body.append(page);
 }

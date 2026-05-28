@@ -106,10 +106,6 @@ U = user, E = extension
 - lucide files
 - Badge логика стандартная
 
-### Уведомления
-- Зелёный popup "Сохранено" (под иконкой расширения)
-- Не использует тостеры!
-
 ### Header
 - Стандартный, но адаптирован под данное расширение
 
@@ -126,11 +122,15 @@ U = user, E = extension
 - Пункты меню:
    - Без подписей, только lucide иконки
    - Список:
-      - files
-      - settings
-      - history
-      - info
+      - files // START
+      - globe // LANGUAGE
+      - settings // SETTINGS
+      - history // HISTORY
+      - keyboard // SHORTCUTS
+      - info // ABOUT
    - Tooltip на каждом пункте меню без задержек. Текст tooltip совпадает с названием страницы
+   - Отступы между элементами равны
+   - Отступы от гарниц самого элемента меню равны
 
 ### Popup окна
 - Для всех:
@@ -139,27 +139,37 @@ U = user, E = extension
       - Учесть, что в момент появления окно может быть не под курсором
       - Чтобы "увести" курсор с окна, сначала пользователь "наводит" на окно
    - Содержат меню
-   - Заголовки отцентрованы по горизонтали
+   - Заго
+   - Заголовки:
+      - Находятся сверху
+      - Отцентрованы по горизонтали
+      - Под заголовком разделительная черта
 - *START*
    - "To copy:"
    - "HOVER and CLICK"
    - Текст отцентрован и по вертикали, и по горизонтали
+- *LANGUAGE*
+   - Text: "TODO"
 - *SETTINGS*
-   - Title: "SETTINGS"
    - Text: "TODO"
 - *HISTORY*
-   - Title: "HISTORY"
    - Text: "TODO"
-- *ABOUT*
-   - Title: "ABOUT"
-   - <circle-power> On/Off with one click
-   - <shield-check> Doesn't use the network
-   - <shield-check> Doesn't collect data
-   - <keyboard> Hotkey:
+- *SHORTCUTS*
+   - To run / stop the extension: // bold line
       - 1. Press:  `Ctrl+Shift+X`
            On Mac: `Cmd+Shift+X`
       - 2. Release the keys
       - 3. Then press `C`
+   - To stop: `Esc` // bold line
+   - <разделительная черта>
+   - The 3-step shortcut is not obvious.
+   - But it is safer and avoids conflicts with other apps.
+- *ABOUT*
+   - <circle-power> On/Off with one click
+   - <keyboard> On/Off with shortcuts
+   - <files> Copy to clipboard
+   - <shield-check> Doesn't use the network
+   - <shield-check> Doesn't collect data
    - Внизу по центру "© Alex T", серая ссылка на https://www.linkedin.com/in/alex-terekhov/
 - *COPIED*
    - "Copied!". Крупный, зелёный, центрованный
@@ -170,3 +180,19 @@ U = user, E = extension
 
 ## НЕ ОБРАЩАТЬ ВНИМАНИЯ, НИЖЕ ЧЕРНОВИК
 
+- Save whole page
+- History
+- Clipboard
+- Word
+- PDF
+- JPG
+- PNG
+- markdown
+- element
+- outerHTML
+- selector
+- JS path
+- styles
+- XPath
+- full XPath
+- meta: weight, symbols, history
