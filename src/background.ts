@@ -30,10 +30,13 @@ import {
   openPanelFromSender,
   openStartPanelFromToolbar,
   PANEL_POPUP_PAGE,
+  type PanelMenuTab,
   type PanelPopupTab,
 } from "./panel-popup";
 import { readPanelTargetTabId } from "./panel-popup/panel-target-tab";
-import { ensureLocaleInStorage } from "./storage";
+import { isRtlLocale, t, type Locale } from "./i18n";
+import type { Strings } from "./i18n/types";
+import { ensureLocaleInStorage, getLocale } from "./storage";
 import { showWelcome, stopWelcomePinWatcher, watchWelcomePinStatus } from "./welcome";
 
 const TOGGLE_DEBOUNCE_MS = 80;
@@ -453,6 +456,110 @@ function getActiveCommandTab(): Promise<chrome.tabs.Tab | undefined> {
   });
 }
 
+const CONTEXT_MENU_LANGUAGE = "element-copier-language";
+const CONTEXT_MENU_SETTINGS = "element-copier-settings";
+const CONTEXT_MENU_HISTORY = "element-copier-history";
+const CONTEXT_MENU_SHORTCUTS = "element-copier-shortcuts";
+const CONTEXT_MENU_ABOUT = "element-copier-about";
+
+const ACTION_MENU_EMOJI = {
+  language: "🌐",
+  settings: "⚙️",
+  history: "🕘",
+  shortcuts: "⌨️",
+  about: "ℹ️",
+} as const;
+
+const CONTEXT_MENU_ITEMS: readonly {
+  id: string;
+  tab: PanelMenuTab;
+  emoji: string;
+  title: (strings: Strings) => string;
+}[] = [
+  {
+    id: CONTEXT_MENU_LANGUAGE,
+    tab: "language",
+    emoji: ACTION_MENU_EMOJI.language,
+    title: (strings) => strings.tabLanguage,
+  },
+  {
+    id: CONTEXT_MENU_SETTINGS,
+    tab: "settings",
+    emoji: ACTION_MENU_EMOJI.settings,
+    title: (strings) => strings.pageSettingsTitle,
+  },
+  {
+    id: CONTEXT_MENU_HISTORY,
+    tab: "history",
+    emoji: ACTION_MENU_EMOJI.history,
+    title: (strings) => strings.pageHistoryTitle,
+  },
+  {
+    id: CONTEXT_MENU_SHORTCUTS,
+    tab: "shortcuts",
+    emoji: ACTION_MENU_EMOJI.shortcuts,
+    title: (strings) => strings.tabShortcuts,
+  },
+  {
+    id: CONTEXT_MENU_ABOUT,
+    tab: "about",
+    emoji: ACTION_MENU_EMOJI.about,
+    title: (strings) => strings.tabAbout,
+  },
+];
+
+type ContextMenuCreateProps = chrome.contextMenus.CreateProperties;
+
+let ensureContextMenuChain: Promise<void> = Promise.resolve();
+
+function logContextMenuError(action: string, detail?: unknown): void {
+  const err = ext.runtime.lastError;
+  if (!err) return;
+  console.error(`[Element Copier] contextMenus.${action} failed:`, err.message, detail);
+}
+
+async function createContextMenuItem(props: ContextMenuCreateProps): Promise<void> {
+  await new Promise<void>((resolve) => {
+    ext.contextMenus.create(props, () => {
+      logContextMenuError("create", props);
+      resolve();
+    });
+  });
+}
+
+function actionMenuTitle(title: string, emoji: string, locale: Locale): string {
+  // RTL labels + leading LTR emoji reorder inconsistently in native menus (bidi).
+  return isRtlLocale(locale) ? `${title} ${emoji}` : `${emoji} ${title}`;
+}
+
+async function ensureContextMenu(): Promise<void> {
+  ensureContextMenuChain = ensureContextMenuChain.then(async () => {
+    const locale = await getLocale();
+    const strings = t(locale);
+
+    await new Promise<void>((resolve) => {
+      ext.contextMenus.removeAll(() => {
+        logContextMenuError("removeAll");
+        resolve();
+      });
+    });
+
+    for (const item of CONTEXT_MENU_ITEMS) {
+      await createContextMenuItem({
+        id: item.id,
+        title: actionMenuTitle(item.title(strings), item.emoji, locale),
+        contexts: ["action", "browser_action"],
+      });
+    }
+  });
+
+  await ensureContextMenuChain;
+}
+
+function findContextMenuTab(menuItemId: string | number): PanelMenuTab | undefined {
+  return CONTEXT_MENU_ITEMS.find((item) => item.id === menuItemId)?.tab;
+}
+
 ext.action.onClicked.addListener((tab) => {
   if (tab.id === undefined) return;
   if (shouldSuppressToolbarClickAfterHotkeyCommand()) {
@@ -472,6 +579,15 @@ registerPrefixHintOperabilityListeners({
   canOperateOnTab,
   onBlockedOnTab: (tabId, windowId) =>
     showBlockedPageFeedback(tabId, windowId, "prefixHint"),
+});
+
+ext.contextMenus.onClicked.addListener((info, tab) => {
+  const panelTab = findContextMenuTab(info.menuItemId);
+  if (panelTab === undefined) return;
+  void (async () => {
+    await syncPickModeForPanelTab(panelTab, { tab });
+    openPanelFromSender(panelTab, tab);
+  })();
 });
 
 ext.runtime.onMessage.addListener(
@@ -566,12 +682,16 @@ ext.storage.onChanged.addListener((changes, area) => {
   if (changes.notificationSeconds || changes.locale) {
     void refreshRestrictedNoticeCache();
   }
+  if (changes.locale) {
+    void ensureContextMenu();
+  }
 });
 
 const onBootstrap = async (): Promise<void> => {
   await ensureLocaleInStorage();
   await refreshRestrictedNoticeCache();
   await bootstrapToolbarIcons();
+  await ensureContextMenu();
 };
 
 void ext.runtime.onInstalled.addListener((details) => {
