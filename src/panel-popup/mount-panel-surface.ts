@@ -20,6 +20,7 @@ export async function mountPanelSurface(
   { hostStyle, surface }: PanelMountSurface,
 ): Promise<void> {
   let locale: Locale = "en";
+  let closeNotified = false;
 
   const { host, shadow } = mountPanelShadowHost({
     rootId: PANEL_POPUP_ROOT_ID,
@@ -31,18 +32,42 @@ export async function mountPanelSurface(
 
   locale = await getLocale();
 
+  const notifyClosedOnce = (): void => {
+    if (closeNotified) return;
+    closeNotified = true;
+    notifyPanelClosed();
+  };
+
   const panelWindow = new CopierPanelWindow({
     shadow,
     surface,
-    onClose: () => window.close(),
+    onClose: () => {
+      notifyClosedOnce();
+      window.close();
+    },
     getLocale: () => locale,
   });
 
   panelWindow.openPanel(initialTab);
   window.addEventListener(
+    "blur",
+    () => {
+      notifyClosedOnce();
+    },
+    { once: true },
+  );
+  document.addEventListener(
+    "visibilitychange",
+    () => {
+      if (document.visibilityState !== "hidden") return;
+      notifyClosedOnce();
+    },
+    { once: true },
+  );
+  window.addEventListener(
     "pagehide",
     () => {
-      notifyPanelClosed();
+      notifyClosedOnce();
     },
     { once: true },
   );

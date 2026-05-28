@@ -133,7 +133,6 @@ U = user, E = extension
 
 ### Приветственное окно
 - Cтандартное
-- Текст копируем из ABOUT, но без хоткеев
 
 ### Вертикальное меню
 - Вёрстка:
@@ -161,7 +160,6 @@ U = user, E = extension
       - Учесть, что в момент появления окно может быть не под курсором
       - Чтобы "увести" курсор с окна, сначала пользователь "наводит" на окно
    - Содержат меню
-   - Заго
    - Заголовки:
       - Находятся сверху
       - Отцентрованы по горизонтали
@@ -192,7 +190,10 @@ U = user, E = extension
    - <files> Copy to clipboard
    - <shield-check> Doesn't use the network
    - <shield-check> Doesn't collect data
-   - Внизу по центру "© Alex T", серая ссылка на https://www.linkedin.com/in/alex-terekhov/
+   - Внизу по центру подпись
+      - "Element-Deleter © Alex T"
+      - Всё серое, одного цвета
+      - Подстрока "Alex T" = ссылка на https://www.linkedin.com/in/alex-terekhov/ , underline
 - *COPIED*
    - "Copied!". Крупный, зелёный, центрованный
    - "Saved to your clipboard". Просто центрованный, обычный
