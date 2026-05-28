@@ -9,3 +9,11 @@ export function notifyPanelTabChanged(tab: PanelPopupTab): void {
     /* extension reloaded */
   });
 }
+
+/** Notify background that popup/panel is closed. */
+export function notifyPanelClosed(): void {
+  const msg: ContentToBg = { type: "PANEL_CLOSED" };
+  void ext.runtime.sendMessage(msg).catch(() => {
+    /* extension reloaded */
+  });
+}

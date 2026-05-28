@@ -14,7 +14,7 @@ import {
   PANEL_BODY_CENTERED_CLASS,
 } from "./panel-body";
 import type { PanelMenuHandle } from "./panel-menu";
-import { notifyPanelTabChanged } from "./lifecycle";
+import { notifyPanelClosed, notifyPanelTabChanged } from "./lifecycle";
 
 export type CopierPanelHost = {
   shadow: ShadowRoot;
@@ -73,6 +73,7 @@ export class CopierPanelWindow {
     );
     if (!panelRoots.length) return;
     panelRoots.forEach((node) => node.remove());
+    notifyPanelClosed();
     this.host.onClose?.();
   }
 

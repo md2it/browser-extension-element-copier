@@ -7,6 +7,7 @@ export type ContentToBg =
   | { type: "ACTIVE_CHANGED"; active: boolean }
   | { type: "OPEN_PANEL"; tab: "start" | "copied" }
   | { type: "PANEL_TAB_CHANGED"; tab: PanelPopupTab }
+  | { type: "PANEL_CLOSED" }
   | { type: "WATCH_PIN_STATUS" }
   | { type: "TOGGLE_REQUEST" }
   | {
