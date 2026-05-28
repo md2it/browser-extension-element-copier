@@ -1,19 +1,21 @@
-import circlePowerSvg from "../icons/circle-power.svg";
-import filesSvg from "../icons/files.svg";
-import keyboardSvg from "../icons/keyboard.svg";
-import shieldCheckSvg from "../icons/shield-check.svg";
+import filesSvg from "../../lib/icons/lucide/files.svg";
 
 export {
   ARROW_UP,
   COG,
+  CIRCLE_POWER,
   FILES,
   HEART,
   HISTORY,
   INFO,
+  KEYBOARD,
   PIN,
   PUZZLE,
   SETTINGS,
+  SHIELD_CHECK,
 } from "../../lib/src/icons";
+
+import { CIRCLE_POWER, FILES, KEYBOARD, SHIELD_CHECK } from "../../lib/src/icons";
 
 const INACTIVE_BG = "#012292";
 const ACTIVE_BG = INACTIVE_BG;
@@ -77,19 +79,13 @@ function drawInnerSvg(
 
 const filesInner = innerSvgMarkup(stripComment(filesSvg));
 
-function lucideUiIcon(raw: string): string {
-  return stripComment(raw);
-}
-
 export const ABOUT_BULLET_ICONS: readonly string[] = [
-  lucideUiIcon(circlePowerSvg),
-  lucideUiIcon(keyboardSvg),
-  lucideUiIcon(filesSvg),
-  lucideUiIcon(shieldCheckSvg),
-  lucideUiIcon(shieldCheckSvg),
+  CIRCLE_POWER,
+  KEYBOARD,
+  FILES,
+  SHIELD_CHECK,
+  SHIELD_CHECK,
 ];
-
-export const KEYBOARD = lucideUiIcon(keyboardSvg);
 
 export type ToolbarIconVariant = "inactive" | "active";
 
