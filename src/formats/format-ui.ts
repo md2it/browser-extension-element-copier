@@ -134,7 +134,6 @@ function createFormatActionButton(
 
 export type CopiedOtherOptionsOptions = {
   enabledFormats: EnabledFormatsMap;
-  excludeFormatId?: CopyFormatId;
   onCopyFormat: (formatId: CopyFormatId) => void;
   onOpenSettings?: () => void;
 };
@@ -155,7 +154,6 @@ export function createCopiedOtherOptionsRow(
 
   for (const format of COPY_FORMATS) {
     if (!options.enabledFormats[format.id]) continue;
-    if (options.excludeFormatId === format.id) continue;
     row.append(createFormatActionButton(format, strings, options.onCopyFormat));
   }
 

@@ -361,7 +361,6 @@ export function buildCopiedPanelBody(
 
     const otherOptions = createCopiedOtherOptionsRow(strings, {
       enabledFormats,
-      excludeFormatId: lastCopiedFormatId,
       onCopyFormat: (formatId) => {
         notifyCopyPickedFormat(formatId);
       },
