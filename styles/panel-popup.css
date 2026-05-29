@@ -332,12 +332,9 @@
   transform: translateY(1px);
 }
 
-.ec-skip-start-toggle {
+.ec-panel-page--start .ec-skip-start-toggle {
   margin-top: auto;
   padding-top: 0.75rem;
-}
-
-.ec-panel-page--start .ec-skip-start-toggle {
   justify-content: center;
 }
 
@@ -348,7 +345,7 @@
 }
 
 .ec-panel-page--settings .ec-skip-start-toggle {
-  margin-top: 1rem;
+  margin-top: 0.85rem;
 }
 
 .ec-format-field {
@@ -399,6 +396,10 @@
   font-weight: 600;
   line-height: 1.2;
   color: #1f2937;
+}
+
+.ec-panel-page--settings .ec-panel-page-title + .ec-panel-page-divider {
+  margin-top: 0;
 }
 
 .ec-panel-page--settings .ec-panel-page-divider {
@@ -561,6 +562,7 @@
   line-height: 1.2;
   color: #1f2937;
   text-align: start;
+  cursor: pointer;
 }
 
 .ec-toggle {

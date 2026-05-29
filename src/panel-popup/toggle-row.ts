@@ -1,3 +1,5 @@
+let toggleRowIdCounter = 0;
+
 export function createToggleRow(
   labelText: string,
   enabled: boolean,
@@ -6,16 +8,18 @@ export function createToggleRow(
   const row = document.createElement("div");
   row.className = "ec-toggle-row";
 
-  const label = document.createElement("span");
-  label.className = "ec-toggle-label";
-  label.textContent = labelText;
-
   const toggle = document.createElement("button");
   toggle.type = "button";
   toggle.className = "ec-toggle";
+  toggle.id = `ec-toggle-${++toggleRowIdCounter}`;
   toggle.setAttribute("role", "switch");
   toggle.setAttribute("aria-checked", enabled ? "true" : "false");
   toggle.setAttribute("aria-label", labelText);
+
+  const label = document.createElement("label");
+  label.className = "ec-toggle-label";
+  label.htmlFor = toggle.id;
+  label.textContent = labelText;
 
   const sync = (on: boolean): void => {
     toggle.classList.toggle("is-on", on);

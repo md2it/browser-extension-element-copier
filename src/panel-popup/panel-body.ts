@@ -27,18 +27,18 @@ export type StartPanelActions = {
   onStart: () => void;
 };
 
-function appendSkipStartToggle(page: HTMLElement, strings: Strings, before?: Node | null): void {
+function createSkipStartToggleRow(strings: Strings, enabled: boolean): HTMLElement {
+  const row = createToggleRow(strings.skipStartPageToggleLabel, enabled, (next) => {
+    void setSkipStartPage(next);
+  });
+  row.classList.add("ec-skip-start-toggle");
+  return row;
+}
+
+function appendSkipStartToggle(page: HTMLElement, strings: Strings): void {
   void (async () => {
     const enabled = await getSkipStartPage();
-    const row = createToggleRow(strings.skipStartPageToggleLabel, enabled, (next) => {
-      void setSkipStartPage(next);
-    });
-    row.classList.add("ec-skip-start-toggle");
-    if (before) {
-      page.insertBefore(row, before);
-    } else {
-      page.append(row);
-    }
+    page.append(createSkipStartToggleRow(strings, enabled));
   })();
 }
 
@@ -188,30 +188,31 @@ export function buildStartPanelBody(
 export function buildSettingsPanelBody(body: HTMLDivElement, strings: Strings): void {
   body.replaceChildren();
 
-  const page = document.createElement("div");
-  page.className = "ec-panel-page ec-panel-page--settings";
-
-  const title = document.createElement("h2");
-  title.className = "ec-panel-page-title";
-  title.textContent = strings.pageSettingsTitle;
-
-  page.append(title, createPageDivider());
-  body.append(page);
-
   void (async () => {
-    const [clipboardDefaultFormat, copiedPageOptions] = await Promise.all([
+    const [clipboardDefaultFormat, copiedPageOptions, skipStartEnabled] = await Promise.all([
       createClipboardDefaultFormatSelect(strings),
       createCopiedPageOptionsSection(strings),
+      getSkipStartPage(),
     ]);
-    const dividerBeforeClipboard = createPageDivider();
-    appendSkipStartToggle(page, strings, dividerBeforeClipboard);
+
+    const page = document.createElement("div");
+    page.className = "ec-panel-page ec-panel-page--settings";
+
+    const title = document.createElement("h2");
+    title.className = "ec-panel-page-title";
+    title.textContent = strings.pageSettingsTitle;
+
     page.append(
-      dividerBeforeClipboard,
+      title,
+      createPageDivider(),
+      createSkipStartToggleRow(strings, skipStartEnabled),
+      createPageDivider(),
       clipboardDefaultFormat,
       createPageDivider(),
       copiedPageOptions,
       createPageDivider(),
     );
+    body.append(page);
   })();
 }
 
