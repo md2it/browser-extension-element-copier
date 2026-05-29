@@ -8,8 +8,18 @@ export type Strings = {
   titleSettings: string;
   startButtonLabel: string;
   skipStartPageToggleLabel: string;
+  settingsClipboardDefaultFormatLabel: string;
+  settingsFormatsGroupLabel: string;
+  formatOuterHtml: string;
+  formatSelector: string;
+  formatJsPath: string;
+  formatStyles: string;
+  formatXPath: string;
+  formatFullXPath: string;
   copiedTitle: string;
   copiedSubtitle: string;
+  copiedSettingsHint: string;
+  copiedFormatsGroupLabel: string;
   pageSavedTitle: string;
   pageSettingsTitle: string;
   pageHistoryTitle: string;

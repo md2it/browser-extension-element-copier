@@ -1,4 +1,9 @@
 import { buildAboutListItems } from "../about";
+import {
+  createClipboardDefaultFormatSelect,
+  createFormatActionButtonList,
+  createFormatChipList,
+} from "../formats/format-ui";
 import type { Strings } from "../i18n";
 import { PANEL_FOOTER_LINKEDIN_URL } from "../../../lib/src/panel-footer/constants";
 import {
@@ -182,6 +187,7 @@ export function buildSettingsPanelBody(body: HTMLDivElement, strings: Strings): 
 
   page.append(title, createPageDivider());
   appendSkipStartToggle(page, strings);
+  page.append(createClipboardDefaultFormatSelect(strings), createFormatChipList(strings));
   body.append(page);
 }
 
@@ -314,7 +320,13 @@ export function buildCopiedPanelBody(body: HTMLDivElement, strings: Strings): vo
   subtitle.className = "ec-copied-subtitle";
   subtitle.textContent = strings.copiedSubtitle;
 
-  copied.append(title, subtitle);
+  const actions = createFormatActionButtonList(strings);
+
+  const hint = document.createElement("p");
+  hint.className = "ec-copied-settings-hint";
+  hint.textContent = strings.copiedSettingsHint;
+
+  copied.append(title, subtitle, actions, hint);
   page.append(heading, createPageDivider(), copied);
   body.append(page);
 }
