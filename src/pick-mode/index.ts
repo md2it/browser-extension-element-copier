@@ -1,10 +1,6 @@
+export { copyElementFormatToClipboard } from "../element-copy";
+export { copyElementWithFormat } from "./copy-element";
 export {
-  copyElementFormatToClipboard,
-  copyElementToClipboard,
-  copyElementWithFormat,
-} from "./copy-element";
-export {
-  clearLastPickedElement,
   getLastPickedElement,
   storeLastPickedElement,
 } from "./last-picked-element";

@@ -11,7 +11,3 @@ export function getLastPickedElement(): Element | null {
   }
   return lastPickedElement;
 }
-
-export function clearLastPickedElement(): void {
-  lastPickedElement = null;
-}
