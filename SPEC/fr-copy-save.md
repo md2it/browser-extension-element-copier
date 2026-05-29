@@ -46,7 +46,7 @@
 
 ## ДОСТУПНЫЕ ФОРМАТЫ
 
-### Только для копирования
+### Всякие devtools, только для копирования
 - ✅ outerHTML
 - ✅ selector
 - ✅ JS path
@@ -54,3 +54,14 @@
 - ✅ computed styles
 - ✅ XPath
 - ✅ full XPath
+
+### Форматированные тексты для копирования
+- Text // Текст элемента без тегов, с форматированием для GoogleDocs / Word
+- Markdown
+
+### Файлы
+- Word
+- PDF
+- PNG
+- JPEG
+
