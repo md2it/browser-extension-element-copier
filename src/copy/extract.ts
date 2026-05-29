@@ -1,6 +1,7 @@
 import { getCssSelector } from "../../../lib/src/copy/selector";
 import { getJsPath } from "../../../lib/src/copy/js-path";
-import { getElementStyles } from "../../../lib/src/copy/styles";
+import { getElementComputedStyles } from "../../../lib/src/copy/styles-computed";
+import { getElementDeclaredStyles } from "../../../lib/src/copy/styles-declared";
 import { getFullXPath, getXPath } from "../../../lib/src/copy/xpath";
 
 export function getOuterHtml(element: Element): string {
@@ -15,8 +16,10 @@ export function extractElementCopyText(element: Element, format: string): string
       return getCssSelector(element);
     case "jsPath":
       return getJsPath(element);
-    case "styles":
-      return getElementStyles(element);
+    case "computedStyles":
+      return getElementComputedStyles(element);
+    case "declaredStyles":
+      return getElementDeclaredStyles(element);
     case "xpath":
       return getXPath(element);
     case "fullXPath":

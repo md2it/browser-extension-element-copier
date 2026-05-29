@@ -13,7 +13,8 @@ export type Strings = {
   formatOuterHtml: string;
   formatSelector: string;
   formatJsPath: string;
-  formatStyles: string;
+  formatComputedStyles: string;
+  formatDeclaredStyles: string;
   formatXPath: string;
   formatFullXPath: string;
   copiedTitle: string;

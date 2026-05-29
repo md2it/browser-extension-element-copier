@@ -42,9 +42,10 @@
 ## ДОСТУПНЫЕ ФОРМАТЫ
 
 ### Только для копирования
-- outerHTML
-- selector
-- JS path
-- styles
-- XPath
-- full XPath
+- ✅ outerHTML
+- ✅ selector
+- ✅ JS path
+- ✅ declared styles
+- ✅ computed styles
+- ✅ XPath
+- ✅ full XPath

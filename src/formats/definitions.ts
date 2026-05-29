@@ -7,7 +7,8 @@ export type CopyFormatId =
   | "outerHTML"
   | "selector"
   | "jsPath"
-  | "styles"
+  | "computedStyles"
+  | "declaredStyles"
   | "xpath"
   | "fullXPath";
 
@@ -35,8 +36,13 @@ export const COPY_FORMATS: readonly FormatDefinition[] = [
     actionIcon: "copy",
   },
   {
-    id: "styles",
-    label: (s) => s.formatStyles,
+    id: "computedStyles",
+    label: (s) => s.formatComputedStyles,
+    actionIcon: "copy",
+  },
+  {
+    id: "declaredStyles",
+    label: (s) => s.formatDeclaredStyles,
     actionIcon: "copy",
   },
   {
