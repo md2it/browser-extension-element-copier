@@ -1,5 +1,6 @@
 import type { Strings } from "../i18n";
 import {
+  CLIPBOARD_DEFAULT_NOTHING,
   getClipboardDefaultFormat,
   getEnabledFormats,
   setClipboardDefaultFormat,
@@ -88,17 +89,28 @@ export async function createCopiedPageOptionsSection(strings: Strings): Promise<
 export async function createClipboardDefaultFormatSelect(strings: Strings): Promise<HTMLElement> {
   const selectedFormatId = await getClipboardDefaultFormat();
 
-  const field = document.createElement("div");
-  field.className = "ec-format-field";
+  const row = document.createElement("div");
+  row.className = "ec-copy-default-row";
 
   const label = document.createElement("label");
-  label.className = "ec-format-field-label";
+  label.className = "ec-copy-default-label";
   label.htmlFor = "ec-clipboard-default-format";
-  label.textContent = strings.settingsClipboardDefaultFormatLabel;
+  label.textContent = strings.settingsCopyDefaultLabel;
 
   const select = document.createElement("select");
   select.id = "ec-clipboard-default-format";
-  select.className = "ec-format-select";
+  select.className = "ec-copy-default-select";
+
+  const syncNothingSelectedStyle = (): void => {
+    select.classList.toggle("ec-copy-default-select--nothing", select.value === CLIPBOARD_DEFAULT_NOTHING);
+  };
+
+  const nothingOption = document.createElement("option");
+  nothingOption.className = "ec-copy-default-option-nothing";
+  nothingOption.value = CLIPBOARD_DEFAULT_NOTHING;
+  nothingOption.textContent = strings.settingsCopyDefaultNothing;
+  nothingOption.selected = selectedFormatId === CLIPBOARD_DEFAULT_NOTHING;
+  select.append(nothingOption);
 
   for (const format of COPY_FORMATS) {
     const option = document.createElement("option");
@@ -108,13 +120,20 @@ export async function createClipboardDefaultFormatSelect(strings: Strings): Prom
     select.append(option);
   }
 
+  syncNothingSelectedStyle();
+
   select.addEventListener("change", () => {
-    const formatId = select.value as CopyFormatId;
-    void setClipboardDefaultFormat(formatId);
+    syncNothingSelectedStyle();
+    const value = select.value;
+    if (value === CLIPBOARD_DEFAULT_NOTHING) {
+      void setClipboardDefaultFormat(CLIPBOARD_DEFAULT_NOTHING);
+      return;
+    }
+    void setClipboardDefaultFormat(value as CopyFormatId);
   });
 
-  field.append(label, select);
-  return field;
+  row.append(label, select);
+  return row;
 }
 
 function createFormatActionButton(

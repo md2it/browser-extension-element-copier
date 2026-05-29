@@ -8,7 +8,8 @@ export type Strings = {
   titleSettings: string;
   startButtonLabel: string;
   skipStartPageToggleLabel: string;
-  settingsClipboardDefaultFormatLabel: string;
+  settingsCopyDefaultLabel: string;
+  settingsCopyDefaultNothing: string;
   settingsFormatsGroupLabel: string;
   formatOuterHtml: string;
   formatSelector: string;

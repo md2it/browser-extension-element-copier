@@ -70,7 +70,7 @@ function requestToggle(): void {
   sendToBackground({ type: "TOGGLE_REQUEST" });
 }
 
-function requestCopiedPanel(formatId: CopyFormatId): void {
+function requestCopiedPanel(formatId: CopyFormatId | null): void {
   sendToBackground({ type: "OPEN_PANEL", tab: "copied", formatId });
 }
 
@@ -149,19 +149,25 @@ function attachMessageHandler(state: ContentState): void {
       await refreshFormatSettingsCache();
       snapshotPickCopyCache(element, getCachedEnabledFormats());
 
-      const formatId = getCachedClipboardDefaultFormat();
-      const defaultText = getCachedCopyText(formatId);
-      if (defaultText !== undefined) {
-        const copied = await copyTextToClipboard(defaultText);
-        if (!copied) {
-          console.warn("[Element Copier] clipboard copy failed");
+      const defaultFormatId = getCachedClipboardDefaultFormat();
+      let copiedFormatId: CopyFormatId | null = null;
+
+      if (defaultFormatId !== null) {
+        const defaultText = getCachedCopyText(defaultFormatId);
+        if (defaultText !== undefined) {
+          const copied = await copyTextToClipboard(defaultText);
+          if (copied) {
+            copiedFormatId = defaultFormatId;
+          } else {
+            console.warn("[Element Copier] clipboard copy failed");
+          }
+        } else {
+          console.warn("[Element Copier] default format not cached (disabled?)");
         }
-      } else {
-        console.warn("[Element Copier] default format not cached (disabled?)");
       }
 
       notifyElementPicked(element);
-      requestCopiedPanel(formatId);
+      requestCopiedPanel(copiedFormatId);
     } finally {
       pickCopyInFlight = false;
     }

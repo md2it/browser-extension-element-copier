@@ -51,12 +51,27 @@ export async function setFormatEnabled(
   await ext.storage.local.set({ [ENABLED_FORMATS_KEY]: current });
 }
 
-export async function getClipboardDefaultFormat(): Promise<CopyFormatId> {
+export const CLIPBOARD_DEFAULT_NOTHING = "nothing";
+
+export type ClipboardDefaultFormatId = CopyFormatId | typeof CLIPBOARD_DEFAULT_NOTHING;
+
+export function isActiveCopyDefault(
+  formatId: ClipboardDefaultFormatId,
+): formatId is CopyFormatId {
+  return formatId !== CLIPBOARD_DEFAULT_NOTHING;
+}
+
+export async function getClipboardDefaultFormat(): Promise<ClipboardDefaultFormatId> {
   const data = await ext.storage.local.get(CLIPBOARD_DEFAULT_FORMAT_KEY);
   const raw = data[CLIPBOARD_DEFAULT_FORMAT_KEY];
+  if (raw === CLIPBOARD_DEFAULT_NOTHING) {
+    return CLIPBOARD_DEFAULT_NOTHING;
+  }
   return normalizeCopyFormatId(raw) ?? DEFAULT_CLIPBOARD_FORMAT_ID;
 }
 
-export async function setClipboardDefaultFormat(formatId: CopyFormatId): Promise<void> {
+export async function setClipboardDefaultFormat(
+  formatId: ClipboardDefaultFormatId,
+): Promise<void> {
   await ext.storage.local.set({ [CLIPBOARD_DEFAULT_FORMAT_KEY]: formatId });
 }

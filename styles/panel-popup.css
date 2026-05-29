@@ -348,6 +348,56 @@
   margin-top: 0.85rem;
 }
 
+.ec-copy-default-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-width: 0;
+  margin-top: 0.85rem;
+}
+
+.ec-copy-default-label {
+  flex: 0 0 auto;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #1f2937;
+  white-space: nowrap;
+}
+
+.ec-copy-default-select {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 0.45rem;
+  background: #fff;
+  color: #1f2937;
+  font: inherit;
+  font-size: 0.82rem;
+  line-height: 1.25;
+  cursor: pointer;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ec-copy-default-select:focus-visible {
+  outline: 2px solid #012292;
+  outline-offset: 1px;
+}
+
+.ec-copy-default-select--nothing {
+  color: #6b7280;
+}
+
+.ec-copy-default-select option.ec-copy-default-option-nothing {
+  color: #6b7280;
+}
+
 .ec-format-field {
   display: flex;
   flex-direction: column;

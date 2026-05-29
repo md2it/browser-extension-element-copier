@@ -11,7 +11,7 @@ export type BgToContent =
 export type ContentToBg =
   | { type: "ACTIVE_CHANGED"; active: boolean }
   | { type: "OPEN_PANEL"; tab: "start" }
-  | { type: "OPEN_PANEL"; tab: "copied"; formatId: CopyFormatId }
+  | { type: "OPEN_PANEL"; tab: "copied"; formatId: CopyFormatId | null }
   | { type: "PANEL_TAB_CHANGED"; tab: PanelPopupTab }
   | { type: "PANEL_CLOSED" }
   | { type: "REQUEST_START_PICK_MODE" }

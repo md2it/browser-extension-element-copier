@@ -1,5 +1,5 @@
 import { ext } from "../api";
-import { DEFAULT_CLIPBOARD_FORMAT_ID, type CopyFormatId } from "../formats/definitions";
+import type { CopyFormatId } from "../formats/definitions";
 import {
   CLIPBOARD_DEFAULT_FORMAT_KEY,
   ENABLED_FORMATS_KEY,
@@ -8,24 +8,26 @@ import {
   defaultEnabledFormats,
   getClipboardDefaultFormat,
   getEnabledFormats,
+  isActiveCopyDefault,
   type EnabledFormatsMap,
 } from "./format-settings";
 
 let cachedEnabledFormats: EnabledFormatsMap = defaultEnabledFormats();
-let cachedDefaultFormat: CopyFormatId = DEFAULT_CLIPBOARD_FORMAT_ID;
+let cachedDefaultFormat: CopyFormatId | null = null;
 let bound = false;
 
 export function getCachedEnabledFormats(): EnabledFormatsMap {
   return cachedEnabledFormats;
 }
 
-export function getCachedClipboardDefaultFormat(): CopyFormatId {
+export function getCachedClipboardDefaultFormat(): CopyFormatId | null {
   return cachedDefaultFormat;
 }
 
 export async function refreshFormatSettingsCache(): Promise<void> {
   cachedEnabledFormats = await getEnabledFormats();
-  cachedDefaultFormat = await getClipboardDefaultFormat();
+  const stored = await getClipboardDefaultFormat();
+  cachedDefaultFormat = isActiveCopyDefault(stored) ? stored : null;
 }
 
 export function bindFormatSettingsCache(): void {

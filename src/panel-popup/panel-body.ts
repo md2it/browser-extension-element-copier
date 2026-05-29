@@ -340,8 +340,6 @@ export function buildCopiedPanelBody(
       getEnabledFormats(),
       getLastCopiedFormat(),
     ]);
-    const savedFormat =
-      COPY_FORMATS.find((format) => format.id === lastCopiedFormatId) ?? COPY_FORMATS[0];
 
     const page = document.createElement("div");
     page.className = "ec-panel-page ec-panel-page--copied";
@@ -350,19 +348,25 @@ export function buildCopiedPanelBody(
     title.className = "ec-copied-title";
     title.textContent = strings.copiedTitle;
 
-    const savedMessage = document.createElement("p");
-    savedMessage.className = "ec-copied-saved-message";
-    const [savedMessageBefore, savedMessageAfter] =
-      strings.copiedSavedMessage.split("{format}");
-    const savedFormatName = document.createElement("strong");
-    savedFormatName.textContent = savedFormat.label(strings);
-    if (savedMessageBefore) savedMessage.append(savedMessageBefore);
-    savedMessage.append(savedFormatName);
-    if (savedMessageAfter) savedMessage.append(savedMessageAfter);
-
     const header = document.createElement("div");
     header.className = "ec-copied-header";
-    header.append(title, savedMessage);
+    header.append(title);
+
+    if (lastCopiedFormatId !== null) {
+      const savedFormat = COPY_FORMATS.find((format) => format.id === lastCopiedFormatId);
+      if (savedFormat) {
+        const savedMessage = document.createElement("p");
+        savedMessage.className = "ec-copied-saved-message";
+        const [savedMessageBefore, savedMessageAfter] =
+          strings.copiedSavedMessage.split("{format}");
+        const savedFormatName = document.createElement("strong");
+        savedFormatName.textContent = savedFormat.label(strings);
+        if (savedMessageBefore) savedMessage.append(savedMessageBefore);
+        savedMessage.append(savedFormatName);
+        if (savedMessageAfter) savedMessage.append(savedMessageAfter);
+        header.append(savedMessage);
+      }
+    }
 
     const divider = createPageDivider();
     divider.classList.add("ec-copied-divider");
