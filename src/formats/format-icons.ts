@@ -15,7 +15,7 @@ const FORMAT_ACTION_ICONS: Record<FormatActionIconId, string> = {
   "image-down": IMAGE_DOWN,
 };
 
-export function formatActionIconSvg(iconId: FormatActionIconId): string {
+function formatActionIconSvg(iconId: FormatActionIconId): string {
   return FORMAT_ACTION_ICONS[iconId];
 }
 

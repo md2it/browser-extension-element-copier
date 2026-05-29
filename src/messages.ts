@@ -32,4 +32,8 @@ export const START_HOTKEY_ENABLED_KEY = "startHotkeyEnabled";
 export const ESC_HOTKEY_ENABLED_KEY = "escHotkeyEnabled";
 /** Default off — pick mode starts from START button unless enabled. */
 export const SKIP_START_PAGE_KEY = "skipStartPage";
+/** Per-format enable flags for SETTINGS chips and COPIED buttons. */
+export const ENABLED_FORMATS_KEY = "enabledFormats";
+/** Default format saved to clipboard on copy (SETTINGS dropdown). */
+export const CLIPBOARD_DEFAULT_FORMAT_KEY = "clipboardDefaultFormat";
 export const DEFAULT_NOTIFICATION_SECONDS = 4;

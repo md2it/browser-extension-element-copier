@@ -461,15 +461,6 @@
   height: 0.95rem;
 }
 
-.ec-format-action-list {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.45rem;
-  width: 100%;
-  margin-top: 0.65rem;
-}
-
 .ec-format-action-btn {
   display: inline-flex;
   align-items: center;

@@ -1,7 +1,13 @@
 import type { Strings } from "../i18n";
 import {
+  getClipboardDefaultFormat,
+  getEnabledFormats,
+  setClipboardDefaultFormat,
+  setFormatEnabled,
+  type EnabledFormatsMap,
+} from "../settings/format-settings";
+import {
   COPY_FORMATS,
-  DEFAULT_CLIPBOARD_FORMAT_ID,
   type CopyFormatId,
   type FormatDefinition,
 } from "./definitions";
@@ -49,10 +55,8 @@ function createFormatChip(
   return chip;
 }
 
-export function createFormatChipList(strings: Strings): HTMLElement {
-  const enabled = new Map<CopyFormatId, boolean>(
-    COPY_FORMATS.map((format) => [format.id, true]),
-  );
+export async function createFormatChipList(strings: Strings): Promise<HTMLElement> {
+  const enabled = await getEnabledFormats();
 
   const list = document.createElement("div");
   list.className = "ec-format-chip-list";
@@ -61,8 +65,9 @@ export function createFormatChipList(strings: Strings): HTMLElement {
 
   for (const format of COPY_FORMATS) {
     list.append(
-      createFormatChip(format, strings, enabled.get(format.id) ?? true, (next) => {
-        enabled.set(format.id, next);
+      createFormatChip(format, strings, enabled[format.id], (next) => {
+        enabled[format.id] = next;
+        void setFormatEnabled(format.id, next);
       }),
     );
   }
@@ -70,7 +75,9 @@ export function createFormatChipList(strings: Strings): HTMLElement {
   return list;
 }
 
-export function createClipboardDefaultFormatSelect(strings: Strings): HTMLElement {
+export async function createClipboardDefaultFormatSelect(strings: Strings): Promise<HTMLElement> {
+  const selectedFormatId = await getClipboardDefaultFormat();
+
   const field = document.createElement("div");
   field.className = "ec-format-field";
 
@@ -87,15 +94,20 @@ export function createClipboardDefaultFormatSelect(strings: Strings): HTMLElemen
     const option = document.createElement("option");
     option.value = format.id;
     option.textContent = format.label(strings);
-    option.selected = format.id === DEFAULT_CLIPBOARD_FORMAT_ID;
+    option.selected = format.id === selectedFormatId;
     select.append(option);
   }
+
+  select.addEventListener("change", () => {
+    const formatId = select.value as CopyFormatId;
+    void setClipboardDefaultFormat(formatId);
+  });
 
   field.append(label, select);
   return field;
 }
 
-export function createFormatActionButton(
+function createFormatActionButton(
   format: FormatDefinition,
   strings: Strings,
 ): HTMLButtonElement {
@@ -116,16 +128,14 @@ export function createFormatActionButton(
 }
 
 export type CopiedOtherOptionsOptions = {
-  savedFormatId?: CopyFormatId;
+  enabledFormats: EnabledFormatsMap;
   onOpenSettings?: () => void;
 };
 
 export function createCopiedOtherOptionsRow(
   strings: Strings,
-  options: CopiedOtherOptionsOptions = {},
+  options: CopiedOtherOptionsOptions,
 ): HTMLElement {
-  const savedFormatId = options.savedFormatId ?? DEFAULT_CLIPBOARD_FORMAT_ID;
-
   const row = document.createElement("div");
   row.className = "ec-copied-other-options";
   row.setAttribute("role", "group");
@@ -137,7 +147,7 @@ export function createCopiedOtherOptionsRow(
   row.append(label);
 
   for (const format of COPY_FORMATS) {
-    if (format.id === savedFormatId) continue;
+    if (!options.enabledFormats[format.id]) continue;
     row.append(createFormatActionButton(format, strings));
   }
 

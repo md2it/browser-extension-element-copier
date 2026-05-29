@@ -1,4 +1,4 @@
-/** Plain text for clipboard until format settings exist (SPEC: raw/text later). */
+/** Pick-mode clipboard text: textContent, or outerHTML if empty. */
 export function getElementCopyText(element: Element): string {
   const text = (element.textContent ?? "").trim();
   if (text.length > 0) return text;
