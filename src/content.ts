@@ -7,7 +7,7 @@ import {
 import { registerDocumentOperabilityProbeListener } from "../../lib/src/page-operability";
 import { bootstrapPanelPopupPageIfNeeded } from "./panel-popup/page";
 import { bootstrapPanelTabPageIfNeeded } from "./panel-tab";
-import { copyTextToClipboard } from "../../lib/src/element-copy";
+import { copyTextToClipboard } from "./element-copy";
 import {
   bindPickCopyCacheLifecycle,
   clearPickCopyCache,
@@ -24,11 +24,11 @@ import {
   refreshFormatSettingsCache,
 } from "./settings/format-settings-cache";
 import type { CopyFormatId } from "./formats/definitions";
-import type {
-  BgToContent,
-  ContentActivationResponse,
-  ContentToBg,
-  CopyPickedFormatResponse,
+import {
+  sendToBackground,
+  type BgToContent,
+  type ContentActivationResponse,
+  type CopyPickedFormatResponse,
 } from "./messages";
 
 type ContentState = {
@@ -63,24 +63,15 @@ function resetState(state: ContentState): void {
 }
 
 function notifyBackgroundActive(isActive: boolean): void {
-  const msg: ContentToBg = { type: "ACTIVE_CHANGED", active: isActive };
-  void ext.runtime.sendMessage(msg).catch(() => {
-    /* extension reloaded */
-  });
+  sendToBackground({ type: "ACTIVE_CHANGED", active: isActive });
 }
 
 function requestToggle(): void {
-  const msg: ContentToBg = { type: "TOGGLE_REQUEST" };
-  void ext.runtime.sendMessage(msg).catch(() => {
-    /* extension reloaded */
-  });
+  sendToBackground({ type: "TOGGLE_REQUEST" });
 }
 
 function requestCopiedPanel(formatId: CopyFormatId): void {
-  const msg: ContentToBg = { type: "OPEN_PANEL", tab: "copied", formatId };
-  void ext.runtime.sendMessage(msg).catch(() => {
-    /* extension reloaded */
-  });
+  sendToBackground({ type: "OPEN_PANEL", tab: "copied", formatId });
 }
 
 function waitForDomRoot(timeoutMs = 5000): Promise<void> {

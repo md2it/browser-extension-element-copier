@@ -1,8 +1,9 @@
-import { createElementCopyCache } from "../../../lib/src/element-copy";
+import { extractElementCopyText } from "../copy";
+import { createStringCache } from "../element-copy";
 import { COPY_FORMATS, type CopyFormatId } from "../formats/definitions";
 import type { EnabledFormatsMap } from "../settings/format-settings";
 
-const cache = createElementCopyCache();
+const cache = createStringCache<CopyFormatId>();
 
 /** Sync snapshot of enabled formats; call only after pick-mode deactivate. */
 export function snapshotPickCopyCache(
@@ -12,15 +13,16 @@ export function snapshotPickCopyCache(
   const formatIds = COPY_FORMATS.filter((format) => enabledFormats[format.id]).map(
     (format) => format.id,
   );
-  cache.snapshot(element, formatIds);
+  cache.snapshot(
+    formatIds.map((formatId) => ({
+      key: formatId,
+      value: extractElementCopyText(element, formatId),
+    })),
+  );
 }
 
 export function getCachedCopyText(formatId: CopyFormatId): string | undefined {
   return cache.get(formatId);
-}
-
-export function hasPickCopyCache(): boolean {
-  return cache.has();
 }
 
 export function clearPickCopyCache(): void {

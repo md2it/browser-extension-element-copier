@@ -1,21 +1,15 @@
 import { ext } from "../api";
-import {
-  COPY_FORMATS,
-  DEFAULT_CLIPBOARD_FORMAT_ID,
-  type CopyFormatId,
-} from "../formats/definitions";
+import { DEFAULT_CLIPBOARD_FORMAT_ID, type CopyFormatId } from "../formats/definitions";
 import {
   CLIPBOARD_DEFAULT_FORMAT_KEY,
   ENABLED_FORMATS_KEY,
 } from "../messages";
-import type { EnabledFormatsMap } from "./format-settings";
-import { getClipboardDefaultFormat, getEnabledFormats } from "./format-settings";
-
-function defaultEnabledFormats(): EnabledFormatsMap {
-  return Object.fromEntries(
-    COPY_FORMATS.map((format) => [format.id, true]),
-  ) as EnabledFormatsMap;
-}
+import {
+  defaultEnabledFormats,
+  getClipboardDefaultFormat,
+  getEnabledFormats,
+  type EnabledFormatsMap,
+} from "./format-settings";
 
 let cachedEnabledFormats: EnabledFormatsMap = defaultEnabledFormats();
 let cachedDefaultFormat: CopyFormatId = DEFAULT_CLIPBOARD_FORMAT_ID;

@@ -1,15 +1,11 @@
 import { ext } from "../api";
 import {
-  COPY_FORMATS,
   DEFAULT_CLIPBOARD_FORMAT_ID,
+  isCopyFormatId,
   type CopyFormatId,
 } from "../formats/definitions";
 
 export const LAST_COPIED_FORMAT_KEY = "lastCopiedFormat";
-
-function isCopyFormatId(value: unknown): value is CopyFormatId {
-  return COPY_FORMATS.some((format) => format.id === value);
-}
 
 export async function getLastCopiedFormat(): Promise<CopyFormatId> {
   const data = await ext.storage.session.get(LAST_COPIED_FORMAT_KEY);

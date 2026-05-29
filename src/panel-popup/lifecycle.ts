@@ -1,36 +1,23 @@
-import { ext } from "../api";
 import type { CopyFormatId } from "../formats/definitions";
-import type { ContentToBg } from "../messages";
+import { sendToBackground } from "../messages";
 import type { PanelPopupTab } from "./constants";
 
 /** Sync pick mode with the visible panel tab (START on/off). */
 export function notifyPanelTabChanged(tab: PanelPopupTab): void {
-  const msg: ContentToBg = { type: "PANEL_TAB_CHANGED", tab };
-  void ext.runtime.sendMessage(msg).catch(() => {
-    /* extension reloaded */
-  });
+  sendToBackground({ type: "PANEL_TAB_CHANGED", tab });
 }
 
 /** START button — enable pick mode on the target page (popup closes separately). */
 export function notifyStartPickMode(): void {
-  const msg: ContentToBg = { type: "REQUEST_START_PICK_MODE" };
-  void ext.runtime.sendMessage(msg).catch(() => {
-    /* extension reloaded */
-  });
+  sendToBackground({ type: "REQUEST_START_PICK_MODE" });
 }
 
 /** Notify background that popup/panel is closed. */
 export function notifyPanelClosed(): void {
-  const msg: ContentToBg = { type: "PANEL_CLOSED" };
-  void ext.runtime.sendMessage(msg).catch(() => {
-    /* extension reloaded */
-  });
+  sendToBackground({ type: "PANEL_CLOSED" });
 }
 
 /** COPIED page — copy another format from the last picked element on the target tab. */
 export function notifyCopyPickedFormat(formatId: CopyFormatId): void {
-  const msg: ContentToBg = { type: "COPY_PICKED_FORMAT", formatId };
-  void ext.runtime.sendMessage(msg).catch(() => {
-    /* extension reloaded */
-  });
+  sendToBackground({ type: "COPY_PICKED_FORMAT", formatId });
 }

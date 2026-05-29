@@ -3,8 +3,7 @@ import {
   isPointInElement,
 } from "../../../lib/src/element-under-cursor";
 import { HighlightSystem } from "../../../lib/src/highlight";
-import { ext } from "../api";
-import type { ContentToBg } from "../messages";
+import { sendToBackground } from "../messages";
 import { formatElementLabel } from "./element-label";
 import { PICK_HOST_ATTR, PICK_ROOT_ID } from "./constants";
 import { COPIER_HIGHLIGHT_PAGE_STYLE, HIGHLIGHT_UI } from "./page-styles";
@@ -114,13 +113,10 @@ export class CopierPickUI {
 }
 
 export function notifyElementPicked(element: Element): void {
-  const msg: ContentToBg = {
+  sendToBackground({
     type: "ELEMENT_PICKED",
     tagName: element.tagName,
     id: element.id,
     className: element.className,
-  };
-  void ext.runtime.sendMessage(msg).catch(() => {
-    /* extension reloaded */
   });
 }

@@ -1,0 +1,27 @@
+import { getCssSelector } from "../../../lib/src/copy/selector";
+import { getJsPath } from "../../../lib/src/copy/js-path";
+import { getElementStyles } from "../../../lib/src/copy/styles";
+import { getFullXPath, getXPath } from "../../../lib/src/copy/xpath";
+
+export function getOuterHtml(element: Element): string {
+  return element.outerHTML;
+}
+
+export function extractElementCopyText(element: Element, format: string): string {
+  switch (format) {
+    case "outerHTML":
+      return getOuterHtml(element);
+    case "selector":
+      return getCssSelector(element);
+    case "jsPath":
+      return getJsPath(element);
+    case "styles":
+      return getElementStyles(element);
+    case "xpath":
+      return getXPath(element);
+    case "fullXPath":
+      return getFullXPath(element);
+    default:
+      return "";
+  }
+}

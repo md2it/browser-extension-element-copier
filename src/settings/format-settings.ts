@@ -2,6 +2,7 @@ import { ext } from "../api";
 import {
   COPY_FORMATS,
   DEFAULT_CLIPBOARD_FORMAT_ID,
+  isCopyFormatId,
   type CopyFormatId,
 } from "../formats/definitions";
 import {
@@ -11,14 +12,10 @@ import {
 
 export type EnabledFormatsMap = Record<CopyFormatId, boolean>;
 
-function defaultEnabledFormats(): EnabledFormatsMap {
+export function defaultEnabledFormats(): EnabledFormatsMap {
   return Object.fromEntries(
     COPY_FORMATS.map((format) => [format.id, true]),
   ) as EnabledFormatsMap;
-}
-
-function isCopyFormatId(value: unknown): value is CopyFormatId {
-  return COPY_FORMATS.some((format) => format.id === value);
 }
 
 export async function getEnabledFormats(): Promise<EnabledFormatsMap> {

@@ -1,4 +1,5 @@
 import type { PrefixHintContentToBg } from "../../lib/src/hotkeys/prefix-hint-messages";
+import { ext } from "./api";
 import type { CopyFormatId } from "./formats/definitions";
 import type { PanelPopupTab } from "./panel-popup/constants";
 
@@ -30,6 +31,12 @@ export type BgToWelcome = { type: "PIN_STATUS_CHANGED"; pinned: boolean };
 export type ContentActivationResponse = { ok: boolean };
 
 export type CopyPickedFormatResponse = { ok: boolean };
+
+export function sendToBackground(msg: ContentToBg): void {
+  void ext.runtime.sendMessage(msg).catch(() => {
+    /* extension reloaded */
+  });
+}
 
 export const STORAGE_KEY = "notificationSeconds";
 export const LOCALE_STORAGE_KEY = "locale";

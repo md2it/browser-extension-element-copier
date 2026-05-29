@@ -1,5 +1,3 @@
-export { copyElementFormatToClipboard } from "../element-copy";
-export { copyElementWithFormat } from "./copy-element";
 export { bindPickCopyCacheLifecycle } from "./cache-lifecycle";
 export {
   clearPickCopyCache,

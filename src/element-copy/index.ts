@@ -1,1 +1,2 @@
-export { copyElementFormatToClipboard } from "../../../lib/src/element-copy";
+export { createStringCache, type StringCache } from "./cache";
+export { copyTextToClipboard } from "./clipboard";
