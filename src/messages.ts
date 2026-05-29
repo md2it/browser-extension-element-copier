@@ -1,11 +1,15 @@
 import type { PrefixHintContentToBg } from "../../lib/src/hotkeys/prefix-hint-messages";
+import type { CopyFormatId } from "./formats/definitions";
 import type { PanelPopupTab } from "./panel-popup/constants";
 
-export type BgToContent = { type: "SET_ACTIVE"; active: boolean };
+export type BgToContent =
+  | { type: "SET_ACTIVE"; active: boolean }
+  | { type: "COPY_PICKED_FORMAT"; formatId: CopyFormatId };
 
 export type ContentToBg =
   | { type: "ACTIVE_CHANGED"; active: boolean }
-  | { type: "OPEN_PANEL"; tab: "start" | "copied" }
+  | { type: "OPEN_PANEL"; tab: "start" }
+  | { type: "OPEN_PANEL"; tab: "copied"; formatId: CopyFormatId }
   | { type: "PANEL_TAB_CHANGED"; tab: PanelPopupTab }
   | { type: "PANEL_CLOSED" }
   | { type: "REQUEST_START_PICK_MODE" }
@@ -17,11 +21,14 @@ export type ContentToBg =
       id: string;
       className: string;
     }
+  | { type: "COPY_PICKED_FORMAT"; formatId: CopyFormatId }
   | PrefixHintContentToBg;
 
 export type BgToWelcome = { type: "PIN_STATUS_CHANGED"; pinned: boolean };
 
 export type ContentActivationResponse = { ok: boolean };
+
+export type CopyPickedFormatResponse = { ok: boolean };
 
 export const STORAGE_KEY = "notificationSeconds";
 export const LOCALE_STORAGE_KEY = "locale";

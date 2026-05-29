@@ -17,7 +17,7 @@ import {
   registerPrefixHintOperabilityListeners,
 } from "../../lib/src/hotkeys";
 import { createBadgeTextColorAnimation } from "../../lib/src/badge/text-color-animation";
-import type { BgToContent, ContentActivationResponse, ContentToBg } from "./messages";
+import type { BgToContent, ContentActivationResponse, ContentToBg, CopyPickedFormatResponse } from "./messages";
 import {
   canOperateOnTab,
   getRestrictedNoticeDismissMs,
@@ -36,6 +36,7 @@ import {
 import { readPanelTargetTabId } from "./panel-popup/panel-target-tab";
 import { isRtlLocale, t, type Locale } from "./i18n";
 import type { Strings } from "./i18n/types";
+import { setLastCopiedFormat } from "./settings/copied-session";
 import { getSkipStartPage } from "./settings/skip-start-page";
 import { ensureLocaleInStorage, getLocale } from "./storage";
 import { showWelcome, stopWelcomePinWatcher, watchWelcomePinStatus } from "./welcome";
@@ -595,11 +596,14 @@ ext.runtime.onMessage.addListener(
     }
     if (contentMessage.type === "OPEN_PANEL") {
       if (contentMessage.tab === "copied") {
-        if (sender.tab?.id !== undefined) {
-          tabCopiedBadge.set(sender.tab.id, true);
-          void syncToolbarBadge(sender.tab.id);
-        }
-        openCopiedPanelFromCopy(sender.tab);
+        void (async () => {
+          await setLastCopiedFormat(contentMessage.formatId);
+          if (sender.tab?.id !== undefined) {
+            tabCopiedBadge.set(sender.tab.id, true);
+            await syncToolbarBadge(sender.tab.id);
+          }
+          openCopiedPanelFromCopy(sender.tab);
+        })();
         return;
       }
       void (async () => {
@@ -642,6 +646,21 @@ ext.runtime.onMessage.addListener(
           ? `${contentMessage.tagName}.${contentMessage.className.trim().split(/\s+/).slice(0, 3).join(".")}`
           : contentMessage.tagName;
       console.log("[Element Copier] element picked:", label);
+    }
+    if (contentMessage.type === "COPY_PICKED_FORMAT") {
+      void (async () => {
+        const tabId = await resolvePickModeTabId(sender);
+        if (tabId === undefined) return;
+        const msg: BgToContent = {
+          type: "COPY_PICKED_FORMAT",
+          formatId: contentMessage.formatId,
+        };
+        try {
+          await ext.tabs.sendMessage<BgToContent, CopyPickedFormatResponse>(tabId, msg);
+        } catch {
+          /* tab navigated or content script unavailable */
+        }
+      })();
     }
   },
 );

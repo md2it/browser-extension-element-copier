@@ -8,15 +8,21 @@ import { registerDocumentOperabilityProbeListener } from "../../lib/src/page-ope
 import { bootstrapPanelPopupPageIfNeeded } from "./panel-popup/page";
 import { bootstrapPanelTabPageIfNeeded } from "./panel-tab";
 import {
-  copyElementToClipboard,
+  copyElementFormatToClipboard,
+  copyElementWithFormat,
   CopierPickUI,
+  getLastPickedElement,
   notifyElementPicked,
   PICK_ROOT_ID,
+  storeLastPickedElement,
 } from "./pick-mode";
+import { getClipboardDefaultFormat } from "./settings/format-settings";
+import type { CopyFormatId } from "./formats/definitions";
 import type {
   BgToContent,
   ContentActivationResponse,
   ContentToBg,
+  CopyPickedFormatResponse,
 } from "./messages";
 
 type ContentState = {
@@ -64,8 +70,8 @@ function requestToggle(): void {
   });
 }
 
-function requestCopiedPanel(): void {
-  const msg: ContentToBg = { type: "OPEN_PANEL", tab: "copied" };
+function requestCopiedPanel(formatId: CopyFormatId): void {
+  const msg: ContentToBg = { type: "OPEN_PANEL", tab: "copied", formatId };
   void ext.runtime.sendMessage(msg).catch(() => {
     /* extension reloaded */
   });
@@ -141,13 +147,15 @@ function attachMessageHandler(state: ContentState): void {
     if (pickCopyInFlight || !state.active) return;
     pickCopyInFlight = true;
     try {
-      const copied = await copyElementToClipboard(element);
+      const formatId = await getClipboardDefaultFormat();
+      const copied = await copyElementWithFormat(element, formatId);
       if (!copied) {
         console.warn("[Element Copier] clipboard copy failed");
         return;
       }
+      storeLastPickedElement(element);
       notifyElementPicked(element);
-      requestCopiedPanel();
+      requestCopiedPanel(formatId);
       deactivate();
     } finally {
       pickCopyInFlight = false;
@@ -219,7 +227,7 @@ function attachMessageHandler(state: ContentState): void {
   const handler = (
     message: BgToContent,
     _sender: chrome.runtime.MessageSender,
-    sendResponse: (response: ContentActivationResponse) => void,
+    sendResponse: (response: ContentActivationResponse | CopyPickedFormatResponse) => void,
   ): boolean | void => {
     if (message.type === "SET_ACTIVE") {
       if (typeof window !== "undefined" && window.top !== window) {
@@ -231,6 +239,22 @@ function attachMessageHandler(state: ContentState): void {
       }
       deactivate();
       return;
+    }
+
+    if (message.type === "COPY_PICKED_FORMAT") {
+      if (typeof window !== "undefined" && window.top !== window) {
+        sendResponse({ ok: false });
+        return;
+      }
+      const element = getLastPickedElement();
+      if (!element) {
+        sendResponse({ ok: false });
+        return;
+      }
+      void copyElementFormatToClipboard(element, message.formatId).then((ok) => {
+        sendResponse({ ok });
+      });
+      return true;
     }
   };
 

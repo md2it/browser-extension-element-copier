@@ -1,42 +1,17 @@
-/** Pick-mode clipboard text: textContent, or outerHTML if empty. */
-export function getElementCopyText(element: Element): string {
-  const text = (element.textContent ?? "").trim();
-  if (text.length > 0) return text;
-  return element.outerHTML;
-}
+import { copyElementFormatToClipboard } from "../element-copy";
+import type { CopyFormatId } from "../formats/definitions";
+import { getClipboardDefaultFormat } from "../settings/format-settings";
 
-function copyTextToClipboardFallback(text: string): boolean {
-  try {
-    const textarea = document.createElement("textarea");
-    textarea.value = text;
-    textarea.setAttribute("readonly", "");
-    textarea.style.cssText = "position:fixed;left:-9999px;top:0;opacity:0;";
-    const root = document.documentElement ?? document.body;
-    if (!root) return false;
-    root.appendChild(textarea);
-    textarea.focus();
-    textarea.select();
-    const ok = document.execCommand("copy");
-    textarea.remove();
-    return ok;
-  } catch {
-    return false;
-  }
-}
-
-export async function copyTextToClipboard(text: string): Promise<boolean> {
-  if (!text) return false;
-  try {
-    if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(text);
-      return true;
-    }
-  } catch {
-    /* fall through */
-  }
-  return copyTextToClipboardFallback(text);
+export async function copyElementWithFormat(
+  element: Element,
+  formatId: CopyFormatId,
+): Promise<boolean> {
+  return copyElementFormatToClipboard(element, formatId);
 }
 
 export async function copyElementToClipboard(element: Element): Promise<boolean> {
-  return copyTextToClipboard(getElementCopyText(element));
+  const formatId = await getClipboardDefaultFormat();
+  return copyElementWithFormat(element, formatId);
 }
+
+export { copyElementFormatToClipboard } from "../element-copy";

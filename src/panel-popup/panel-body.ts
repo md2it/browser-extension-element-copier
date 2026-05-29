@@ -1,7 +1,6 @@
 import { buildAboutListItems } from "../about";
 import {
   COPY_FORMATS,
-  DEFAULT_CLIPBOARD_FORMAT_ID,
 } from "../formats/definitions";
 import {
   createClipboardDefaultFormatSelect,
@@ -16,6 +15,8 @@ import {
 } from "../hotkeys/keys";
 import { getSkipStartPage, setSkipStartPage } from "../settings/skip-start-page";
 import { getEnabledFormats } from "../settings/format-settings";
+import { getLastCopiedFormat } from "../settings/copied-session";
+import { notifyCopyPickedFormat } from "./lifecycle";
 import { createToggleRow } from "./toggle-row";
 
 export const PANEL_BODY_CENTERED_CLASS = "ec-panel-body--centered";
@@ -327,9 +328,12 @@ export function buildCopiedPanelBody(
   body.replaceChildren();
 
   void (async () => {
-    const enabledFormats = await getEnabledFormats();
+    const [enabledFormats, lastCopiedFormatId] = await Promise.all([
+      getEnabledFormats(),
+      getLastCopiedFormat(),
+    ]);
     const savedFormat =
-      COPY_FORMATS.find((format) => format.id === DEFAULT_CLIPBOARD_FORMAT_ID) ?? COPY_FORMATS[0];
+      COPY_FORMATS.find((format) => format.id === lastCopiedFormatId) ?? COPY_FORMATS[0];
 
     const page = document.createElement("div");
     page.className = "ec-panel-page ec-panel-page--copied";
@@ -357,6 +361,10 @@ export function buildCopiedPanelBody(
 
     const otherOptions = createCopiedOtherOptionsRow(strings, {
       enabledFormats,
+      excludeFormatId: lastCopiedFormatId,
+      onCopyFormat: (formatId) => {
+        notifyCopyPickedFormat(formatId);
+      },
       onOpenSettings: actions.onOpenSettings,
     });
 

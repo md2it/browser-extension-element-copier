@@ -1,4 +1,5 @@
 import { ext } from "../api";
+import type { CopyFormatId } from "../formats/definitions";
 import type { ContentToBg } from "../messages";
 import type { PanelPopupTab } from "./constants";
 
@@ -21,6 +22,14 @@ export function notifyStartPickMode(): void {
 /** Notify background that popup/panel is closed. */
 export function notifyPanelClosed(): void {
   const msg: ContentToBg = { type: "PANEL_CLOSED" };
+  void ext.runtime.sendMessage(msg).catch(() => {
+    /* extension reloaded */
+  });
+}
+
+/** COPIED page — copy another format from the last picked element on the target tab. */
+export function notifyCopyPickedFormat(formatId: CopyFormatId): void {
+  const msg: ContentToBg = { type: "COPY_PICKED_FORMAT", formatId };
   void ext.runtime.sendMessage(msg).catch(() => {
     /* extension reloaded */
   });
