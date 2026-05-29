@@ -17,10 +17,9 @@ export type Strings = {
   formatXPath: string;
   formatFullXPath: string;
   copiedTitle: string;
-  copiedSubtitle: string;
-  copiedSettingsHint: string;
+  copiedSavedMessage: string;
+  copiedSettingsLink: string;
   copiedFormatsGroupLabel: string;
-  pageSavedTitle: string;
   pageSettingsTitle: string;
   pageHistoryTitle: string;
   tabShortcuts: string;

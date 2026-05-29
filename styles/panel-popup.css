@@ -399,7 +399,6 @@
   background: #f3f4f6;
   color: #6b7280;
   font-size: 0.78rem;
-  font-weight: 400;
   line-height: 1.2;
   cursor: pointer;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.03);
@@ -409,7 +408,6 @@
   background: #dcfce7;
   border-color: #86efac;
   color: #111827;
-  font-weight: 700;
 }
 
 .ec-format-chip:not(.is-enabled):hover,
@@ -423,7 +421,27 @@
 }
 
 .ec-format-chip-label {
+  display: inline-grid;
   min-width: 0;
+}
+
+.ec-format-chip-label::before {
+  content: attr(data-text);
+  grid-area: 1 / 1;
+  font-weight: 700;
+  visibility: hidden;
+  pointer-events: none;
+  user-select: none;
+}
+
+.ec-format-chip-label-text {
+  grid-area: 1 / 1;
+  min-width: 0;
+  font-weight: 400;
+}
+
+.ec-format-chip.is-enabled .ec-format-chip-label-text {
+  font-weight: 700;
 }
 
 .ec-format-action-icon {
@@ -476,13 +494,41 @@
   min-width: 0;
 }
 
-.ec-copied-settings-hint {
-  margin: 0.75rem 0 0;
-  max-width: 14rem;
+.ec-copied-other-options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.4rem 0.45rem;
+  width: 100%;
+  margin-top: 0.65rem;
+  text-align: start;
+}
+
+.ec-copied-other-options-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #374151;
+}
+
+.ec-copied-settings-link {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #012292;
+  font: inherit;
   font-size: 0.78rem;
-  line-height: 1.35;
-  font-weight: 400;
-  color: #6b7280;
+  font-weight: 600;
+  line-height: 1.25;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.ec-copied-settings-link:hover,
+.ec-copied-settings-link:focus-visible {
+  color: #011a6e;
 }
 
 .ec-toggle-row {
@@ -544,33 +590,41 @@
   outline-offset: 2px;
 }
 
-.ec-copied {
+.ec-panel-page--copied {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+}
+
+.ec-copied-header {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  flex: 1 1 auto;
-  gap: 0.5rem;
-  margin: 0;
+  width: 100%;
   text-align: center;
 }
 
-.ec-copied-title,
-.ec-copied-subtitle {
-  margin: 0;
-  line-height: 1.25;
-}
-
 .ec-copied-title {
+  margin: 0;
   font-size: 1.5rem;
   font-weight: 700;
+  line-height: 1.25;
   color: #15803d;
 }
 
-.ec-copied-subtitle {
+.ec-copied-saved-message {
+  margin: 0.35rem 0 0;
   font-size: 0.95rem;
   font-weight: 400;
+  line-height: 1.25;
   color: #374151;
+}
+
+.ec-copied-divider {
+  width: 100%;
+  margin-inline: 0;
+  margin-top: 0.65rem;
 }
 
 .ec-panel--surface-popup .ec-panel-body:has(.ec-panel-page--about) {

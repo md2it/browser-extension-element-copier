@@ -29,9 +29,15 @@ function createFormatChip(
 
   chip.append(createFormatActionIcon(format.actionIcon));
 
+  const labelText = format.label(strings);
   const label = document.createElement("span");
   label.className = "ec-format-chip-label";
-  label.textContent = format.label(strings);
+  label.dataset.text = labelText;
+
+  const labelContent = document.createElement("span");
+  labelContent.className = "ec-format-chip-label-text";
+  labelContent.textContent = labelText;
+  label.append(labelContent);
   chip.append(label);
 
   chip.addEventListener("click", () => {
@@ -109,15 +115,42 @@ export function createFormatActionButton(
   return button;
 }
 
-export function createFormatActionButtonList(strings: Strings): HTMLElement {
-  const list = document.createElement("div");
-  list.className = "ec-format-action-list";
-  list.setAttribute("role", "group");
-  list.setAttribute("aria-label", strings.copiedFormatsGroupLabel);
+export type CopiedOtherOptionsOptions = {
+  savedFormatId?: CopyFormatId;
+  onOpenSettings?: () => void;
+};
+
+export function createCopiedOtherOptionsRow(
+  strings: Strings,
+  options: CopiedOtherOptionsOptions = {},
+): HTMLElement {
+  const savedFormatId = options.savedFormatId ?? DEFAULT_CLIPBOARD_FORMAT_ID;
+
+  const row = document.createElement("div");
+  row.className = "ec-copied-other-options";
+  row.setAttribute("role", "group");
+  row.setAttribute("aria-label", strings.copiedFormatsGroupLabel);
+
+  const label = document.createElement("span");
+  label.className = "ec-copied-other-options-label";
+  label.textContent = strings.copiedFormatsGroupLabel;
+  row.append(label);
 
   for (const format of COPY_FORMATS) {
-    list.append(createFormatActionButton(format, strings));
+    if (format.id === savedFormatId) continue;
+    row.append(createFormatActionButton(format, strings));
   }
 
-  return list;
+  if (options.onOpenSettings) {
+    const settingsLink = document.createElement("button");
+    settingsLink.type = "button";
+    settingsLink.className = "ec-copied-settings-link";
+    settingsLink.textContent = strings.copiedSettingsLink;
+    settingsLink.addEventListener("click", () => {
+      options.onOpenSettings!();
+    });
+    row.append(settingsLink);
+  }
+
+  return row;
 }

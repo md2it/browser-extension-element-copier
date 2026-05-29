@@ -1,7 +1,11 @@
 import { buildAboutListItems } from "../about";
 import {
+  COPY_FORMATS,
+  DEFAULT_CLIPBOARD_FORMAT_ID,
+} from "../formats/definitions";
+import {
   createClipboardDefaultFormatSelect,
-  createFormatActionButtonList,
+  createCopiedOtherOptionsRow,
   createFormatChipList,
 } from "../formats/format-ui";
 import type { Strings } from "../i18n";
@@ -21,14 +25,18 @@ export type StartPanelActions = {
   onStart: () => void;
 };
 
-function appendSkipStartToggle(page: HTMLElement, strings: Strings): void {
+function appendSkipStartToggle(page: HTMLElement, strings: Strings, before?: Node | null): void {
   void (async () => {
     const enabled = await getSkipStartPage();
     const row = createToggleRow(strings.skipStartPageToggleLabel, enabled, (next) => {
       void setSkipStartPage(next);
     });
     row.classList.add("ec-skip-start-toggle");
-    page.append(row);
+    if (before) {
+      page.insertBefore(row, before);
+    } else {
+      page.append(row);
+    }
   })();
 }
 
@@ -186,8 +194,10 @@ export function buildSettingsPanelBody(body: HTMLDivElement, strings: Strings): 
   title.textContent = strings.pageSettingsTitle;
 
   page.append(title, createPageDivider());
-  appendSkipStartToggle(page, strings);
-  page.append(createClipboardDefaultFormatSelect(strings), createFormatChipList(strings));
+  const clipboardDefaultFormat = createClipboardDefaultFormatSelect(strings);
+  const formatChips = createFormatChipList(strings);
+  appendSkipStartToggle(page, strings, clipboardDefaultFormat);
+  page.append(clipboardDefaultFormat, formatChips);
   body.append(page);
 }
 
@@ -299,34 +309,50 @@ export function buildLanguagePanelBody(body: HTMLDivElement, strings: Strings): 
   body.append(page);
 }
 
-export function buildCopiedPanelBody(body: HTMLDivElement, strings: Strings): void {
+export type CopiedPanelActions = {
+  onOpenSettings?: () => void;
+};
+
+export function buildCopiedPanelBody(
+  body: HTMLDivElement,
+  strings: Strings,
+  actions: CopiedPanelActions = {},
+): void {
   body.replaceChildren();
 
+  const savedFormatId = DEFAULT_CLIPBOARD_FORMAT_ID;
+  const savedFormat =
+    COPY_FORMATS.find((format) => format.id === savedFormatId) ?? COPY_FORMATS[0];
+
   const page = document.createElement("div");
-  page.className = "ec-panel-page ec-panel-page--saved";
+  page.className = "ec-panel-page ec-panel-page--copied";
 
-  const heading = document.createElement("h2");
-  heading.className = "ec-panel-page-title";
-  heading.textContent = strings.pageSavedTitle;
-
-  const copied = document.createElement("div");
-  copied.className = "ec-copied";
-
-  const title = document.createElement("p");
+  const title = document.createElement("h2");
   title.className = "ec-copied-title";
   title.textContent = strings.copiedTitle;
 
-  const subtitle = document.createElement("p");
-  subtitle.className = "ec-copied-subtitle";
-  subtitle.textContent = strings.copiedSubtitle;
+  const savedMessage = document.createElement("p");
+  savedMessage.className = "ec-copied-saved-message";
+  const [savedMessageBefore, savedMessageAfter] =
+    strings.copiedSavedMessage.split("{format}");
+  const savedFormatName = document.createElement("strong");
+  savedFormatName.textContent = savedFormat.label(strings);
+  if (savedMessageBefore) savedMessage.append(savedMessageBefore);
+  savedMessage.append(savedFormatName);
+  if (savedMessageAfter) savedMessage.append(savedMessageAfter);
 
-  const actions = createFormatActionButtonList(strings);
+  const header = document.createElement("div");
+  header.className = "ec-copied-header";
+  header.append(title, savedMessage);
 
-  const hint = document.createElement("p");
-  hint.className = "ec-copied-settings-hint";
-  hint.textContent = strings.copiedSettingsHint;
+  const divider = createPageDivider();
+  divider.classList.add("ec-copied-divider");
 
-  copied.append(title, subtitle, actions, hint);
-  page.append(heading, createPageDivider(), copied);
+  const otherOptions = createCopiedOtherOptionsRow(strings, {
+    savedFormatId,
+    onOpenSettings: actions.onOpenSettings,
+  });
+
+  page.append(header, divider, otherOptions);
   body.append(page);
 }

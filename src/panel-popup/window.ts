@@ -91,7 +91,7 @@ export class CopierPanelWindow {
 
     const strings = t(this.host.getLocale());
 
-    const centered = tab === "start";
+    const centered = tab === "start" || tab === "copied";
     this.body.classList.toggle(PANEL_BODY_CENTERED_CLASS, centered);
 
     switch (tab) {
@@ -104,7 +104,9 @@ export class CopierPanelWindow {
         });
         break;
       case "copied":
-        buildCopiedPanelBody(this.body, strings);
+        buildCopiedPanelBody(this.body, strings, {
+          onOpenSettings: () => this.showTab("settings"),
+        });
         break;
       case "settings":
         buildSettingsPanelBody(this.body, strings);
