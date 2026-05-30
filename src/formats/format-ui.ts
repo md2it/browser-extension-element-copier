@@ -19,8 +19,8 @@ import {
   type InlineImageMode,
 } from "../settings/inline-images";
 import {
-  CLIPBOARD_COPY_FORMATS,
   COPY_FORMATS,
+  isClipboardCopyFormat,
   type CopyFormatId,
   type FormatDefinition,
   type SettingsChipGroup,
@@ -234,12 +234,15 @@ export async function createClipboardDefaultFormatSelect(strings: Strings): Prom
   nothingOption.selected = selectedFormatId === CLIPBOARD_DEFAULT_NOTHING;
   select.append(nothingOption);
 
-  for (const format of CLIPBOARD_COPY_FORMATS) {
-    const option = document.createElement("option");
-    option.value = format.id;
-    option.textContent = format.label(strings);
-    option.selected = format.id === selectedFormatId;
-    select.append(option);
+  for (const { group } of SETTINGS_CHIP_GROUPS) {
+    for (const format of COPY_FORMATS) {
+      if (format.settingsGroup !== group || !isClipboardCopyFormat(format)) continue;
+      const option = document.createElement("option");
+      option.value = format.id;
+      option.textContent = format.label(strings);
+      option.selected = format.id === selectedFormatId;
+      select.append(option);
+    }
   }
 
   syncNothingSelectedStyle();
