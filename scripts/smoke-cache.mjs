@@ -95,13 +95,12 @@ function getTextFromRecord(record, formatId) {
 // ---------------------------------------------------------------------------
 
 const messagesSrc = readFileSync(join(src, "messages.ts"), "utf8");
-// removed message types
-assert.doesNotMatch(messagesSrc, /GET_PICK_COPY_TEXT/,
-  "BgToContent must not contain GET_PICK_COPY_TEXT");
+// message types
+assert.match(messagesSrc, /GET_PICK_COPY_TEXT/,
+  "BgToContent must contain GET_PICK_COPY_TEXT fallback");
 assert.doesNotMatch(messagesSrc, /CLEAR_PICK_COPY_CACHE/,
   "BgToContent must not contain CLEAR_PICK_COPY_CACHE");
-assert.doesNotMatch(messagesSrc, /GetPickCopyTextResponse/,
-  "GetPickCopyTextResponse type must be removed from messages.ts");
+assert.match(messagesSrc, /GetPickCopyTextResponse/);
 // panel response type still present
 assert.match(messagesSrc, /CopyPickedFormatPanelResponse/);
 
@@ -115,20 +114,28 @@ assert.doesNotMatch(contentSrc, /clearPickCopyCache[^S]/,
 assert.match(contentSrc, /await snapshotPickCopyCache/,
   "snapshotPickCopyCache must be awaited in content.ts");
 // no message handlers for removed types
-assert.doesNotMatch(contentSrc, /GET_PICK_COPY_TEXT/);
+assert.match(contentSrc, /GET_PICK_COPY_TEXT/);
+assert.match(contentSrc, /getCachedCopyText\(message\.formatId\)/);
 assert.doesNotMatch(contentSrc, /CLEAR_PICK_COPY_CACHE/);
 
 const backgroundSrc = readFileSync(join(src, "background.ts"), "utf8");
 // old tab-proxy helpers removed
 assert.doesNotMatch(backgroundSrc, /clearPickCopyCacheOnTab/,
   "background.ts must not contain clearPickCopyCacheOnTab");
-assert.doesNotMatch(backgroundSrc, /GET_PICK_COPY_TEXT/,
-  "background.ts must not send GET_PICK_COPY_TEXT to content");
 assert.doesNotMatch(backgroundSrc, /CLEAR_PICK_COPY_CACHE/,
   "background.ts must not send CLEAR_PICK_COPY_CACHE");
-// reads cache from storage directly
-assert.match(backgroundSrc, /getPickCopyTextFromStorage/,
-  "background.ts must read cache from storage");
+// reads cache from storage, falls back to content script
+assert.match(backgroundSrc, /getPickCopyTextForPanel/);
+assert.match(backgroundSrc, /getPickCopyTextFromStorage/);
+assert.match(backgroundSrc, /GET_PICK_COPY_TEXT/);
+
+const panelBodySrc = readFileSync(join(src, "panel-popup/panel-body.ts"), "utf8");
+assert.match(panelBodySrc, /hasPickCopyCacheInStorage/,
+  "COPIED page must check cache presence, not only lastCopiedFormat");
+
+const fetchSrc = readFileSync(join(src, "panel-popup/fetch-picked-format.ts"), "utf8");
+assert.match(fetchSrc, /payload\.text === undefined/,
+  "fetch must treat empty string as valid cached text");
 
 const storageSrc = readFileSync(
   join(src, "pick-mode/pick-copy-cache-storage.ts"), "utf8",
@@ -136,7 +143,11 @@ const storageSrc = readFileSync(
 assert.match(storageSrc, /writePickCopyCacheToStorage/);
 assert.match(storageSrc, /readPickCopyCacheFromStorage/);
 assert.match(storageSrc, /clearPickCopyCacheStorage/);
-assert.match(storageSrc, /getPickCopyTextFromStorage/);
+assert.match(storageSrc, /hasPickCopyCacheInStorage/);
+assert.match(storageSrc, /writePickCopyCacheIndex/);
+assert.match(storageSrc, /pickCopyCacheFormats/);
+assert.doesNotMatch(storageSrc, /ext\.storage\.session/,
+  "pick-copy-cache-storage must not use session storage (content script writes cache)");
 assert.match(storageSrc, /markdownFile/,
   "storage must handle markdownFile");
 assert.match(storageSrc, /record\.markdown/,
@@ -147,6 +158,8 @@ const cacheSrc = readFileSync(
 );
 assert.match(cacheSrc, /async function snapshotPickCopyCache/,
   "snapshotPickCopyCache must be async");
+assert.match(cacheSrc, /await clearPickCopyCacheStorage/);
+assert.match(cacheSrc, /writePickCopyCacheIndex/);
 assert.match(cacheSrc, /writePickCopyCacheToStorage/);
 assert.match(cacheSrc, /clearPickCopyCacheStorage/);
 assert.doesNotMatch(cacheSrc, /export.*clearPickCopyCache[^S]/,

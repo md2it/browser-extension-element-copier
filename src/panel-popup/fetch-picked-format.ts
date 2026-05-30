@@ -11,7 +11,7 @@ export async function fetchPickedFormatText(
       type: "COPY_PICKED_FORMAT",
       formatId,
     });
-    if (!payload?.ok || !payload.text) return undefined;
+    if (!payload?.ok || payload.text === undefined) return undefined;
     return payload.text;
   } catch {
     return undefined;

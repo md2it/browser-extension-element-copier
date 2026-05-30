@@ -5,6 +5,7 @@ import type { EnabledFormatsMap } from "../settings/format-settings";
 import { DEFAULT_INLINE_IMAGES_MODE, type InlineImageMode } from "../settings/inline-images";
 import {
   clearPickCopyCacheStorage,
+  writePickCopyCacheIndex,
   writePickCopyCacheToStorage,
 } from "./pick-copy-cache-storage";
 
@@ -37,10 +38,16 @@ export async function snapshotPickCopyCache(
   }
 
   cache.snapshot(entries);
-  if (entries.length === 0) {
+
+  try {
     await clearPickCopyCacheStorage();
-  } else {
+    await writePickCopyCacheIndex(entries.map((entry) => entry.key));
+    if (entries.length === 0) {
+      return;
+    }
     await writePickCopyCacheToStorage(entries);
+  } catch (error) {
+    console.warn("[Element Copier] pick copy cache storage write failed:", error);
   }
 }
 

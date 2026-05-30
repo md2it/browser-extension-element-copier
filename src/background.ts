@@ -22,7 +22,9 @@ import type {
   ContentActivationResponse,
   ContentToBg,
   CopyPickedFormatPanelResponse,
+  GetPickCopyTextResponse,
 } from "./messages";
+import type { CopyFormatId } from "./formats/definitions";
 import { getPickCopyTextFromStorage } from "./pick-mode/pick-copy-cache-storage";
 import {
   canOperateOnTab,
@@ -402,6 +404,29 @@ async function resolvePickModeTabId(
   return tab?.id;
 }
 
+async function getPickCopyTextForPanel(
+  formatId: CopyFormatId,
+  sender: chrome.runtime.MessageSender,
+): Promise<string | undefined> {
+  const fromStorage = await getPickCopyTextFromStorage(formatId);
+  if (fromStorage !== undefined) return fromStorage;
+
+  const tabId = await resolvePickModeTabId(sender);
+  if (tabId === undefined) return undefined;
+
+  try {
+    const response = await ext.tabs.sendMessage<BgToContent, GetPickCopyTextResponse>(
+      tabId,
+      { type: "GET_PICK_COPY_TEXT", formatId },
+      { frameId: MAIN_FRAME_ID },
+    );
+    if (!response?.ok || response.text === undefined) return undefined;
+    return response.text;
+  } catch {
+    return undefined;
+  }
+}
+
 /** Pick mode is off while any extension popup panel is open. */
 async function syncPickModeForPanelTab(
   _tab: PanelPopupTab,
@@ -676,7 +701,7 @@ ext.runtime.onMessage.addListener(
     }
     if (contentMessage.type === "COPY_PICKED_FORMAT") {
       void (async () => {
-        const text = await getPickCopyTextFromStorage(contentMessage.formatId);
+        const text = await getPickCopyTextForPanel(contentMessage.formatId, sender);
         if (text === undefined) {
           sendResponse({ ok: false });
           return;

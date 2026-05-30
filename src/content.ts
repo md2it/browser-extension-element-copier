@@ -27,6 +27,7 @@ import {
   sendToBackground,
   type BgToContent,
   type ContentActivationResponse,
+  type GetPickCopyTextResponse,
 } from "./messages";
 
 type ContentState = {
@@ -238,7 +239,7 @@ function attachMessageHandler(state: ContentState): void {
   const handler = (
     message: BgToContent,
     _sender: chrome.runtime.MessageSender,
-    sendResponse: (response: ContentActivationResponse) => void,
+    sendResponse: (response: ContentActivationResponse | GetPickCopyTextResponse) => void,
   ): boolean | void => {
     if (message.type === "SET_ACTIVE") {
       if (typeof window !== "undefined" && window.top !== window) {
@@ -249,6 +250,20 @@ function attachMessageHandler(state: ContentState): void {
         return true;
       }
       deactivate();
+      return;
+    }
+
+    if (message.type === "GET_PICK_COPY_TEXT") {
+      if (typeof window !== "undefined" && window.top !== window) {
+        sendResponse({ ok: false });
+        return;
+      }
+      const text = getCachedCopyText(message.formatId);
+      if (text === undefined) {
+        sendResponse({ ok: false });
+        return;
+      }
+      sendResponse({ ok: true, text });
       return;
     }
 
