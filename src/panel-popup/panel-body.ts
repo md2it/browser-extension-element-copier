@@ -377,6 +377,7 @@ export async function buildCopiedPanelBody(
 
   const otherOptions = createCopiedOtherOptionsRow(strings, {
     enabledFormats,
+    selectedFormatId: lastCopiedFormatId,
     onCopyFormat: (formatId) => {
       void (async () => {
         const copied = await copyPickedFormatFromPanel(formatId);

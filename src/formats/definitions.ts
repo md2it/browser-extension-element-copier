@@ -15,10 +15,13 @@ export type CopyFormatId =
   | "markdown"
   | "markdownFile";
 
+export type SettingsChipGroup = "files" | "clipboard-text" | "devtools";
+
 export type FormatDefinition = {
   id: CopyFormatId;
   label: (strings: Strings) => string;
   actionIcon: FormatActionIconId;
+  settingsGroup: SettingsChipGroup;
 };
 
 /** Copy-only formats from fr-copy.md (ДОСТУПНЫЕ ФОРМАТЫ). */
@@ -27,51 +30,61 @@ export const COPY_FORMATS: readonly FormatDefinition[] = [
     id: "outerHTML",
     label: (s) => s.formatOuterHtml,
     actionIcon: "copy",
+    settingsGroup: "devtools",
   },
   {
     id: "selector",
     label: (s) => s.formatSelector,
     actionIcon: "copy",
+    settingsGroup: "devtools",
   },
   {
     id: "jsPath",
     label: (s) => s.formatJsPath,
     actionIcon: "copy",
+    settingsGroup: "devtools",
   },
   {
     id: "computedStyles",
     label: (s) => s.formatComputedStyles,
     actionIcon: "copy",
+    settingsGroup: "devtools",
   },
   {
     id: "styles",
     label: (s) => s.formatStyles,
     actionIcon: "copy",
+    settingsGroup: "devtools",
   },
   {
     id: "xpath",
     label: (s) => s.formatXPath,
     actionIcon: "copy",
+    settingsGroup: "devtools",
   },
   {
     id: "fullXPath",
     label: (s) => s.formatFullXPath,
     actionIcon: "copy",
+    settingsGroup: "devtools",
   },
   {
     id: "text",
     label: (s) => s.formatText,
     actionIcon: "copy",
+    settingsGroup: "clipboard-text",
   },
   {
     id: "markdown",
     label: (s) => s.formatMarkdown,
     actionIcon: "copy",
+    settingsGroup: "clipboard-text",
   },
   {
     id: "markdownFile",
     label: (s) => s.formatMarkdown,
     actionIcon: "file-down",
+    settingsGroup: "files",
   },
 ] as const;
 

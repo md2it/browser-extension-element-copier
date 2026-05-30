@@ -17,7 +17,9 @@ export type Strings = {
   settingsInlineImagesInfoLabel: string;
   settingsInlineImagesInfo: string;
   infoWindowCloseLabel: string;
-  settingsFormatsGroupLabel: string;
+  settingsFilesToDownloadLabel: string;
+  settingsTextToClipboardLabel: string;
+  settingsDeveloperToolsLabel: string;
   formatOuterHtml: string;
   formatSelector: string;
   formatJsPath: string;
