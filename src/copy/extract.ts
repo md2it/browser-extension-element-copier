@@ -17,21 +17,32 @@ import { elementToMarkdown } from "../../../lib/src/copy/markdown/index";
 import { getFullXPath, getXPath } from "../../../lib/src/copy/xpath";
 import type { FormattedText } from "../../../lib/src/copy/formatted-text/types";
 
+function getDocumentBaseHref(element: Element): string {
+  return element.ownerDocument.baseURI || element.ownerDocument.location?.href || "";
+}
+
+function getPrepareOptions(element: Element, pruneHiddenTableRows = false) {
+  return {
+    ...(pruneHiddenTableRows ? { pruneHiddenTableRows: true as const } : {}),
+    baseHref: getDocumentBaseHref(element),
+  };
+}
+
 function getFormattedText(element: Element): FormattedText {
-  const htmlContainer = prepareElementForCopy(element, { pruneHiddenTableRows: true });
+  const htmlContainer = prepareElementForCopy(element, getPrepareOptions(element, true));
   const html = extractHtmlFromPreparedContainer(element, htmlContainer);
 
   const tablePlain = tryExtractPlainFromTable(element);
   const plain = tablePlain ?? extractPlainFromPreparedContainer(
     element,
-    prepareElementForCopy(element),
+    prepareElementForCopy(element, getPrepareOptions(element)),
   );
 
   return finalizeFormattedText(element, html, plain);
 }
 
 function getElementMarkdown(element: Element): string {
-  const prepared = prepareElementForCopy(element, { pruneHiddenTableRows: true });
+  const prepared = prepareElementForCopy(element, getPrepareOptions(element, true));
   return elementToMarkdown(prepared);
 }
 
