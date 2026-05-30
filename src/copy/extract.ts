@@ -30,6 +30,11 @@ function getFormattedText(element: Element): FormattedText {
   return finalizeFormattedText(element, html, plain);
 }
 
+function getElementMarkdown(element: Element): string {
+  const prepared = prepareElementForCopy(element, { pruneHiddenTableRows: true });
+  return elementToMarkdown(prepared);
+}
+
 export function getOuterHtml(element: Element): string {
   if (!element.shadowRoot) {
     return element.outerHTML;
@@ -66,7 +71,7 @@ export function extractElementCopyText(element: Element, format: string): string
       return serializeFormattedTextCache(getFormattedText(element));
     case "markdown":
     case "markdownFile":
-      return elementToMarkdown(element);
+      return getElementMarkdown(element);
     default:
       return "";
   }
