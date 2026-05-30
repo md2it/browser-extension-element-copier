@@ -306,7 +306,22 @@ export function buildLanguagePanelBody(body: HTMLDivElement, strings: Strings): 
 
 export type CopiedPanelActions = {
   onOpenSettings?: () => void;
+  onStartOver?: () => void;
 };
+
+function createCopiedAgainBlock(strings: Strings, onStartOver: () => void): HTMLElement {
+  const again = document.createElement("div");
+  again.className = "ec-copied-again";
+
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "ec-start-btn";
+  btn.textContent = strings.copiedStartOverButtonLabel;
+  btn.addEventListener("click", onStartOver);
+
+  again.append(btn);
+  return again;
+}
 
 function copiedFormatLabel(formatId: CopyFormatId | null, strings: Strings): string {
   if (formatId === null) return strings.settingsCopyDefaultNothing;
@@ -392,6 +407,15 @@ export async function buildCopiedPanelBody(
     onOpenSettings: actions.onOpenSettings,
   });
 
-  page.append(header, divider, otherOptions);
+  const againDivider = createPageDivider();
+  againDivider.classList.add("ec-copied-divider");
+
+  page.append(
+    header,
+    divider,
+    otherOptions,
+    againDivider,
+    createCopiedAgainBlock(strings, actions.onStartOver ?? (() => {})),
+  );
   body.append(page);
 }

@@ -42,7 +42,7 @@ async function fillPanelTabBody(
   tab: PanelPopupTab,
   strings: ReturnType<typeof t>,
 ): Promise<void> {
-  body.classList.toggle(PANEL_BODY_CENTERED_CLASS, tab === "start" || tab === "copied");
+  body.classList.toggle(PANEL_BODY_CENTERED_CLASS, tab === "start");
 
   switch (tab) {
     case "start":

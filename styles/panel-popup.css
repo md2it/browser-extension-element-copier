@@ -673,6 +673,7 @@
 
 .ec-copied-other-options {
   display: flex;
+  flex: 0 0 auto;
   flex-wrap: wrap;
   align-items: center;
   justify-content: flex-start;
@@ -766,10 +767,19 @@
   outline-offset: 2px;
 }
 
+.ec-panel--surface-popup .ec-panel-body:has(.ec-panel-page--copied) {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  align-items: stretch;
+}
+
 .ec-panel-page--copied {
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  flex: 1 1 auto;
+  min-height: 0;
   width: 100%;
 }
 
@@ -777,6 +787,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  flex: 1 1 auto;
+  min-height: 0;
   gap: 0.25rem;
   width: 100%;
   text-align: center;
@@ -807,9 +820,19 @@
 }
 
 .ec-copied-divider {
+  flex: 0 0 auto;
   width: 100%;
   margin-inline: 0;
   margin-top: 0.65rem;
+}
+
+.ec-copied-again {
+  display: flex;
+  flex: 0 0 auto;
+  justify-content: center;
+  width: 100%;
+  margin-top: 0.85rem;
+  padding-top: 0.25rem;
 }
 
 .ec-panel--surface-popup .ec-panel-body:has(.ec-panel-page--about) {

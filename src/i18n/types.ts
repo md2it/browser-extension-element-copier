@@ -33,6 +33,7 @@ export type Strings = {
   copiedSubtitlePrefix: string;
   copiedSettingsLink: string;
   copiedFormatsGroupLabel: string;
+  copiedStartOverButtonLabel: string;
   pageSettingsTitle: string;
   tabShortcuts: string;
   tabLanguage: string;

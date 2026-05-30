@@ -86,20 +86,25 @@ export class CopierPanelWindow {
     notifyPanelTabChanged(tab);
   }
 
+  /** START / START OVER — enable pick mode and close the panel. */
+  private startPickModeAndClose(): void {
+    notifyStartPickMode();
+    this.close();
+  }
+
   private async renderTab(tab: PanelPopupTab): Promise<void> {
     if (!this.body) return;
 
     const strings = t(this.host.getLocale());
 
-    const centered = tab === "start" || tab === "copied";
+    const centered = tab === "start";
     this.body.classList.toggle(PANEL_BODY_CENTERED_CLASS, centered);
 
     switch (tab) {
       case "start":
         buildStartPanelBody(this.body, strings, {
           onStart: () => {
-            notifyStartPickMode();
-            this.close();
+            this.startPickModeAndClose();
           },
         });
         break;
@@ -107,6 +112,9 @@ export class CopierPanelWindow {
         await buildCopiedPanelBody(this.body, strings, {
           onOpenSettings: () => {
             void this.showTab("settings");
+          },
+          onStartOver: () => {
+            this.startPickModeAndClose();
           },
         });
         break;

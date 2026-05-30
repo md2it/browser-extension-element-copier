@@ -34,6 +34,7 @@ const MESSAGES: Record<Locale, Strings> = {
     copiedSubtitlePrefix: "Copied to clipboard:",
     copiedSettingsLink: "… change the options",
     copiedFormatsGroupLabel: "Options:",
+    copiedStartOverButtonLabel: "START OVER",
     pageSettingsTitle: "SETTINGS",
     tabShortcuts: "SHORTCUTS",
     tabLanguage: "LANGUAGE",
