@@ -21,7 +21,7 @@ const MESSAGES: Record<Locale, Strings> = {
     settingsFilesToDownloadLabel: "Files to download:",
     settingsTextToClipboardLabel: "Text to clipboard:",
     settingsDeveloperToolsLabel: "Developer tools:",
-    formatOuterHtml: "outerHTML",
+    formatCode: "code",
     formatSelector: "selector",
     formatJsPath: "JS path",
     formatComputedStyles: "computed styles",

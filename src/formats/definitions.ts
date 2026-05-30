@@ -1,7 +1,17 @@
 import type { Strings } from "../i18n";
 
-/** Action icon shown on format chips and COPIED buttons (fr-copy.md). */
+/** Routing/semantics for COPIED buttons (copy to clipboard vs download a file). */
 export type FormatActionIconId = "copy" | "files" | "images" | "file-down" | "image-down";
+
+/** Per-format icon shown on chips and COPIED buttons (SPEC/fr-copy-save.md). */
+export type FormatIconId =
+  | "code-xml"
+  | "terminal"
+  | "list-plus"
+  | "list-minus"
+  | "text-initial"
+  | "markdown"
+  | "markdown-file";
 
 export type CopyFormatId =
   | "outerHTML"
@@ -20,6 +30,7 @@ export type SettingsChipGroup = "files" | "clipboard-text" | "devtools";
 export type FormatDefinition = {
   id: CopyFormatId;
   label: (strings: Strings) => string;
+  icon: FormatIconId;
   actionIcon: FormatActionIconId;
   settingsGroup: SettingsChipGroup;
 };
@@ -28,61 +39,71 @@ export type FormatDefinition = {
 export const COPY_FORMATS: readonly FormatDefinition[] = [
   {
     id: "outerHTML",
-    label: (s) => s.formatOuterHtml,
+    label: (s) => s.formatCode,
+    icon: "code-xml",
     actionIcon: "copy",
     settingsGroup: "devtools",
   },
   {
     id: "selector",
     label: (s) => s.formatSelector,
+    icon: "terminal",
     actionIcon: "copy",
     settingsGroup: "devtools",
   },
   {
     id: "jsPath",
     label: (s) => s.formatJsPath,
+    icon: "terminal",
     actionIcon: "copy",
     settingsGroup: "devtools",
   },
   {
     id: "computedStyles",
     label: (s) => s.formatComputedStyles,
+    icon: "list-plus",
     actionIcon: "copy",
     settingsGroup: "devtools",
   },
   {
     id: "styles",
     label: (s) => s.formatStyles,
+    icon: "list-minus",
     actionIcon: "copy",
     settingsGroup: "devtools",
   },
   {
     id: "xpath",
     label: (s) => s.formatXPath,
+    icon: "terminal",
     actionIcon: "copy",
     settingsGroup: "devtools",
   },
   {
     id: "fullXPath",
     label: (s) => s.formatFullXPath,
+    icon: "terminal",
     actionIcon: "copy",
     settingsGroup: "devtools",
   },
   {
     id: "text",
     label: (s) => s.formatText,
+    icon: "text-initial",
     actionIcon: "copy",
     settingsGroup: "clipboard-text",
   },
   {
     id: "markdown",
     label: (s) => s.formatMarkdown,
+    icon: "markdown",
     actionIcon: "copy",
     settingsGroup: "clipboard-text",
   },
   {
     id: "markdownFile",
     label: (s) => s.formatMarkdown,
+    icon: "markdown-file",
     actionIcon: "file-down",
     settingsGroup: "files",
   },

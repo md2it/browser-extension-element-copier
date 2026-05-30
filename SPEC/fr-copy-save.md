@@ -35,14 +35,14 @@
 ## ДОСТУПНЫЕ ФОРМАТЫ
 
 ### Всякие devtools, только для копирования
-- outerHTML
-- selector
-- JS path
-- styles // приближено к тому, что получаем из DevTools
-- computed styles
-- XPath
-- full XPath
-- Для всех lucide code
+- code // code-xml lucide
+- computed styles // list-plus
+- styles // list-minus
+- Для этих lucide terminal:
+   - selector
+   - JS path
+   - XPath
+   - full XPath
 
 ### Форматированные тексты для копирования
 - Text // Человекочитаемый текст с форматированием для GoogleDocs / Word
@@ -55,7 +55,7 @@
       5. Вставил текст в GoogleDocs / Word
       Ожидаемый результат: Текст вставился с форматированием, как если бы человек выделял контент страницы через окно браузера
 - Markdown
-   - Иконка markdown-sigma.svg (у нас есть кастомизированная)
+   - Иконка markdown.svg (у нас есть кастомизированная)
    - headingStyle atx
    - hr `---`
    - fence ```
@@ -65,7 +65,7 @@
 
 ### Файлы
 - Markdown
-   - Иконка markdown-square-sigma.svg (у нас есть кастомизированная)
+   - Иконка markdown-file.svg (у нас есть кастомизированная)
 - Word
 - PDF
 - PNG

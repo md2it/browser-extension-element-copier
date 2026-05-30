@@ -20,7 +20,7 @@ export type Strings = {
   settingsFilesToDownloadLabel: string;
   settingsTextToClipboardLabel: string;
   settingsDeveloperToolsLabel: string;
-  formatOuterHtml: string;
+  formatCode: string;
   formatSelector: string;
   formatJsPath: string;
   formatComputedStyles: string;

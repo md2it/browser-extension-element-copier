@@ -25,7 +25,7 @@ import {
   type FormatDefinition,
   type SettingsChipGroup,
 } from "./definitions";
-import { createFormatActionIcon } from "./format-icons";
+import { createFormatIcon } from "./format-icons";
 
 const INFO_WINDOW_CLASSES = createInfoWindowClasses("ec");
 
@@ -123,7 +123,7 @@ function createFormatChip(
 
   sync(enabled);
 
-  chip.append(createFormatActionIcon(format.actionIcon));
+  chip.append(createFormatIcon(format.icon));
 
   const labelText = format.label(strings);
   const label = document.createElement("span");
@@ -272,7 +272,7 @@ function createFormatActionButton(
   button.setAttribute("aria-pressed", "false");
   button.setAttribute("aria-label", format.label(strings));
 
-  button.append(createFormatActionIcon(format.actionIcon));
+  button.append(createFormatIcon(format.icon));
 
   const label = document.createElement("span");
   label.className = "ec-format-action-btn-label";
