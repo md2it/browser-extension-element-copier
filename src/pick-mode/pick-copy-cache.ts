@@ -13,15 +13,27 @@ export function snapshotPickCopyCache(
   const formatIds = COPY_FORMATS.filter((format) => enabledFormats[format.id]).map(
     (format) => format.id,
   );
-  cache.snapshot(
-    formatIds.map((formatId) => ({
-      key: formatId,
-      value: extractElementCopyText(element, formatId),
-    })),
-  );
+  const entries: { key: CopyFormatId; value: string }[] = [];
+  let markdownText: string | undefined;
+
+  for (const formatId of formatIds) {
+    if (formatId === "markdown" || formatId === "markdownFile") {
+      if (markdownText === undefined) {
+        markdownText = extractElementCopyText(element, "markdown");
+        entries.push({ key: "markdown", value: markdownText });
+      }
+      continue;
+    }
+    entries.push({ key: formatId, value: extractElementCopyText(element, formatId) });
+  }
+
+  cache.snapshot(entries);
 }
 
 export function getCachedCopyText(formatId: CopyFormatId): string | undefined {
+  if (formatId === "markdownFile") {
+    return cache.get("markdown");
+  }
   return cache.get(formatId);
 }
 
