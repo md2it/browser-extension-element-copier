@@ -22,8 +22,8 @@ import type {
   ContentActivationResponse,
   ContentToBg,
   CopyPickedFormatPanelResponse,
-  GetPickCopyTextResponse,
 } from "./messages";
+import { getPickCopyTextFromStorage } from "./pick-mode/pick-copy-cache-storage";
 import {
   canOperateOnTab,
   getRestrictedNoticeDismissMs,
@@ -302,25 +302,12 @@ async function sendWithInject(
   return sendToTab(tabId, message, frameId);
 }
 
-async function clearPickCopyCacheOnTab(tabId: number): Promise<void> {
-  try {
-    await ext.tabs.sendMessage(
-      tabId,
-      { type: "CLEAR_PICK_COPY_CACHE" },
-      { frameId: MAIN_FRAME_ID },
-    );
-  } catch {
-    /* tab closed, navigated, or content script unavailable */
-  }
-}
-
 async function handlePanelSessionEnded(): Promise<void> {
   if (!consumePanelSessionClose()) return;
   const tabId = await readPanelTargetTabId();
   if (tabId === undefined) return;
   tabCopiedBadge.set(tabId, false);
   await syncToolbarBadge(tabId);
-  await clearPickCopyCacheOnTab(tabId);
 }
 
 async function setTabActive(
@@ -662,9 +649,6 @@ ext.runtime.onMessage.addListener(
         if (tabId !== undefined) {
           tabCopiedBadge.set(tabId, contentMessage.tab === "copied");
           await syncToolbarBadge(tabId);
-          if (contentMessage.tab !== "copied") {
-            await clearPickCopyCacheOnTab(tabId);
-          }
         }
         await syncPickModeForPanelTab(contentMessage.tab, sender);
       })();
@@ -692,29 +676,12 @@ ext.runtime.onMessage.addListener(
     }
     if (contentMessage.type === "COPY_PICKED_FORMAT") {
       void (async () => {
-        const tabId = await resolvePickModeTabId(sender);
-        if (tabId === undefined) {
+        const text = await getPickCopyTextFromStorage(contentMessage.formatId);
+        if (text === undefined) {
           sendResponse({ ok: false });
           return;
         }
-        const msg: BgToContent = {
-          type: "GET_PICK_COPY_TEXT",
-          formatId: contentMessage.formatId,
-        };
-        try {
-          const response = await ext.tabs.sendMessage<BgToContent, GetPickCopyTextResponse>(
-            tabId,
-            msg,
-            { frameId: MAIN_FRAME_ID },
-          );
-          if (!response?.ok || !response.text) {
-            sendResponse({ ok: false });
-            return;
-          }
-          sendResponse({ ok: true, text: response.text });
-        } catch {
-          sendResponse({ ok: false });
-        }
+        sendResponse({ ok: true, text });
       })();
       return true;
     }

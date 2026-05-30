@@ -2,7 +2,7 @@ import { ext } from "../api";
 import type { CopyFormatId } from "../formats/definitions";
 import type { CopyPickedFormatPanelResponse, ContentToBg } from "../messages";
 
-/** Fetch cached pick text for a format from the target tab (via background). */
+/** Fetch cached pick text for a format from extension storage (via background). */
 export async function fetchPickedFormatText(
   formatId: CopyFormatId,
 ): Promise<string | undefined> {

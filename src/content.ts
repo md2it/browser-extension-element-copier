@@ -9,8 +9,6 @@ import { bootstrapPanelPopupPageIfNeeded } from "./panel-popup/page";
 import { bootstrapPanelTabPageIfNeeded } from "./panel-tab";
 import { copyToClipboardForFormat } from "./element-copy";
 import {
-  bindPickCopyCacheLifecycle,
-  clearPickCopyCache,
   CopierPickUI,
   getCachedCopyText,
   notifyElementPicked,
@@ -29,7 +27,6 @@ import {
   sendToBackground,
   type BgToContent,
   type ContentActivationResponse,
-  type GetPickCopyTextResponse,
 } from "./messages";
 
 type ContentState = {
@@ -149,7 +146,7 @@ function attachMessageHandler(state: ContentState): void {
 
       await refreshFormatSettingsCache();
       const enabledFormats = getCachedEnabledFormats();
-      snapshotPickCopyCache(element, enabledFormats, getCachedInlineImagesMode());
+      await snapshotPickCopyCache(element, enabledFormats, getCachedInlineImagesMode());
 
       const defaultFormatId = getCachedClipboardDefaultFormat();
       let copiedFormatId: CopyFormatId | null = null;
@@ -241,7 +238,7 @@ function attachMessageHandler(state: ContentState): void {
   const handler = (
     message: BgToContent,
     _sender: chrome.runtime.MessageSender,
-    sendResponse: (response: ContentActivationResponse | GetPickCopyTextResponse) => void,
+    sendResponse: (response: ContentActivationResponse) => void,
   ): boolean | void => {
     if (message.type === "SET_ACTIVE") {
       if (typeof window !== "undefined" && window.top !== window) {
@@ -255,24 +252,6 @@ function attachMessageHandler(state: ContentState): void {
       return;
     }
 
-    if (message.type === "GET_PICK_COPY_TEXT") {
-      if (typeof window !== "undefined" && window.top !== window) {
-        sendResponse({ ok: false });
-        return;
-      }
-      const text = getCachedCopyText(message.formatId);
-      if (text === undefined) {
-        sendResponse({ ok: false });
-        return;
-      }
-      sendResponse({ ok: true, text });
-      return;
-    }
-
-    if (message.type === "CLEAR_PICK_COPY_CACHE") {
-      clearPickCopyCache();
-      return;
-    }
   };
 
   window.__ecMessageHandler = handler;
@@ -289,7 +268,6 @@ if (window.__ecRuntimeId !== undefined && window.__ecRuntimeId !== runtimeId) {
 window.__ecRuntimeId = runtimeId;
 registerDocumentOperabilityProbeListener();
 bindFormatSettingsCache();
-bindPickCopyCacheLifecycle();
 attachMessageHandler(state);
 registerCopierStartHotkey(requestToggle);
 

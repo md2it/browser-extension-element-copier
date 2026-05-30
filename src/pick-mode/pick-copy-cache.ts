@@ -3,15 +3,19 @@ import { createStringCache } from "../element-copy";
 import { COPY_FORMATS, type CopyFormatId } from "../formats/definitions";
 import type { EnabledFormatsMap } from "../settings/format-settings";
 import { DEFAULT_INLINE_IMAGES_MODE, type InlineImageMode } from "../settings/inline-images";
+import {
+  clearPickCopyCacheStorage,
+  writePickCopyCacheToStorage,
+} from "./pick-copy-cache-storage";
 
 const cache = createStringCache<CopyFormatId>();
 
 /** Sync snapshot of enabled formats; call only after pick-mode deactivate. */
-export function snapshotPickCopyCache(
+export async function snapshotPickCopyCache(
   element: Element,
   enabledFormats: EnabledFormatsMap,
   inlineImages: InlineImageMode = DEFAULT_INLINE_IMAGES_MODE,
-): void {
+): Promise<void> {
   const formatIds = COPY_FORMATS.filter((format) => enabledFormats[format.id]).map(
     (format) => format.id,
   );
@@ -33,6 +37,11 @@ export function snapshotPickCopyCache(
   }
 
   cache.snapshot(entries);
+  if (entries.length === 0) {
+    await clearPickCopyCacheStorage();
+  } else {
+    await writePickCopyCacheToStorage(entries);
+  }
 }
 
 export function getCachedCopyText(formatId: CopyFormatId): string | undefined {
@@ -42,6 +51,3 @@ export function getCachedCopyText(formatId: CopyFormatId): string | undefined {
   return cache.get(formatId);
 }
 
-export function clearPickCopyCache(): void {
-  cache.clear();
-}

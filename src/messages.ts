@@ -3,10 +3,7 @@ import { ext } from "./api";
 import type { CopyFormatId } from "./formats/definitions";
 import type { PanelPopupTab } from "./panel-popup/constants";
 
-export type BgToContent =
-  | { type: "SET_ACTIVE"; active: boolean }
-  | { type: "GET_PICK_COPY_TEXT"; formatId: CopyFormatId }
-  | { type: "CLEAR_PICK_COPY_CACHE" };
+export type BgToContent = { type: "SET_ACTIVE"; active: boolean };
 
 export type ContentToBg =
   | { type: "ACTIVE_CHANGED"; active: boolean }
@@ -30,9 +27,7 @@ export type BgToWelcome = { type: "PIN_STATUS_CHANGED"; pinned: boolean };
 
 export type ContentActivationResponse = { ok: boolean };
 
-export type GetPickCopyTextResponse = { ok: boolean; text?: string };
-
-/** Background → panel after fetching cached pick text from the target tab. */
+/** Background → panel after fetching cached pick text from extension storage. */
 export type CopyPickedFormatPanelResponse = { ok: boolean; text?: string };
 
 export function sendToBackground(msg: ContentToBg): void {
