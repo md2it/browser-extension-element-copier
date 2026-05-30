@@ -10,6 +10,13 @@ export type Strings = {
   skipStartPageToggleLabel: string;
   settingsCopyDefaultLabel: string;
   settingsCopyDefaultNothing: string;
+  settingsInlineImagesLabel: string;
+  settingsInlineImagesUseAll: string;
+  settingsInlineImagesRemoveLarge: string;
+  settingsInlineImagesRemoveAll: string;
+  settingsInlineImagesInfoLabel: string;
+  settingsInlineImagesInfo: string;
+  infoWindowCloseLabel: string;
   settingsFormatsGroupLabel: string;
   formatOuterHtml: string;
   formatSelector: string;

@@ -2,6 +2,7 @@ import { extractElementCopyText } from "../copy";
 import { createStringCache } from "../element-copy";
 import { COPY_FORMATS, type CopyFormatId } from "../formats/definitions";
 import type { EnabledFormatsMap } from "../settings/format-settings";
+import { DEFAULT_INLINE_IMAGES_MODE, type InlineImageMode } from "../settings/inline-images";
 
 const cache = createStringCache<CopyFormatId>();
 
@@ -9,6 +10,7 @@ const cache = createStringCache<CopyFormatId>();
 export function snapshotPickCopyCache(
   element: Element,
   enabledFormats: EnabledFormatsMap,
+  inlineImages: InlineImageMode = DEFAULT_INLINE_IMAGES_MODE,
 ): void {
   const formatIds = COPY_FORMATS.filter((format) => enabledFormats[format.id]).map(
     (format) => format.id,
@@ -19,12 +21,15 @@ export function snapshotPickCopyCache(
   for (const formatId of formatIds) {
     if (formatId === "markdown" || formatId === "markdownFile") {
       if (markdownText === undefined) {
-        markdownText = extractElementCopyText(element, "markdown");
+        markdownText = extractElementCopyText(element, "markdown", inlineImages);
         entries.push({ key: "markdown", value: markdownText });
       }
       continue;
     }
-    entries.push({ key: formatId, value: extractElementCopyText(element, formatId) });
+    entries.push({
+      key: formatId,
+      value: extractElementCopyText(element, formatId, inlineImages),
+    });
   }
 
   cache.snapshot(entries);

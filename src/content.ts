@@ -21,6 +21,7 @@ import {
   bindFormatSettingsCache,
   getCachedClipboardDefaultFormat,
   getCachedEnabledFormats,
+  getCachedInlineImagesMode,
   refreshFormatSettingsCache,
 } from "./settings/format-settings-cache";
 import type { CopyFormatId } from "./formats/definitions";
@@ -148,7 +149,7 @@ function attachMessageHandler(state: ContentState): void {
 
       await refreshFormatSettingsCache();
       const enabledFormats = getCachedEnabledFormats();
-      snapshotPickCopyCache(element, enabledFormats);
+      snapshotPickCopyCache(element, enabledFormats, getCachedInlineImagesMode());
 
       const defaultFormatId = getCachedClipboardDefaultFormat();
       let copiedFormatId: CopyFormatId | null = null;

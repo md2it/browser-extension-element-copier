@@ -1,3 +1,8 @@
+import { INFO } from "../icons";
+import {
+  createInfoWindow,
+  createInfoWindowClasses,
+} from "../../../lib/src/info-window";
 import type { Strings } from "../i18n";
 import {
   CLIPBOARD_DEFAULT_NOTHING,
@@ -8,12 +13,94 @@ import {
   type EnabledFormatsMap,
 } from "../settings/format-settings";
 import {
+  getInlineImagesMode,
+  INLINE_IMAGES_MODES,
+  setInlineImagesMode,
+  type InlineImageMode,
+} from "../settings/inline-images";
+import {
   CLIPBOARD_COPY_FORMATS,
   COPY_FORMATS,
   type CopyFormatId,
   type FormatDefinition,
 } from "./definitions";
 import { createFormatActionIcon } from "./format-icons";
+
+const INFO_WINDOW_CLASSES = createInfoWindowClasses("ec");
+
+function inlineImagesOptionLabel(mode: InlineImageMode, strings: Strings): string {
+  switch (mode) {
+    case "all":
+      return strings.settingsInlineImagesUseAll;
+    case "remove-large":
+      return strings.settingsInlineImagesRemoveLarge;
+    case "remove-all":
+      return strings.settingsInlineImagesRemoveAll;
+  }
+}
+
+function infoWindowContainer(anchor: HTMLElement): HTMLElement {
+  return anchor.closest<HTMLElement>(".ec-panel") ?? document.body;
+}
+
+function openInlineImagesInfo(anchor: HTMLElement, strings: Strings): void {
+  const container = infoWindowContainer(anchor);
+  container.querySelector(`.${INFO_WINDOW_CLASSES.overlay}`)?.remove();
+
+  const para = document.createElement("p");
+  para.textContent = strings.settingsInlineImagesInfo;
+
+  const { root } = createInfoWindow({
+    classes: INFO_WINDOW_CLASSES,
+    contentHtml: para.outerHTML,
+    closeLabel: strings.infoWindowCloseLabel,
+  });
+  container.appendChild(root);
+}
+
+function createInlineImagesInfoButton(strings: Strings): HTMLButtonElement {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "ec-inline-images-info";
+  button.setAttribute("aria-label", strings.settingsInlineImagesInfoLabel);
+  button.innerHTML = INFO;
+  button.addEventListener("click", (event) => {
+    event.stopPropagation();
+    openInlineImagesInfo(button, strings);
+  });
+  return button;
+}
+
+export async function createInlineImagesSelect(strings: Strings): Promise<HTMLElement> {
+  const selectedMode = await getInlineImagesMode();
+
+  const row = document.createElement("div");
+  row.className = "ec-copy-default-row ec-inline-images-row";
+
+  const label = document.createElement("label");
+  label.className = "ec-copy-default-label";
+  label.htmlFor = "ec-inline-images-mode";
+  label.textContent = strings.settingsInlineImagesLabel;
+
+  const select = document.createElement("select");
+  select.id = "ec-inline-images-mode";
+  select.className = "ec-copy-default-select";
+
+  for (const mode of INLINE_IMAGES_MODES) {
+    const option = document.createElement("option");
+    option.value = mode;
+    option.textContent = inlineImagesOptionLabel(mode, strings);
+    option.selected = mode === selectedMode;
+    select.append(option);
+  }
+
+  select.addEventListener("change", () => {
+    void setInlineImagesMode(select.value as InlineImageMode);
+  });
+
+  row.append(label, createInlineImagesInfoButton(strings), select);
+  return row;
+}
 
 function createFormatChip(
   format: FormatDefinition,

@@ -54,4 +54,6 @@ export const SKIP_START_PAGE_KEY = "skipStartPage";
 export const ENABLED_FORMATS_KEY = "enabledFormats";
 /** Default format saved to clipboard on copy (SETTINGS dropdown). */
 export const CLIPBOARD_DEFAULT_FORMAT_KEY = "clipboardDefaultFormat";
+/** Inline (data:) image handling for TEXT/MARKDOWN (SETTINGS dropdown). */
+export const INLINE_IMAGES_KEY = "inlineImages";
 export const DEFAULT_NOTIFICATION_SECONDS = 4;

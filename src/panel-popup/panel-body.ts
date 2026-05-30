@@ -7,6 +7,7 @@ import {
   createClipboardDefaultFormatSelect,
   createCopiedOtherOptionsRow,
   createCopiedPageOptionsSection,
+  createInlineImagesSelect,
 } from "../formats/format-ui";
 import type { Strings } from "../i18n";
 import { PANEL_FOOTER_LINKEDIN_URL } from "../../../lib/src/panel-footer/constants";
@@ -190,11 +191,13 @@ export async function buildSettingsPanelBody(
 ): Promise<void> {
   body.replaceChildren();
 
-  const [clipboardDefaultFormat, copiedPageOptions, skipStartEnabled] = await Promise.all([
-    createClipboardDefaultFormatSelect(strings),
-    createCopiedPageOptionsSection(strings),
-    getSkipStartPage(),
-  ]);
+  const [clipboardDefaultFormat, inlineImagesSelect, copiedPageOptions, skipStartEnabled] =
+    await Promise.all([
+      createClipboardDefaultFormatSelect(strings),
+      createInlineImagesSelect(strings),
+      createCopiedPageOptionsSection(strings),
+      getSkipStartPage(),
+    ]);
 
   const page = document.createElement("div");
   page.className = "ec-panel-page ec-panel-page--settings";
@@ -208,6 +211,7 @@ export async function buildSettingsPanelBody(
     createPageDivider(),
     createSkipStartToggleRow(strings, skipStartEnabled),
     clipboardDefaultFormat,
+    inlineImagesSelect,
     createPageDivider(),
     copiedPageOptions,
   );
