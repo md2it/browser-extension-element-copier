@@ -36,9 +36,11 @@ import {
   openPanelFromSender,
   openStartPanelFromToolbar,
   PANEL_POPUP_PAGE,
+  PANEL_SESSION_PORT_NAME,
   type PanelMenuTab,
   type PanelPopupTab,
 } from "./panel-popup";
+import { consumePanelSessionClose } from "./panel-popup/panel-session";
 import { readPanelTargetTabId } from "./panel-popup/panel-target-tab";
 import { isRtlLocale, t, type Locale } from "./i18n";
 import type { Strings } from "./i18n/types";
@@ -303,6 +305,15 @@ async function clearPickCopyCacheOnTab(tabId: number): Promise<void> {
   } catch {
     /* tab closed, navigated, or content script unavailable */
   }
+}
+
+async function handlePanelSessionEnded(): Promise<void> {
+  if (!consumePanelSessionClose()) return;
+  const tabId = await readPanelTargetTabId();
+  if (tabId === undefined) return;
+  tabCopiedBadge.set(tabId, false);
+  await syncToolbarBadge(tabId);
+  await clearPickCopyCacheOnTab(tabId);
 }
 
 async function setTabActive(
@@ -643,13 +654,7 @@ ext.runtime.onMessage.addListener(
       })();
     }
     if (contentMessage.type === "PANEL_CLOSED") {
-      void (async () => {
-        const tabId = await resolvePickModeTabId(sender);
-        if (tabId === undefined) return;
-        tabCopiedBadge.set(tabId, false);
-        await syncToolbarBadge(tabId);
-        await clearPickCopyCacheOnTab(tabId);
-      })();
+      void handlePanelSessionEnded();
     }
     if (contentMessage.type === "REQUEST_START_PICK_MODE") {
       void (async () => {
@@ -698,6 +703,13 @@ ext.runtime.onMessage.addListener(
     }
   },
 );
+
+ext.runtime.onConnect.addListener((port) => {
+  if (port.name !== PANEL_SESSION_PORT_NAME) return;
+  port.onDisconnect.addListener(() => {
+    void handlePanelSessionEnded();
+  });
+});
 
 ext.tabs.onRemoved.addListener((tabId) => {
   clearBlockedBadgeTimer(tabId);

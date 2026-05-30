@@ -6,6 +6,7 @@ import {
 import { openPanelInTab } from "../panel-tab";
 import { PANEL_PAGE_CONFIG, type PanelPopupTab } from "./constants";
 import { rememberPanelTargetTab } from "./panel-target-tab";
+import { markPanelSessionOpened } from "./panel-session";
 
 export type { PanelPageOpenTarget as PanelPopupOpenTarget };
 
@@ -18,6 +19,7 @@ export function openPanelInActionPopup(
   panelTab: PanelPopupTab,
   target: PanelPageOpenTarget,
 ): void {
+  markPanelSessionOpened();
   if (target.tabId !== undefined) {
     void rememberPanelTargetTab(target.tabId);
   }

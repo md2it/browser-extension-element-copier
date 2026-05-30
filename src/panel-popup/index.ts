@@ -5,6 +5,7 @@ export {
   PANEL_POPUP_PAGE,
   PANEL_POPUP_ROOT_ID,
   PANEL_POPUP_TABS,
+  PANEL_SESSION_PORT_NAME,
   type PanelMenuTab,
   type PanelPopupTab,
 } from "./constants";

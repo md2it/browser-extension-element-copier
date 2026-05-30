@@ -1,5 +1,6 @@
+import { ext } from "../api";
 import { sendToBackground } from "../messages";
-import type { PanelPopupTab } from "./constants";
+import { PANEL_SESSION_PORT_NAME, type PanelPopupTab } from "./constants";
 
 /** Sync pick mode with the visible panel tab (START on/off). */
 export function notifyPanelTabChanged(tab: PanelPopupTab): void {
@@ -14,6 +15,11 @@ export function notifyStartPickMode(): void {
 /** Notify background that popup/panel is closed. */
 export function notifyPanelClosed(): void {
   sendToBackground({ type: "PANEL_CLOSED" });
+}
+
+/** Keep a port open until the panel document is destroyed (reliable close signal). */
+export function bindPanelSessionPort(): void {
+  ext.runtime.connect({ name: PANEL_SESSION_PORT_NAME });
 }
 
 export { copyPickedFormatFromPanel } from "./copy-picked-format";

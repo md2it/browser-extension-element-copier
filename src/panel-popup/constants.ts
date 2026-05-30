@@ -8,6 +8,9 @@ export const PANEL_POPUP_HOST_ATTR = "data-element-copier-ui";
 
 export const PANEL_POPUP_SESSION_TAB_KEY = "panelPopupTab";
 
+/** Long-lived port from panel page → background; disconnect means panel closed. */
+export const PANEL_SESSION_PORT_NAME = "element-copier-panel-session";
+
 export const PANEL_POPUP_DISMISS_DELAY_MS = 1000;
 export const PANEL_POPUP_WIDTH_PX = 380;
 export const PANEL_POPUP_PROBE_WIDTH = `${PANEL_POPUP_WIDTH_PX}px`;
