@@ -8,7 +8,7 @@
    - "Copied to clipboard: WHAT_COPIED"
    - WHAT_COPIED = то, что скопировано в clopboard
    - Если WHAT_COPIED = nothing, то серая
-   - Если WHAT_COPIED != nothing, то чёрная
+   - Если WHAT_COPIED != nothing, то чёрная, жирная
    - При сохранении в clopboard нового значения, WHAT_COPIED меняется соответственно
 - [разделительная черта]
 - Inline текст "Options:" и кнопки для копирования/сохранения в других форматах:

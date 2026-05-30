@@ -691,10 +691,12 @@
 
 .ec-copied-subtitle-what {
   color: #111827;
+  font-weight: 700;
 }
 
 .ec-copied-subtitle-what--nothing {
   color: #6b7280;
+  font-weight: 400;
 }
 
 .ec-copied-divider {

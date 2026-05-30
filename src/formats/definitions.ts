@@ -63,7 +63,7 @@ export const COPY_FORMATS: readonly FormatDefinition[] = [
   },
 ] as const;
 
-export const DEFAULT_CLIPBOARD_FORMAT_ID: CopyFormatId = "outerHTML";
+export const DEFAULT_CLIPBOARD_FORMAT_ID: CopyFormatId = "text";
 
 export function isCopyFormatId(value: unknown): value is CopyFormatId {
   return COPY_FORMATS.some((format) => format.id === value);
