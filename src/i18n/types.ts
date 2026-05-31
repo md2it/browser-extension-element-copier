@@ -36,6 +36,7 @@ export type Strings = {
   copiedFormatsGroupLabel: string;
   copiedFilesLabel: string;
   copiedCopyImagesLabel: string;
+  copiedImageClipboardUnsupportedTooltip: string;
   copiedCopyTextLabel: string;
   copiedDeveloperToolsLabel: string;
   copiedStartOverButtonLabel: string;

@@ -37,6 +37,8 @@ const MESSAGES: Record<Locale, Strings> = {
     copiedFormatsGroupLabel: "Options:",
     copiedFilesLabel: "Download:",
     copiedCopyImagesLabel: "Copy image:",
+    copiedImageClipboardUnsupportedTooltip:
+      "Your browser can't copy this image format to the clipboard. Use Download instead.",
     copiedCopyTextLabel: "Copy text:",
     copiedDeveloperToolsLabel: "Developer tools:",
     copiedStartOverButtonLabel: "START OVER",

@@ -42,5 +42,5 @@ U = user, E = extension
 - Copy Text: копирует text/html + text/plain в clipboard
 - Copy markdown: копирует markdown как текст
 - Copy (any image): копирует в clipboard изображение как файл
-- Download: скачивает соответсвующий файл
-- Copy (any devtools): копирует соответсвующую информацию в clipboard
+- Download: скачивает соответствующий файл
+- Copy (any devtools): копирует соответствующую информацию в clipboard

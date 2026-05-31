@@ -6,6 +6,18 @@ export type ImageCopyFormatId = Extract<CopyFormatId, "png" | "jpeg">;
 const IMAGE_FORMATS = new Set<CopyFormatId>(["png", "jpeg"]);
 const TRANSPARENT_CANVAS_FALLBACK = "rgba(0, 0, 0, 0)";
 
+/**
+ * Transparent 1x1 PNG. modern-screenshot returns this for resources it cannot
+ * fetch (e.g. cross-origin images without CORS), so a failed embed degrades to
+ * a blank pixel instead of rejecting with an uncaught "Failed to fetch".
+ *
+ * The library applies this by default, but passing a partial `fetch` option
+ * clobbers its `fetch` defaults via its `...options` spread, so we must set it
+ * explicitly to keep the safe behaviour.
+ */
+const FETCH_PLACEHOLDER_IMAGE =
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+
 type ScreenshotBackground = {
   color: string | null;
   background: string | null;
@@ -174,6 +186,7 @@ function screenshotOptions(
       background.color ?? (formatId === "jpeg" ? "#ffffff" : null),
     fetch: {
       requestInit: { cache: "force-cache" },
+      placeholderImage: FETCH_PLACEHOLDER_IMAGE,
     },
     style: Object.keys(style).length > 0 ? style : null,
   };

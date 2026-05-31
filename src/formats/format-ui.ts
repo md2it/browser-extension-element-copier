@@ -38,6 +38,7 @@ import {
   type SettingsChipGroup,
 } from "./definitions";
 import { isImageCopyFormat } from "../copy/screenshot";
+import { canCopyFormatToClipboard } from "../element-copy";
 
 const INFO_WINDOW_CLASSES = createInfoWindowClasses("ec");
 
@@ -223,6 +224,7 @@ function createFormatActionButton(
   available: boolean,
   actionKind: CopiedPanelActionKind,
   onActivate: (formatId: CopyFormatId, actionKind: CopiedPanelActionKind) => void,
+  unavailableTooltip?: string,
 ): HTMLButtonElement {
   const button = document.createElement("button");
   button.type = "button";
@@ -240,6 +242,7 @@ function createFormatActionButton(
   if (!available) {
     button.disabled = true;
     button.classList.add("ec-format-action-btn--unavailable");
+    if (unavailableTooltip) button.title = unavailableTooltip;
     return button;
   }
 
@@ -267,8 +270,8 @@ export type CopiedOtherOptionsOptions = {
   enabledFormats: EnabledFormatsMap;
   pickCopyCacheRecord: PickCopyCacheRecord | undefined;
   selectedSelection?: CopiedPanelButtonSelection | null;
-  onCopyFormat: (formatId: CopyFormatId) => void;
-  onSaveFormat?: (formatId: CopyFormatId) => void;
+  onCopyFormat: (formatId: CopyFormatId) => void | boolean | Promise<boolean>;
+  onSaveFormat?: (formatId: CopyFormatId) => void | boolean | Promise<boolean>;
 };
 
 function createCopiedBlock(): HTMLDivElement {
@@ -330,21 +333,34 @@ function createCopiedFormatInlineList(
   for (const format of COPY_FORMATS) {
     if (format.settingsGroup !== group) continue;
     if (!options.enabledFormats[format.id]) continue;
-    const onActivate = isDownloadFormatAction(format.actionIcon)
-      ? options.onSaveFormat
-      : options.onCopyFormat;
+    const isDownload = isDownloadFormatAction(format.actionIcon);
+    const onActivate = isDownload ? options.onSaveFormat : options.onCopyFormat;
     if (!onActivate) continue;
-    const available = isPickCopyFormatAvailable(
+    const inCache = isPickCopyFormatAvailable(
       format.id,
       options.pickCopyCacheRecord,
       document,
     );
+    const clipboardWritable = isDownload || canCopyFormatToClipboard(format.id);
+    const available = inCache && clipboardWritable;
+    const unavailableTooltip =
+      inCache && !clipboardWritable
+        ? strings.copiedImageClipboardUnsupportedTooltip
+        : undefined;
     const actionKind = copiedFormatActionKind(format, false);
     row.append(
-      createFormatActionButton(format, strings, available, actionKind, (formatId, kind) => {
-        onSelectFormat(formatId, kind);
-        onActivate(formatId);
-      }),
+      createFormatActionButton(
+        format,
+        strings,
+        available,
+        actionKind,
+        (formatId, kind) => {
+          void Promise.resolve(onActivate(formatId)).then((copied) => {
+            if (copied) onSelectFormat(formatId, kind);
+          });
+        },
+        unavailableTooltip,
+      ),
     );
   }
 
@@ -364,8 +380,9 @@ function createCopiedFormatInlineList(
           available,
           "download",
           (formatId, kind) => {
-            onSelectFormat(formatId, kind);
-            options.onSaveFormat?.(formatId);
+            void Promise.resolve(options.onSaveFormat?.(formatId)).then((saved) => {
+              if (saved) onSelectFormat(formatId, kind);
+            });
           },
         ),
       );
@@ -435,8 +452,9 @@ function createCopiedDeveloperToolsRows(
     row.dataset.actionKind = "copy";
     row.addEventListener("click", () => {
       if (!available) return;
-      onSelectFormat(format.id, "copy");
-      options.onCopyFormat(format.id);
+      void Promise.resolve(options.onCopyFormat(format.id)).then((copied) => {
+        if (copied) onSelectFormat(format.id, "copy");
+      });
     });
 
     rows.append(row);

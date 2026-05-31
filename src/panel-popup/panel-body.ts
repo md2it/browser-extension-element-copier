@@ -505,31 +505,29 @@ export async function buildCopiedPanelBody(
     enabledFormats,
     pickCopyCacheRecord,
     selectedSelection,
-    onCopyFormat: (formatId) => {
-      void (async () => {
-        const copied = await copyPickedFormatFromPanel(formatId);
-        if (!copied) return;
-        const nextState: CopiedSubtitleState = {
-          action: "copied",
-          copiedFormatId: formatId,
-          downloadedFormatId: lastDownloadedFormatId,
-        };
-        updateCopiedPageSubtitle(header, nextState, strings);
-        await setLastCopiedFormat(formatId);
-      })();
+    onCopyFormat: async (formatId) => {
+      const copied = await copyPickedFormatFromPanel(formatId);
+      if (!copied) return false;
+      const nextState: CopiedSubtitleState = {
+        action: "copied",
+        copiedFormatId: formatId,
+        downloadedFormatId: lastDownloadedFormatId,
+      };
+      updateCopiedPageSubtitle(header, nextState, strings);
+      await setLastCopiedFormat(formatId);
+      return true;
     },
-    onSaveFormat: (formatId) => {
-      void (async () => {
-        const saved = await savePickedFormatFromPanel(formatId);
-        if (!saved) return;
-        const nextState: CopiedSubtitleState = {
-          action: "saved",
-          copiedFormatId: lastCopiedFormatId,
-          downloadedFormatId: formatId,
-        };
-        updateCopiedPageSubtitle(header, nextState, strings);
-        await setLastDownloadedFormat(formatId);
-      })();
+    onSaveFormat: async (formatId) => {
+      const saved = await savePickedFormatFromPanel(formatId);
+      if (!saved) return false;
+      const nextState: CopiedSubtitleState = {
+        action: "saved",
+        copiedFormatId: lastCopiedFormatId,
+        downloadedFormatId: formatId,
+      };
+      updateCopiedPageSubtitle(header, nextState, strings);
+      await setLastDownloadedFormat(formatId);
+      return true;
     },
   });
 
