@@ -27,9 +27,15 @@ export function isPickCopyCacheValueStorable(
 export function isPickCopyFormatAvailable(
   formatId: CopyFormatId,
   record: PickCopyCacheRecord | undefined,
+  doc?: Document,
 ): boolean {
   if (!record) return false;
-  return record[resolvePickCopyCacheStorageKey(formatId)] !== undefined;
+  const value = record[resolvePickCopyCacheStorageKey(formatId)];
+  if (value === undefined) return false;
+  if (formatId === "text") {
+    return isFormattedTextCacheStorable(value, doc);
+  }
+  return true;
 }
 
 export async function readPickCopyCacheFromStorage(): Promise<PickCopyCacheRecord | undefined> {

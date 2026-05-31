@@ -290,7 +290,11 @@ function createCopiedFormatInlineList(
       ? options.onSaveFormat
       : options.onCopyFormat;
     if (!onActivate) continue;
-    const available = isPickCopyFormatAvailable(format.id, options.pickCopyCacheRecord);
+    const available = isPickCopyFormatAvailable(
+      format.id,
+      options.pickCopyCacheRecord,
+      document,
+    );
     row.append(
       createFormatActionButton(format, strings, available, (formatId) => {
         onSelectFormat(formatId);

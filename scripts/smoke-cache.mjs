@@ -89,14 +89,36 @@ function getTextFromRecord(record, formatId) {
   assert.equal(entries[0].key, "markdown");
 }
 
-/** Mirrors lib formatted-text/cache.ts: isFormattedTextCacheStorable (no doc). */
-function isFormattedTextCacheStorable(serialized) {
+const FRAGMENT_START = "<!--StartFragment-->";
+const FRAGMENT_END = "<!--EndFragment-->";
+
+function extractClipboardHtmlFragment(html) {
+  const start = html.indexOf(FRAGMENT_START);
+  if (start < 0) return html;
+  const contentStart = start + FRAGMENT_START.length;
+  const end = html.indexOf(FRAGMENT_END, contentStart);
+  if (end < 0) return html.slice(contentStart);
+  return html.slice(contentStart, end);
+}
+
+/** Smoke mirror: text between tags (matches DOM text-node walk for typical fragments). */
+function hasNonWhitespaceTextInClipboardHtml(html) {
+  const fragment = extractClipboardHtmlFragment(html).trim();
+  if (!fragment) return false;
+  const text = fragment.replace(/<[^>]+>/g, "");
+  return text.trim() !== "";
+}
+
+/** Mirrors lib formatted-text/cache.ts: isFormattedTextCacheStorable */
+function isFormattedTextCacheStorable(serialized, doc) {
   try {
     const parsed = JSON.parse(serialized);
     if (typeof parsed !== "object" || parsed === null || typeof parsed.html !== "string") {
       return false;
     }
-    return parsed.html.trim() !== "";
+    if (!parsed.html.trim()) return false;
+    if (!doc) return false;
+    return hasNonWhitespaceTextInClipboardHtml(parsed.html);
   } catch {
     return false;
   }
@@ -128,6 +150,10 @@ function entriesToStorableRecord(entries, doc) {
 
 // isPickCopyCacheValueStorable: text uses html inside serialized cache
 {
+  const wrap = (fragment) =>
+    `<html><head><meta charset="utf-8"></head><body>${FRAGMENT_START}${fragment}${FRAGMENT_END}</body></html>`;
+  const doc = {};
+
   assert.equal(isPickCopyCacheValueStorable("text", "{}"), false);
   assert.equal(isPickCopyCacheValueStorable("text", "   "), false);
   assert.equal(
@@ -139,8 +165,19 @@ function entriesToStorableRecord(entries, doc) {
     false,
   );
   assert.equal(
-    isPickCopyCacheValueStorable("text", JSON.stringify({ html: "<p>x</p>", plain: "x" })),
+    isPickCopyCacheValueStorable(
+      "text",
+      JSON.stringify({ html: wrap("<p>x</p>") }),
+      doc,
+    ),
     true,
+  );
+  // Icon-only tablist: aria-label on tabs, no text nodes → not storable
+  const tablist =
+    '<div role="tablist"><div role="tab" aria-label="Calendar"><div></div><div style="background-image:url(x)"></div></div><div role="tab" aria-label="Keep"><div></div></div></div>';
+  assert.equal(
+    isPickCopyCacheValueStorable("text", JSON.stringify({ html: wrap(tablist) }), doc),
+    false,
   );
 }
 
@@ -159,9 +196,14 @@ function resolvePickCopyCacheStorageKey(formatId) {
   return formatId === "markdownFile" ? "markdown" : formatId;
 }
 
-function isPickCopyFormatAvailable(formatId, record) {
+function isPickCopyFormatAvailable(formatId, record, doc) {
   if (!record) return false;
-  return record[resolvePickCopyCacheStorageKey(formatId)] !== undefined;
+  const value = record[resolvePickCopyCacheStorageKey(formatId)];
+  if (value === undefined) return false;
+  if (formatId === "text") {
+    return isFormattedTextCacheStorable(value, doc);
+  }
+  return true;
 }
 
 // isPickCopyFormatAvailable: derived markdownFile uses markdown key
@@ -169,6 +211,27 @@ function isPickCopyFormatAvailable(formatId, record) {
   assert.equal(isPickCopyFormatAvailable("markdownFile", { markdown: "# Hi" }), true);
   assert.equal(isPickCopyFormatAvailable("markdownFile", { selector: "#x" }), false);
   assert.equal(isPickCopyFormatAvailable("markdown", { markdown: "# Hi" }), true);
+}
+
+// isPickCopyFormatAvailable: text key with icon-only html is unavailable
+{
+  const wrap = (fragment) =>
+    `<html><head><meta charset="utf-8"></head><body>${FRAGMENT_START}${fragment}${FRAGMENT_END}</body></html>`;
+  const tablist =
+    '<div role="tablist"><div role="tab" aria-label="Calendar"><div></div></div></div>';
+  const serialized = JSON.stringify({ html: wrap(tablist) });
+  assert.equal(
+    isPickCopyFormatAvailable("text", { text: serialized }, {}),
+    false,
+  );
+  assert.equal(
+    isPickCopyFormatAvailable(
+      "text",
+      { text: JSON.stringify({ html: wrap("<p>hi</p>") }) },
+      {},
+    ),
+    true,
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -218,6 +281,7 @@ assert.match(panelBodySrc, /pickCopyCacheRecord/);
 
 const formatUiSrc = readFileSync(join(src, "formats/format-ui.ts"), "utf8");
 assert.match(formatUiSrc, /isPickCopyFormatAvailable/);
+assert.match(formatUiSrc, /isPickCopyFormatAvailable\([\s\S]*document/);
 assert.match(formatUiSrc, /pickCopyCacheRecord/);
 assert.match(formatUiSrc, /ec-format-action-btn--unavailable/);
 
