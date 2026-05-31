@@ -25,7 +25,12 @@ import type {
   GetPickCopyTextResponse,
 } from "./messages";
 import type { CopyFormatId } from "./formats/definitions";
-import { getPickCopyTextFromStorage } from "./pick-mode/pick-copy-cache-storage";
+import {
+  getPickCopyTextFromStorage,
+  hasPickCopyCacheInStorage,
+  PICK_COPY_CACHE_INDEX_KEY,
+  PICK_COPY_CACHE_STORAGE_KEY,
+} from "./pick-mode/pick-copy-cache-storage";
 import {
   canOperateOnTab,
   getRestrictedNoticeDismissMs,
@@ -513,24 +518,26 @@ const ACTION_MENU_EMOJI = {
   about: "ℹ️",
 } as const;
 
-const CONTEXT_MENU_ITEMS: readonly {
+const CONTEXT_MENU_START_ITEM = {
+  id: CONTEXT_MENU_START,
+  tab: "start" as const,
+  emoji: ACTION_MENU_EMOJI.start,
+  title: (strings: Strings) => strings.titleSettings,
+};
+
+const CONTEXT_MENU_COPIED_ITEM = {
+  id: CONTEXT_MENU_COPIED,
+  tab: "copied" as const,
+  emoji: ACTION_MENU_EMOJI.copied,
+  title: (strings: Strings) => strings.tabCopied,
+};
+
+const CONTEXT_MENU_SECONDARY_ITEMS: readonly {
   id: string;
   tab: PanelMenuTab;
   emoji: string;
   title: (strings: Strings) => string;
 }[] = [
-  {
-    id: CONTEXT_MENU_START,
-    tab: "start",
-    emoji: ACTION_MENU_EMOJI.start,
-    title: (strings) => strings.titleSettings,
-  },
-  {
-    id: CONTEXT_MENU_COPIED,
-    tab: "copied",
-    emoji: ACTION_MENU_EMOJI.copied,
-    title: (strings) => strings.tabCopied,
-  },
   {
     id: CONTEXT_MENU_LANGUAGE,
     tab: "language",
@@ -585,7 +592,11 @@ async function ensureContextMenu(): Promise<void> {
       console.error("[Element Copier] contextMenus.removeAll failed:", err);
     }
 
-    for (const item of CONTEXT_MENU_ITEMS) {
+    const hasCache = await hasPickCopyCacheInStorage();
+    const primaryItem = hasCache ? CONTEXT_MENU_COPIED_ITEM : CONTEXT_MENU_START_ITEM;
+    const contextMenuItems = [primaryItem, ...CONTEXT_MENU_SECONDARY_ITEMS];
+
+    for (const item of contextMenuItems) {
       await createContextMenuItem({
         id: item.id,
         title: actionMenuTitle(item.title(strings), item.emoji, locale),
@@ -598,7 +609,9 @@ async function ensureContextMenu(): Promise<void> {
 }
 
 function findContextMenuTab(menuItemId: string | number): PanelMenuTab | undefined {
-  return CONTEXT_MENU_ITEMS.find((item) => item.id === menuItemId)?.tab;
+  if (menuItemId === CONTEXT_MENU_START) return "start";
+  if (menuItemId === CONTEXT_MENU_COPIED) return "copied";
+  return CONTEXT_MENU_SECONDARY_ITEMS.find((item) => item.id === menuItemId)?.tab;
 }
 
 ext.action.onClicked.addListener((tab) => {
@@ -752,6 +765,9 @@ ext.storage.onChanged.addListener((changes, area) => {
     void refreshRestrictedNoticeCache();
   }
   if (changes.locale) {
+    void ensureContextMenu();
+  }
+  if (changes[PICK_COPY_CACHE_STORAGE_KEY] || changes[PICK_COPY_CACHE_INDEX_KEY]) {
     void ensureContextMenu();
   }
 });

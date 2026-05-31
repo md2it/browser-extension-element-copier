@@ -6,6 +6,7 @@ import { createPanelDivider, createPanelHeader } from "../../../lib/src/panel-he
 import { isRtlLocale, t, type Locale } from "../i18n";
 import { PANEL_FOOTER_CONFIG } from "../ui-config";
 import { PANEL_POPUP_HOST_ATTR } from "./constants";
+import { hasPickCopyCacheInStorage } from "../pick-mode/pick-copy-cache-storage";
 import { createPanelMenu, type PanelMenuHandle } from "./panel-menu";
 
 export type PanelSurfaceParts = {
@@ -14,10 +15,10 @@ export type PanelSurfaceParts = {
   menu: PanelMenuHandle | null;
 };
 
-export function createPanelSurface(
+export async function createPanelSurface(
   locale: Locale,
   surface?: "popup",
-): PanelSurfaceParts {
+): Promise<PanelSurfaceParts> {
   const panelRoot = document.createElement("div");
   panelRoot.className = "ec-panel";
   if (surface === "popup") {
@@ -43,7 +44,8 @@ export function createPanelSurface(
   let menu: PanelMenuHandle | null = null;
 
   if (surface === "popup") {
-    menu = createPanelMenu(strings);
+    const hasCache = await hasPickCopyCacheInStorage();
+    menu = createPanelMenu(strings, hasCache);
     const main = document.createElement("div");
     main.className = "ec-panel-main";
 

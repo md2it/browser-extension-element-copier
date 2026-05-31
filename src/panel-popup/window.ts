@@ -13,6 +13,7 @@ import {
   buildShortcutsPanelBody,
   PANEL_BODY_CENTERED_CLASS,
 } from "./panel-body";
+import { hasPickCopyCacheInStorage } from "../pick-mode/pick-copy-cache-storage";
 import type { PanelMenuHandle } from "./panel-menu";
 import {
   notifyPanelClosed,
@@ -44,7 +45,7 @@ export class CopierPanelWindow {
     this.close();
 
     const locale = this.host.getLocale();
-    const { panelRoot, body, menu } = createPanelSurface(locale, this.host.surface);
+    const { panelRoot, body, menu } = await createPanelSurface(locale, this.host.surface);
 
     this.panelRoot = panelRoot;
     this.body = body;
@@ -130,6 +131,8 @@ export class CopierPanelWindow {
     }
 
     if (this.menu) {
+      const hasCache = await hasPickCopyCacheInStorage();
+      this.menu.setCacheState(hasCache);
       this.menu.setActive(isMenuTab(tab) ? tab : null);
     }
 

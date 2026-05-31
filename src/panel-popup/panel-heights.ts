@@ -27,7 +27,7 @@ async function measurePanelBodyHeight(
   style.textContent = process.env.PANEL_CSS_CONTENT ?? "";
   shadow.append(style);
 
-  const { panelRoot, body } = createPanelSurface(locale, "popup");
+  const { panelRoot, body } = await createPanelSurface(locale, "popup");
   await fillBody(body);
   shadow.appendChild(panelRoot);
 
