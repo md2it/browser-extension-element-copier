@@ -33,6 +33,7 @@ export type Strings = {
   tabCopied: string;
   copiedTitle: string;
   copiedSubtitlePrefix: string;
+  copiedSubtitleDownloadPrefix: string;
   copiedFormatsGroupLabel: string;
   copiedFilesLabel: string;
   copiedCopyImagesLabel: string;

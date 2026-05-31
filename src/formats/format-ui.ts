@@ -20,8 +20,10 @@ import {
   type InlineImageMode,
 } from "../settings/inline-images";
 import { createToggleRow } from "../panel-popup/toggle-row";
+import { COPY } from "../../../lib/src/icons";
 import {
   isPickCopyFormatAvailable,
+  resolvePickCopyCacheStorageKey,
   type PickCopyCacheRecord,
 } from "../pick-mode/pick-copy-cache-storage";
 import {
@@ -251,11 +253,10 @@ export type CopiedOtherOptionsOptions = {
   onSaveFormat?: (formatId: CopyFormatId) => void;
 };
 
-function createCopiedFormatGroupDivider(): HTMLDivElement {
-  const divider = document.createElement("div");
-  divider.className = "dd-panel-divider ec-copied-format-group-divider";
-  divider.setAttribute("aria-hidden", "true");
-  return divider;
+function createCopiedBlock(): HTMLDivElement {
+  const block = document.createElement("div");
+  block.className = "ec-copied-block";
+  return block;
 }
 
 function copiedGroupHasFormats(
@@ -347,6 +348,77 @@ function createCopiedFormatInlineList(
   return row;
 }
 
+function createCopiedDeveloperToolsRows(
+  strings: Strings,
+  options: CopiedOtherOptionsOptions,
+): HTMLElement | null {
+  const formats = COPY_FORMATS.filter(
+    (format) =>
+      format.settingsGroup === "devtools" &&
+      options.enabledFormats[format.id] &&
+      options.onCopyFormat,
+  );
+  if (formats.length === 0) return null;
+
+  const block = createCopiedBlock();
+  block.classList.add("ec-copied-block--devtools");
+
+  const heading = document.createElement("div");
+  heading.className = "ec-copied-block-heading";
+  heading.textContent = strings.copiedDeveloperToolsLabel;
+  block.append(heading);
+
+  const rows = document.createElement("div");
+  rows.className = "ec-copied-devtools-rows";
+
+  for (const format of formats) {
+    const available = isPickCopyFormatAvailable(
+      format.id,
+      options.pickCopyCacheRecord,
+      document,
+    );
+    const cacheKey = resolvePickCopyCacheStorageKey(format.id);
+    const preview = options.pickCopyCacheRecord?.[cacheKey] ?? "";
+
+    const row = document.createElement("button");
+    row.type = "button";
+    row.className = "ec-copied-devtools-row";
+    row.disabled = !available;
+    if (!available) {
+      row.classList.add("ec-copied-devtools-row--unavailable");
+    }
+
+    const label = document.createElement("span");
+    label.className = "ec-copied-devtools-row-label";
+    label.textContent = format.label(strings);
+
+    const field = document.createElement("span");
+    field.className = "ec-copied-devtools-row-field";
+
+    const value = document.createElement("span");
+    value.className = "ec-copied-devtools-row-value";
+    value.textContent = preview;
+    field.append(value);
+
+    const copyIcon = document.createElement("span");
+    copyIcon.className = "ec-copied-devtools-row-copy-icon";
+    copyIcon.setAttribute("aria-hidden", "true");
+    copyIcon.innerHTML = COPY;
+    field.append(copyIcon);
+
+    row.append(label, field);
+    row.addEventListener("click", () => {
+      if (!available) return;
+      options.onCopyFormat(format.id);
+    });
+
+    rows.append(row);
+  }
+
+  block.append(rows);
+  return block;
+}
+
 export function createCopiedOtherOptionsRow(
   strings: Strings,
   options: CopiedOtherOptionsOptions,
@@ -360,14 +432,11 @@ export function createCopiedOtherOptionsRow(
     syncSelectedFormatActionButton(section, formatId);
   };
 
-  let hasPreviousGroup = false;
   for (const { group, label: groupLabel } of COPIED_CHIP_GROUPS) {
+    if (group === "devtools") continue;
     if (!copiedGroupHasFormats(group, options)) continue;
-    if (hasPreviousGroup) {
-      section.append(createCopiedFormatGroupDivider());
-    }
-    hasPreviousGroup = true;
-    section.append(
+    const block = createCopiedBlock();
+    block.append(
       createCopiedFormatInlineList(
         group,
         groupLabel(strings),
@@ -376,6 +445,12 @@ export function createCopiedOtherOptionsRow(
         selectFormat,
       ),
     );
+    section.append(block);
+  }
+
+  const devtoolsBlock = createCopiedDeveloperToolsRows(strings, options);
+  if (devtoolsBlock) {
+    section.append(devtoolsBlock);
   }
 
   syncSelectedFormatActionButton(section, options.selectedFormatId ?? null);

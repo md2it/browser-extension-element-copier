@@ -21,7 +21,14 @@ import {
   hasPickCopyCacheInStorage,
   readPickCopyCacheFromStorage,
 } from "../pick-mode/pick-copy-cache-storage";
-import { getLastCopiedFormat, setLastCopiedFormat } from "../settings/copied-session";
+import {
+  getLastCopiedFormat,
+  getLastCopiedPanelAction,
+  getLastDownloadedFormat,
+  setLastCopiedFormat,
+  setLastDownloadedFormat,
+  type CopiedPanelLastAction,
+} from "../settings/copied-session";
 import { copyPickedFormatFromPanel, savePickedFormatFromPanel } from "./lifecycle";
 import { createToggleRow } from "./toggle-row";
 
@@ -351,27 +358,53 @@ function createCopiedAgainBlock(strings: Strings, onStartOver: () => void): HTML
   return again;
 }
 
+type CopiedSubtitleState = {
+  action: CopiedPanelLastAction | null;
+  copiedFormatId: CopyFormatId | null;
+  downloadedFormatId: CopyFormatId | null;
+};
+
 function copiedFormatLabel(formatId: CopyFormatId | null, strings: Strings): string {
   if (formatId === null) return strings.settingsCopyDefaultNothing;
   const format = COPY_FORMATS.find((entry) => entry.id === formatId);
   return format ? format.label(strings) : strings.settingsCopyDefaultNothing;
 }
 
-function updateCopiedPageSubtitleWhat(
-  header: HTMLElement,
-  formatId: CopyFormatId | null,
-  strings: Strings,
-): void {
-  const what = header.querySelector<HTMLElement>(".ec-copied-subtitle-what");
-  if (!what) return;
-  what.textContent = copiedFormatLabel(formatId, strings);
-  what.classList.toggle("ec-copied-subtitle-what--nothing", formatId === null);
+function copiedSubtitleVisible(state: CopiedSubtitleState): boolean {
+  if (state.action === "saved") return state.downloadedFormatId !== null;
+  if (state.action === "copied") return true;
+  return false;
 }
 
-function createCopiedPageHeader(
-  formatId: CopyFormatId | null,
+function updateCopiedPageSubtitle(
+  header: HTMLElement,
+  state: CopiedSubtitleState,
   strings: Strings,
-): HTMLElement {
+): void {
+  const slot = header.querySelector<HTMLElement>(".ec-copied-subtitle-slot");
+  const subtitle = header.querySelector<HTMLElement>(".ec-copied-subtitle");
+  const prefix = header.querySelector<HTMLElement>(".ec-copied-subtitle-prefix");
+  const what = header.querySelector<HTMLElement>(".ec-copied-subtitle-what");
+  if (!slot || !subtitle || !prefix || !what) return;
+
+  const visible = copiedSubtitleVisible(state);
+  slot.classList.toggle("ec-copied-subtitle-slot--empty", !visible);
+  subtitle.hidden = !visible;
+  if (!visible) return;
+
+  if (state.action === "saved" && state.downloadedFormatId !== null) {
+    prefix.textContent = strings.copiedSubtitleDownloadPrefix;
+    what.textContent = copiedFormatLabel(state.downloadedFormatId, strings);
+    what.classList.remove("ec-copied-subtitle-what--nothing");
+    return;
+  }
+
+  prefix.textContent = strings.copiedSubtitlePrefix;
+  what.textContent = copiedFormatLabel(state.copiedFormatId, strings);
+  what.classList.toggle("ec-copied-subtitle-what--nothing", state.copiedFormatId === null);
+}
+
+function createCopiedPageHeader(state: CopiedSubtitleState, strings: Strings): HTMLElement {
   const header = document.createElement("div");
   header.className = "ec-copied-header";
 
@@ -379,22 +412,22 @@ function createCopiedPageHeader(
   title.className = "ec-copied-title";
   title.textContent = strings.copiedTitle;
 
+  const slot = document.createElement("div");
+  slot.className = "ec-copied-subtitle-slot";
+
   const subtitle = document.createElement("p");
   subtitle.className = "ec-copied-subtitle";
 
   const prefix = document.createElement("span");
   prefix.className = "ec-copied-subtitle-prefix";
-  prefix.textContent = strings.copiedSubtitlePrefix;
 
   const what = document.createElement("span");
   what.className = "ec-copied-subtitle-what";
-  if (formatId === null) {
-    what.classList.add("ec-copied-subtitle-what--nothing");
-  }
-  what.textContent = copiedFormatLabel(formatId, strings);
 
   subtitle.append(prefix, document.createTextNode(" "), what);
-  header.append(title, subtitle);
+  slot.append(subtitle);
+  header.append(title, slot);
+  updateCopiedPageSubtitle(header, state, strings);
   return header;
 }
 
@@ -405,9 +438,18 @@ export async function buildCopiedPanelBody(
 ): Promise<void> {
   body.replaceChildren();
 
-  const [enabledFormats, lastCopiedFormatId, hasCache, pickCopyCacheRecord] = await Promise.all([
+  const [
+    enabledFormats,
+    lastCopiedFormatId,
+    lastCopiedPanelAction,
+    lastDownloadedFormatId,
+    hasCache,
+    pickCopyCacheRecord,
+  ] = await Promise.all([
     getEnabledFormats(),
     getLastCopiedFormat(),
+    getLastCopiedPanelAction(),
+    getLastDownloadedFormat(),
     hasPickCopyCacheInStorage(),
     readPickCopyCacheFromStorage(),
   ]);
@@ -420,10 +462,12 @@ export async function buildCopiedPanelBody(
   const page = document.createElement("div");
   page.className = "ec-panel-page ec-panel-page--copied";
 
-  const header = createCopiedPageHeader(lastCopiedFormatId, strings);
-
-  const divider = createPageDivider();
-  divider.classList.add("ec-copied-divider");
+  const subtitleState: CopiedSubtitleState = {
+    action: lastCopiedPanelAction,
+    copiedFormatId: lastCopiedFormatId,
+    downloadedFormatId: lastDownloadedFormatId,
+  };
+  const header = createCopiedPageHeader(subtitleState, strings);
 
   const otherOptions = createCopiedOtherOptionsRow(strings, {
     enabledFormats,
@@ -433,23 +477,33 @@ export async function buildCopiedPanelBody(
       void (async () => {
         const copied = await copyPickedFormatFromPanel(formatId);
         if (!copied) return;
-        updateCopiedPageSubtitleWhat(header, formatId, strings);
+        const nextState: CopiedSubtitleState = {
+          action: "copied",
+          copiedFormatId: formatId,
+          downloadedFormatId: lastDownloadedFormatId,
+        };
+        updateCopiedPageSubtitle(header, nextState, strings);
         await setLastCopiedFormat(formatId);
       })();
     },
     onSaveFormat: (formatId) => {
-      void savePickedFormatFromPanel(formatId);
+      void (async () => {
+        const saved = await savePickedFormatFromPanel(formatId);
+        if (!saved) return;
+        const nextState: CopiedSubtitleState = {
+          action: "saved",
+          copiedFormatId: lastCopiedFormatId,
+          downloadedFormatId: formatId,
+        };
+        updateCopiedPageSubtitle(header, nextState, strings);
+        await setLastDownloadedFormat(formatId);
+      })();
     },
   });
 
-  const againDivider = createPageDivider();
-  againDivider.classList.add("ec-copied-divider");
-
   page.append(
     header,
-    divider,
     otherOptions,
-    againDivider,
     createCopiedAgainBlock(strings, actions.onStartOver ?? (() => {})),
   );
   body.append(page);
