@@ -798,6 +798,21 @@
   background: rgba(107, 114, 128, 0.08);
 }
 
+.ec-copied-devtools-row--selected .ec-copied-devtools-row-field {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: #15803d;
+}
+
+.ec-copied-devtools-row--selected .ec-copied-devtools-row-copy-icon {
+  color: #15803d;
+}
+
+.ec-copied-devtools-row--selected:hover .ec-copied-devtools-row-field,
+.ec-copied-devtools-row--selected:focus-visible .ec-copied-devtools-row-field {
+  background: #bbf7d0;
+}
+
 .ec-copied-other-options-label {
   font-size: 0.82rem;
   font-weight: 600;

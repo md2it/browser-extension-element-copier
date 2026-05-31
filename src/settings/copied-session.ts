@@ -7,6 +7,14 @@ export const LAST_COPIED_PANEL_ACTION_KEY = "lastCopiedPanelAction";
 
 export type CopiedPanelLastAction = "copied" | "saved";
 
+/** COPIED button highlight: copy-to-clipboard vs download (same formatId can exist twice). */
+export type CopiedPanelActionKind = "copy" | "download";
+
+export type CopiedPanelButtonSelection = {
+  formatId: CopyFormatId;
+  action: CopiedPanelActionKind;
+};
+
 export async function getLastCopiedFormat(): Promise<CopyFormatId | null> {
   const data = await ext.storage.session.get(LAST_COPIED_FORMAT_KEY);
   const raw = data[LAST_COPIED_FORMAT_KEY];
@@ -43,4 +51,20 @@ export async function setLastDownloadedFormat(formatId: CopyFormatId): Promise<v
     [LAST_DOWNLOADED_FORMAT_KEY]: formatId,
     [LAST_COPIED_PANEL_ACTION_KEY]: "saved",
   });
+}
+
+/** COPIED highlight: last copy or download action (one button at a time). */
+export function resolveCopiedPanelSelection(
+  lastAction: CopiedPanelLastAction | null,
+  lastCopiedFormatId: CopyFormatId | null,
+  lastDownloadedFormatId: CopyFormatId | null,
+): CopiedPanelButtonSelection | null {
+  if (lastAction === "saved") {
+    return lastDownloadedFormatId
+      ? { formatId: lastDownloadedFormatId, action: "download" }
+      : null;
+  }
+  return lastCopiedFormatId
+    ? { formatId: lastCopiedFormatId, action: "copy" }
+    : null;
 }

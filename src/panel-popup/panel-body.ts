@@ -25,6 +25,7 @@ import {
   getLastCopiedFormat,
   getLastCopiedPanelAction,
   getLastDownloadedFormat,
+  resolveCopiedPanelSelection,
   setLastCopiedFormat,
   setLastDownloadedFormat,
   type CopiedPanelLastAction,
@@ -469,10 +470,16 @@ export async function buildCopiedPanelBody(
   };
   const header = createCopiedPageHeader(subtitleState, strings);
 
-  const otherOptions = createCopiedOtherOptionsRow(strings, {
+  const selectedSelection = resolveCopiedPanelSelection(
+    lastCopiedPanelAction,
+    lastCopiedFormatId,
+    lastDownloadedFormatId,
+  );
+
+  const { root: otherOptions } = createCopiedOtherOptionsRow(strings, {
     enabledFormats,
     pickCopyCacheRecord,
-    selectedFormatId: lastCopiedFormatId,
+    selectedSelection,
     onCopyFormat: (formatId) => {
       void (async () => {
         const copied = await copyPickedFormatFromPanel(formatId);

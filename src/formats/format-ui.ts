@@ -19,6 +19,10 @@ import {
   setInlineImagesMode,
   type InlineImageMode,
 } from "../settings/inline-images";
+import type {
+  CopiedPanelActionKind,
+  CopiedPanelButtonSelection,
+} from "../settings/copied-session";
 import { createToggleRow } from "../panel-popup/toggle-row";
 import { COPY } from "../../../lib/src/icons";
 import {
@@ -183,18 +187,36 @@ export async function createClipboardDefaultFormatSelect(strings: Strings): Prom
   return row;
 }
 
-function syncSelectedFormatActionButton(
+function isCopiedButtonSelected(
+  element: HTMLButtonElement,
+  selection: CopiedPanelButtonSelection | null,
+): boolean {
+  if (element.disabled || selection === null) return false;
+  const action: CopiedPanelActionKind =
+    element.dataset.actionKind === "download" ? "download" : "copy";
+  return (
+    element.dataset.formatId === selection.formatId && selection.action === action
+  );
+}
+
+function syncCopiedFormatSelection(
   container: HTMLElement,
-  formatId: CopyFormatId | null,
+  selection: CopiedPanelButtonSelection | null,
 ): void {
   for (const button of Array.from(
     container.querySelectorAll<HTMLButtonElement>(".ec-format-action-btn"),
   )) {
-    const unavailable = button.disabled;
-    const selected =
-      !unavailable && formatId !== null && button.dataset.formatId === formatId;
+    const selected = isCopiedButtonSelected(button, selection);
     button.classList.toggle("ec-format-action-btn--selected", selected);
     button.setAttribute("aria-pressed", selected ? "true" : "false");
+  }
+
+  for (const row of Array.from(
+    container.querySelectorAll<HTMLButtonElement>(".ec-copied-devtools-row"),
+  )) {
+    const selected = isCopiedButtonSelected(row, selection);
+    row.classList.toggle("ec-copied-devtools-row--selected", selected);
+    row.setAttribute("aria-pressed", selected ? "true" : "false");
   }
 }
 
@@ -202,13 +224,15 @@ function createFormatActionButton(
   format: FormatDefinition,
   strings: Strings,
   available: boolean,
-  onActivate: (formatId: CopyFormatId) => void,
+  actionKind: CopiedPanelActionKind,
+  onActivate: (formatId: CopyFormatId, actionKind: CopiedPanelActionKind) => void,
   iconId: FormatIconId = format.icon,
 ): HTMLButtonElement {
   const button = document.createElement("button");
   button.type = "button";
   button.className = "ec-format-action-btn";
   button.dataset.formatId = format.id;
+  button.dataset.actionKind = actionKind;
   button.setAttribute("aria-pressed", "false");
   button.setAttribute("aria-label", format.label(strings));
 
@@ -226,7 +250,7 @@ function createFormatActionButton(
   }
 
   button.addEventListener("click", () => {
-    onActivate(format.id);
+    onActivate(format.id, actionKind);
   });
 
   return button;
@@ -248,7 +272,7 @@ function copiedGroupHasImageDownloads(options: CopiedOtherOptionsOptions): boole
 export type CopiedOtherOptionsOptions = {
   enabledFormats: EnabledFormatsMap;
   pickCopyCacheRecord: PickCopyCacheRecord | undefined;
-  selectedFormatId?: CopyFormatId | null;
+  selectedSelection?: CopiedPanelButtonSelection | null;
   onCopyFormat: (formatId: CopyFormatId) => void;
   onSaveFormat?: (formatId: CopyFormatId) => void;
 };
@@ -281,12 +305,20 @@ function copiedGroupHasFormats(
   });
 }
 
+function copiedFormatActionKind(
+  format: FormatDefinition,
+  imageDownloadButton: boolean,
+): CopiedPanelActionKind {
+  if (imageDownloadButton) return "download";
+  return isDownloadFormatAction(format.actionIcon) ? "download" : "copy";
+}
+
 function createCopiedFormatInlineList(
   group: SettingsChipGroup,
   labelText: string,
   strings: Strings,
   options: CopiedOtherOptionsOptions,
-  onSelectFormat: (formatId: CopyFormatId) => void,
+  onSelectFormat: (formatId: CopyFormatId, actionKind: CopiedPanelActionKind) => void,
 ): HTMLElement {
   const row = document.createElement("div");
   row.className = "ec-settings-format-inline-list";
@@ -313,9 +345,10 @@ function createCopiedFormatInlineList(
       options.pickCopyCacheRecord,
       document,
     );
+    const actionKind = copiedFormatActionKind(format, false);
     row.append(
-      createFormatActionButton(format, strings, available, (formatId) => {
-        onSelectFormat(formatId);
+      createFormatActionButton(format, strings, available, actionKind, (formatId, kind) => {
+        onSelectFormat(formatId, kind);
         onActivate(formatId);
       }),
     );
@@ -335,8 +368,9 @@ function createCopiedFormatInlineList(
           format,
           strings,
           available,
-          (formatId) => {
-            onSelectFormat(formatId);
+          "download",
+          (formatId, kind) => {
+            onSelectFormat(formatId, kind);
             options.onSaveFormat?.(formatId);
           },
           "image-down",
@@ -351,6 +385,7 @@ function createCopiedFormatInlineList(
 function createCopiedDeveloperToolsRows(
   strings: Strings,
   options: CopiedOtherOptionsOptions,
+  onSelectFormat: (formatId: CopyFormatId, actionKind: CopiedPanelActionKind) => void,
 ): HTMLElement | null {
   const formats = COPY_FORMATS.filter(
     (format) =>
@@ -383,6 +418,8 @@ function createCopiedDeveloperToolsRows(
     const row = document.createElement("button");
     row.type = "button";
     row.className = "ec-copied-devtools-row";
+    row.dataset.formatId = format.id;
+    row.setAttribute("aria-pressed", "false");
     row.disabled = !available;
     if (!available) {
       row.classList.add("ec-copied-devtools-row--unavailable");
@@ -407,8 +444,10 @@ function createCopiedDeveloperToolsRows(
     field.append(copyIcon);
 
     row.append(label, field);
+    row.dataset.actionKind = "copy";
     row.addEventListener("click", () => {
       if (!available) return;
+      onSelectFormat(format.id, "copy");
       options.onCopyFormat(format.id);
     });
 
@@ -419,17 +458,25 @@ function createCopiedDeveloperToolsRows(
   return block;
 }
 
+export type CopiedOtherOptionsRow = {
+  root: HTMLElement;
+  selectFormat: (formatId: CopyFormatId, actionKind: CopiedPanelActionKind) => void;
+};
+
 export function createCopiedOtherOptionsRow(
   strings: Strings,
   options: CopiedOtherOptionsOptions,
-): HTMLElement {
+): CopiedOtherOptionsRow {
   const section = document.createElement("div");
   section.className = "ec-copied-other-options";
   section.setAttribute("role", "group");
   section.setAttribute("aria-label", strings.copiedFormatsGroupLabel);
 
-  const selectFormat = (formatId: CopyFormatId): void => {
-    syncSelectedFormatActionButton(section, formatId);
+  const selectFormat = (
+    formatId: CopyFormatId,
+    actionKind: CopiedPanelActionKind,
+  ): void => {
+    syncCopiedFormatSelection(section, { formatId, action: actionKind });
   };
 
   for (const { group, label: groupLabel } of COPIED_CHIP_GROUPS) {
@@ -437,23 +484,17 @@ export function createCopiedOtherOptionsRow(
     if (!copiedGroupHasFormats(group, options)) continue;
     const block = createCopiedBlock();
     block.append(
-      createCopiedFormatInlineList(
-        group,
-        groupLabel(strings),
-        strings,
-        options,
-        selectFormat,
-      ),
+      createCopiedFormatInlineList(group, groupLabel(strings), strings, options, selectFormat),
     );
     section.append(block);
   }
 
-  const devtoolsBlock = createCopiedDeveloperToolsRows(strings, options);
+  const devtoolsBlock = createCopiedDeveloperToolsRows(strings, options, selectFormat);
   if (devtoolsBlock) {
     section.append(devtoolsBlock);
   }
 
-  syncSelectedFormatActionButton(section, options.selectedFormatId ?? null);
+  syncCopiedFormatSelection(section, options.selectedSelection ?? null);
 
-  return section;
+  return { root: section, selectFormat };
 }
