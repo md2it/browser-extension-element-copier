@@ -3,25 +3,22 @@
 ---
 
 ## Devtools
-- code // code-xml lucide
-- computed styles // list-plus
-- styles // list-minus
-- Для этих lucide terminal:
-   - selector
-   - JS path
-   - XPath
-   - full XPath
+- code
+- selector
+- JS path
+- XPath
+- full XPath
+- styles
+- computed styles
 
 ---
 
 ## Форматированные тексты для копирования
 - Text
-   - lucide text-initial
    - text/html основной
    - text/plain вычисляется из text/html
    - Человекочитаемый текст с форматированием для GoogleDocs / Word
 - Markdown
-   - Иконка markdown.svg (у нас есть кастомизированная)
    - headingStyle atx
    - hr `---`
    - fence ```
@@ -33,27 +30,18 @@
 
 ### Файлы для копирования
 - PNG
-   - lucide images
 - JPEG
-   - lucide images
 
 ---
 
 ### Файлы для скачивания
-- Markdown
-   - Иконка markdown-file.svg (у нас есть кастомизированная)
-   - Формируется из текста markdown
+- Markdown // Формируется из текста markdown
 - PNG
-   - lucide image-down
 - JPEG
-   - lucide image-down
-- .html
-   - file-braces-corner
-   - Формируется из текста code
+- .html // Формируется из текста code
 
 ---
 
 ## СВЯЗАННЫЕ СТРАНИЦЫ UI
 - COPIED -- информация о сохранении / копировании, кнопки действия
 - SETTINGS -- пользовательские настройки
-

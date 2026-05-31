@@ -12,8 +12,12 @@ export const PANEL_POPUP_SESSION_TAB_KEY = "panelPopupTab";
 export const PANEL_SESSION_PORT_NAME = "element-copier-panel-session";
 
 export const PANEL_POPUP_DISMISS_DELAY_MS = 1000;
-export const PANEL_POPUP_WIDTH_PX = 380;
-export const PANEL_POPUP_PROBE_WIDTH = `${PANEL_POPUP_WIDTH_PX}px`;
+/** Fallback when COPIED download row cannot be measured. */
+export const PANEL_POPUP_WIDTH_FALLBACK_PX = 380;
+
+export function panelPopupHostStyle(widthPx: number): string {
+  return `display:block;width:${widthPx}px;min-height:0;height:auto;position:relative;pointer-events:auto;`;
+}
 
 export type PanelMenuTab =
   | "start"

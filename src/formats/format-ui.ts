@@ -35,11 +35,9 @@ import {
   isClipboardCopyFormat,
   type CopyFormatId,
   type FormatDefinition,
-  type FormatIconId,
   type SettingsChipGroup,
 } from "./definitions";
 import { isImageCopyFormat } from "../copy/screenshot";
-import { createFormatIcon } from "./format-icons";
 
 const INFO_WINDOW_CLASSES = createInfoWindowClasses("ec");
 
@@ -225,7 +223,6 @@ function createFormatActionButton(
   available: boolean,
   actionKind: CopiedPanelActionKind,
   onActivate: (formatId: CopyFormatId, actionKind: CopiedPanelActionKind) => void,
-  iconId: FormatIconId = format.icon,
 ): HTMLButtonElement {
   const button = document.createElement("button");
   button.type = "button";
@@ -234,8 +231,6 @@ function createFormatActionButton(
   button.dataset.actionKind = actionKind;
   button.setAttribute("aria-pressed", "false");
   button.setAttribute("aria-label", format.label(strings));
-
-  button.append(createFormatIcon(iconId));
 
   const label = document.createElement("span");
   label.className = "ec-format-action-btn-label";
@@ -372,7 +367,6 @@ function createCopiedFormatInlineList(
             onSelectFormat(formatId, kind);
             options.onSaveFormat?.(formatId);
           },
-          "image-down",
         ),
       );
     }

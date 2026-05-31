@@ -15,7 +15,6 @@ import {
   ABOUT_PREFIX_CHORD_MAC_DISPLAY,
   ABOUT_PREFIX_CHORD_WIN_DISPLAY,
 } from "../hotkeys/keys";
-import { getSkipStartPage, setSkipStartPage } from "../settings/skip-start-page";
 import { defaultEnabledFormats, getEnabledFormats } from "../settings/format-settings";
 import {
   hasPickCopyCacheInStorage,
@@ -33,28 +32,12 @@ import {
   type CopiedPanelLastAction,
 } from "../settings/copied-session";
 import { copyPickedFormatFromPanel, savePickedFormatFromPanel } from "./lifecycle";
-import { createToggleRow } from "./toggle-row";
 
 export const PANEL_BODY_CENTERED_CLASS = "ec-panel-body--centered";
 
 export type StartPanelActions = {
   onStart: () => void;
 };
-
-function createSkipStartToggleRow(strings: Strings, enabled: boolean): HTMLElement {
-  const row = createToggleRow(strings.skipStartPageToggleLabel, enabled, (next) => {
-    void setSkipStartPage(next);
-  });
-  row.classList.add("ec-skip-start-toggle");
-  return row;
-}
-
-function appendSkipStartToggle(page: HTMLElement, strings: Strings): void {
-  void (async () => {
-    const enabled = await getSkipStartPage();
-    page.append(createSkipStartToggleRow(strings, enabled));
-  })();
-}
 
 function createPageDivider(): HTMLDivElement {
   const divider = document.createElement("div");
@@ -195,7 +178,6 @@ export function buildStartPanelBody(
 
   center.append(startBtn);
   page.append(title, createPageDivider(), center);
-  appendSkipStartToggle(page, strings);
   body.append(page);
 }
 
@@ -205,13 +187,11 @@ export async function buildSettingsPanelBody(
 ): Promise<void> {
   body.replaceChildren();
 
-  const [clipboardDefaultFormat, inlineImagesSelect, developerToolsToggle, skipStartEnabled] =
-    await Promise.all([
-      createClipboardDefaultFormatSelect(strings),
-      createInlineImagesSelect(strings),
-      createDeveloperToolsToggleRow(strings),
-      getSkipStartPage(),
-    ]);
+  const [clipboardDefaultFormat, inlineImagesSelect, developerToolsToggle] = await Promise.all([
+    createClipboardDefaultFormatSelect(strings),
+    createInlineImagesSelect(strings),
+    createDeveloperToolsToggleRow(strings),
+  ]);
 
   const page = document.createElement("div");
   page.className = "ec-panel-page ec-panel-page--settings";
@@ -223,7 +203,6 @@ export async function buildSettingsPanelBody(
   page.append(
     title,
     createPageDivider(),
-    createSkipStartToggleRow(strings, skipStartEnabled),
     developerToolsToggle,
     clipboardDefaultFormat,
     inlineImagesSelect,

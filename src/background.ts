@@ -55,7 +55,6 @@ import {
 import { isRtlLocale, t, type Locale } from "./i18n";
 import type { Strings } from "./i18n/types";
 import { setLastCopiedFormat } from "./settings/copied-session";
-import { getSkipStartPage } from "./settings/skip-start-page";
 import { ensureLocaleInStorage, getLocale } from "./storage";
 import { showWelcome, stopWelcomePinWatcher, watchWelcomePinStatus } from "./welcome";
 
@@ -472,12 +471,6 @@ async function toggleTab(
   }
 
   if (tabUrl !== undefined && isLikelyNonOperableTabUrl(tabUrl)) {
-    await activateTab(tabId, windowId);
-    return;
-  }
-
-  const skipStartPage = await getSkipStartPage();
-  if (skipStartPage) {
     await activateTab(tabId, windowId);
     return;
   }

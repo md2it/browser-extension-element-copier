@@ -3,19 +3,6 @@ import type { Strings } from "../i18n";
 /** Routing/semantics for COPIED buttons (copy to clipboard vs download a file). */
 export type FormatActionIconId = "copy" | "files" | "images" | "file-down" | "image-down";
 
-/** Per-format icon shown on chips and COPIED buttons (SPEC/fr-copy-save.md). */
-export type FormatIconId =
-  | "code-xml"
-  | "terminal"
-  | "list-plus"
-  | "list-minus"
-  | "text-initial"
-  | "markdown"
-  | "markdown-file"
-  | "file-braces-corner"
-  | "images"
-  | "image-down";
-
 export type CopyFormatId =
   | "outerHTML"
   | "selector"
@@ -36,101 +23,87 @@ export type SettingsChipGroup = "copy-images" | "files" | "clipboard-text" | "de
 export type FormatDefinition = {
   id: CopyFormatId;
   label: (strings: Strings) => string;
-  icon: FormatIconId;
   actionIcon: FormatActionIconId;
   settingsGroup: SettingsChipGroup;
 };
 
-/** Copy-only formats from fr-copy.md (ДОСТУПНЫЕ ФОРМАТЫ). Devtools order matches SPEC/fr-copy-save.md. */
+/** Copy-only formats from fr-copy.md (ДОСТУПНЫЕ ФОРМАТЫ). Devtools order matches SPEC/fr-formats.md. */
 export const COPY_FORMATS: readonly FormatDefinition[] = [
   {
     id: "outerHTML",
     label: (s) => s.formatCode,
-    icon: "code-xml",
-    actionIcon: "copy",
-    settingsGroup: "devtools",
-  },
-  {
-    id: "computedStyles",
-    label: (s) => s.formatComputedStyles,
-    icon: "list-plus",
-    actionIcon: "copy",
-    settingsGroup: "devtools",
-  },
-  {
-    id: "styles",
-    label: (s) => s.formatStyles,
-    icon: "list-minus",
     actionIcon: "copy",
     settingsGroup: "devtools",
   },
   {
     id: "selector",
     label: (s) => s.formatSelector,
-    icon: "terminal",
     actionIcon: "copy",
     settingsGroup: "devtools",
   },
   {
     id: "jsPath",
     label: (s) => s.formatJsPath,
-    icon: "terminal",
     actionIcon: "copy",
     settingsGroup: "devtools",
   },
   {
     id: "xpath",
     label: (s) => s.formatXPath,
-    icon: "terminal",
     actionIcon: "copy",
     settingsGroup: "devtools",
   },
   {
     id: "fullXPath",
     label: (s) => s.formatFullXPath,
-    icon: "terminal",
+    actionIcon: "copy",
+    settingsGroup: "devtools",
+  },
+  {
+    id: "styles",
+    label: (s) => s.formatStyles,
+    actionIcon: "copy",
+    settingsGroup: "devtools",
+  },
+  {
+    id: "computedStyles",
+    label: (s) => s.formatComputedStyles,
     actionIcon: "copy",
     settingsGroup: "devtools",
   },
   {
     id: "text",
     label: (s) => s.formatText,
-    icon: "text-initial",
     actionIcon: "copy",
     settingsGroup: "clipboard-text",
   },
   {
     id: "markdown",
     label: (s) => s.formatMarkdown,
-    icon: "markdown",
     actionIcon: "copy",
     settingsGroup: "clipboard-text",
   },
   {
     id: "png",
     label: (s) => s.formatPng,
-    icon: "images",
     actionIcon: "images",
     settingsGroup: "copy-images",
   },
   {
     id: "markdownFile",
     label: (s) => s.formatMarkdown,
-    icon: "markdown-file",
     actionIcon: "file-down",
     settingsGroup: "files",
   },
   {
     id: "htmlFile",
     label: (s) => s.formatHtml,
-    icon: "file-braces-corner",
     actionIcon: "file-down",
     settingsGroup: "files",
   },
   {
     id: "jpeg",
     label: (s) => s.formatJpeg,
-    icon: "images",
     actionIcon: "images",
     settingsGroup: "copy-images",
   },

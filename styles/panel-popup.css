@@ -333,25 +333,10 @@
   transform: translateY(1px);
 }
 
-.ec-panel-page--start .ec-skip-start-toggle {
-  margin-top: auto;
-  padding-top: 0.75rem;
-  align-self: center;
-  width: auto;
-  justify-content: flex-start;
-  gap: 0.5rem;
-}
-
 .ec-panel-page--settings {
   display: flex;
   flex-direction: column;
   width: 100%;
-}
-
-.ec-panel-page--settings .ec-skip-start-toggle {
-  margin-top: 0.85rem;
-  width: 100%;
-  justify-content: space-between;
 }
 
 .ec-copy-default-row {
@@ -616,23 +601,6 @@
 
 .ec-format-chip.is-enabled .ec-format-chip-label-text {
   font-weight: 700;
-}
-
-.ec-format-action-icon {
-  flex: 0 0 auto;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 0.95rem;
-  height: 0.95rem;
-  line-height: 0;
-  color: inherit;
-}
-
-.ec-format-action-icon svg {
-  display: block;
-  width: 0.95rem;
-  height: 0.95rem;
 }
 
 .ec-format-action-btn {

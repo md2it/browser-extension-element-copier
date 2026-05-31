@@ -7,7 +7,6 @@ export type Strings = {
   panelSubtitle: string;
   titleSettings: string;
   startButtonLabel: string;
-  skipStartPageToggleLabel: string;
   settingsCopyDefaultLabel: string;
   settingsCopyDefaultNothing: string;
   settingsInlineImagesLabel: string;

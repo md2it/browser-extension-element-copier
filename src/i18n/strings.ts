@@ -7,7 +7,6 @@ const MESSAGES: Record<Locale, Strings> = {
     panelSubtitle: "browser extension",
     titleSettings: "Start",
     startButtonLabel: "START",
-    skipStartPageToggleLabel: "Skip START page",
     settingsCopyDefaultLabel: "Copy default",
     settingsCopyDefaultNothing: "nothing",
     settingsInlineImagesLabel: "Inline images in text",

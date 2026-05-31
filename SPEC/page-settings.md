@@ -2,9 +2,6 @@
 
 ---
 
-## Skip START page
-- Toggler, default off
-
 ## Developer tools
 - Toggler, default on
 - Если off, то скрывает из страницы COPIED соответствующий блок кнопок
