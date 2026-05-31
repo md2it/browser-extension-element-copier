@@ -26,6 +26,7 @@ export async function snapshotPickCopyCache(
   const formatIds = COPY_FORMATS.map((format) => format.id);
   const entries: { key: CopyFormatId; value: string }[] = [];
   let markdownText: string | undefined;
+  let computedStylesText: string | undefined;
 
   for (const formatId of formatIds) {
     if (formatId === "markdown" || formatId === "markdownFile") {
@@ -39,11 +40,16 @@ export async function snapshotPickCopyCache(
       try {
         entries.push({
           key: formatId,
-          value: await captureElementImage(element, formatId),
+          value: await captureElementImage(element, formatId, computedStylesText),
         });
       } catch (error) {
         console.warn("[Element Copier] image snapshot failed:", formatId, error);
       }
+      continue;
+    }
+    if (formatId === "computedStyles") {
+      computedStylesText = extractElementCopyText(element, formatId, inlineImages);
+      entries.push({ key: formatId, value: computedStylesText });
       continue;
     }
     entries.push({
