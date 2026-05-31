@@ -27,6 +27,7 @@ function entriesToRecord(entries) {
 function getTextFromRecord(record, formatId) {
   if (!record) return undefined;
   if (formatId === "markdownFile") return record.markdown;
+  if (formatId === "htmlFile") return record.outerHTML;
   return record[formatId];
 }
 
@@ -56,6 +57,13 @@ function getTextFromRecord(record, formatId) {
   const record = { markdown: "# Hi" };
   assert.equal(getTextFromRecord(record, "markdownFile"), "# Hi");
   assert.equal(getTextFromRecord(record, "markdown"), "# Hi");
+}
+
+// getPickCopyTextFromStorage: htmlFile → outerHTML
+{
+  const record = { outerHTML: "<div>hi</div>" };
+  assert.equal(getTextFromRecord(record, "htmlFile"), "<div>hi</div>");
+  assert.equal(getTextFromRecord(record, "outerHTML"), "<div>hi</div>");
 }
 
 // getPickCopyTextFromStorage: missing key → undefined
@@ -193,7 +201,9 @@ function entriesToStorableRecord(entries, doc) {
 
 /** Mirrors pick-copy-cache-storage.ts: isPickCopyFormatAvailable */
 function resolvePickCopyCacheStorageKey(formatId) {
-  return formatId === "markdownFile" ? "markdown" : formatId;
+  if (formatId === "markdownFile") return "markdown";
+  if (formatId === "htmlFile") return "outerHTML";
+  return formatId;
 }
 
 function isPickCopyFormatAvailable(formatId, record, doc) {
@@ -204,6 +214,31 @@ function isPickCopyFormatAvailable(formatId, record, doc) {
     return isFormattedTextCacheStorable(value, doc);
   }
   return true;
+}
+
+// snapshotPickCopyCache: outerHTML + htmlFile dedup.
+{
+  const formatIds = ["outerHTML", "htmlFile"];
+  const entries = [];
+  let outerHtmlText;
+  for (const formatId of formatIds) {
+    if (formatId === "outerHTML" || formatId === "htmlFile") {
+      if (outerHtmlText === undefined) {
+        outerHtmlText = "<div>hi</div>";
+        entries.push({ key: "outerHTML", value: outerHtmlText });
+      }
+      continue;
+    }
+    entries.push({ key: formatId, value: "x" });
+  }
+  assert.equal(entries.length, 1);
+  assert.equal(entries[0].key, "outerHTML");
+}
+
+// isPickCopyFormatAvailable: derived htmlFile uses outerHTML key
+{
+  assert.equal(isPickCopyFormatAvailable("htmlFile", { outerHTML: "<div></div>" }), true);
+  assert.equal(isPickCopyFormatAvailable("htmlFile", { markdown: "# Hi" }), false);
 }
 
 // isPickCopyFormatAvailable: derived markdownFile uses markdown key
@@ -306,6 +341,8 @@ assert.doesNotMatch(storageSrc, /ext\.storage\.session/,
   "pick-copy-cache-storage must not use session storage (content script writes cache)");
 assert.match(storageSrc, /markdownFile/,
   "storage must handle markdownFile");
+assert.match(storageSrc, /htmlFile/,
+  "storage must handle htmlFile");
 assert.match(storageSrc, /resolvePickCopyCacheStorageKey/,
   "storage must remap markdownFile via resolvePickCopyCacheStorageKey");
 

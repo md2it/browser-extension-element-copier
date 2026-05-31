@@ -71,6 +71,7 @@ export function extractElementCopyText(
 ): string {
   switch (format) {
     case "outerHTML":
+    case "htmlFile":
       return getOuterHtml(element);
     case "selector":
       return getCssSelector(element);

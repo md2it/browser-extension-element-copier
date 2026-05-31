@@ -27,6 +27,7 @@ export type Strings = {
   formatFullXPath: string;
   formatText: string;
   formatMarkdown: string;
+  formatHtml: string;
   formatPng: string;
   formatJpeg: string;
   tabCopied: string;

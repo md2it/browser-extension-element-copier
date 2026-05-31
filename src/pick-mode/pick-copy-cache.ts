@@ -43,6 +43,7 @@ export async function snapshotPickCopyCache(
   const entries: { key: CopyFormatId; value: string }[] = [];
   const doc = element.ownerDocument;
   let markdownText: string | undefined;
+  let outerHtmlText: string | undefined;
   const computedStylesText = extractElementCopyText(element, "computedStyles", inlineImages);
   const screenshotBackground = createScreenshotBackgroundSnapshot(element, computedStylesText);
 
@@ -51,6 +52,13 @@ export async function snapshotPickCopyCache(
       if (markdownText === undefined) {
         markdownText = extractElementCopyText(element, "markdown", inlineImages);
         tryPushCacheEntry(entries, "markdown", markdownText, doc);
+      }
+      continue;
+    }
+    if (formatId === "outerHTML" || formatId === "htmlFile") {
+      if (outerHtmlText === undefined) {
+        outerHtmlText = extractElementCopyText(element, "outerHTML", inlineImages);
+        tryPushCacheEntry(entries, "outerHTML", outerHtmlText, doc);
       }
       continue;
     }
@@ -95,6 +103,9 @@ export async function snapshotPickCopyCache(
 export function getCachedCopyText(formatId: CopyFormatId): string | undefined {
   if (formatId === "markdownFile") {
     return cache.get("markdown");
+  }
+  if (formatId === "htmlFile") {
+    return cache.get("outerHTML");
   }
   return cache.get(formatId);
 }

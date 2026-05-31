@@ -12,6 +12,7 @@ export type FormatIconId =
   | "text-initial"
   | "markdown"
   | "markdown-file"
+  | "file-braces-corner"
   | "images"
   | "image-down";
 
@@ -26,6 +27,7 @@ export type CopyFormatId =
   | "text"
   | "markdown"
   | "markdownFile"
+  | "htmlFile"
   | "png"
   | "jpeg";
 
@@ -115,6 +117,13 @@ export const COPY_FORMATS: readonly FormatDefinition[] = [
     id: "markdownFile",
     label: (s) => s.formatMarkdown,
     icon: "markdown-file",
+    actionIcon: "file-down",
+    settingsGroup: "files",
+  },
+  {
+    id: "htmlFile",
+    label: (s) => s.formatHtml,
+    icon: "file-braces-corner",
     actionIcon: "file-down",
     settingsGroup: "files",
   },

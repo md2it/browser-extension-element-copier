@@ -1,5 +1,6 @@
 import {
   CODE_XML,
+  FILE_BRACES_CORNER,
   IMAGE_DOWN,
   IMAGES,
   LIST_MINUS,
@@ -19,6 +20,7 @@ const FORMAT_ICONS: Record<FormatIconId, string> = {
   "text-initial": TEXT_INITIAL,
   markdown: MARKDOWN,
   "markdown-file": MARKDOWN_FILE,
+  "file-braces-corner": FILE_BRACES_CORNER,
   images: IMAGES,
   "image-down": IMAGE_DOWN,
 };

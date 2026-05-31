@@ -4,6 +4,8 @@ function downloadFilenameForFormat(formatId: CopyFormatId): string {
   switch (formatId) {
     case "markdownFile":
       return "element-copier.md";
+    case "htmlFile":
+      return "element-copier.html";
     case "png":
       return "element-copier.png";
     case "jpeg":
@@ -17,6 +19,8 @@ export function mimeTypeForFormat(formatId: CopyFormatId): string {
   switch (formatId) {
     case "markdownFile":
       return "text/markdown;charset=utf-8";
+    case "htmlFile":
+      return "text/html;charset=utf-8";
     case "png":
       return "image/png";
     case "jpeg":

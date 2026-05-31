@@ -8,7 +8,9 @@ export const PICK_COPY_CACHE_INDEX_KEY = "pickCopyCacheFormats";
 export type PickCopyCacheRecord = Partial<Record<CopyFormatId, string>>;
 
 export function resolvePickCopyCacheStorageKey(formatId: CopyFormatId): CopyFormatId {
-  return formatId === "markdownFile" ? "markdown" : formatId;
+  if (formatId === "markdownFile") return "markdown";
+  if (formatId === "htmlFile") return "outerHTML";
+  return formatId;
 }
 
 /** Whether a snapshot value should be written to pick-copy cache (SPEC: no empty values). */

@@ -47,6 +47,9 @@
    - lucide image-down
 - JPEG
    - lucide image-down
+- .html
+   - file-braces-corner
+   - Формируется из текста code
 
 ---
 
