@@ -22,13 +22,11 @@ export function isPanelPopupPage(href: string): boolean {
 }
 
 export async function resolvePanelPageInitialTab(): Promise<PanelPopupTab> {
-  const tabParam = new URLSearchParams(location.search).get("tab");
   const tab = await resolveLibPanelPageInitialTab({
     sessionTabKey: PANEL_PAGE_CONFIG.sessionTabKey,
     defaultTab: "start",
     validTabs: PANEL_POPUP_TABS,
   });
-  if (tabParam !== null) return tab;
   if (tab !== "start") return tab;
   return (await hasPickCopyCacheInStorage()) ? "copied" : "start";
 }
