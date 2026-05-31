@@ -1,3 +1,4 @@
+import { isDerivativeFormatNoiseNode } from "../../../lib/src/copy/cleanup/sanitize";
 import { domToJpeg, domToPng, type Options } from "modern-screenshot";
 import type { CopyFormatId } from "../formats/definitions";
 
@@ -188,6 +189,7 @@ function screenshotOptions(
       requestInit: { cache: "force-cache" },
       placeholderImage: FETCH_PLACEHOLDER_IMAGE,
     },
+    filter: (node) => !isDerivativeFormatNoiseNode(node),
     style: Object.keys(style).length > 0 ? style : null,
   };
 }
