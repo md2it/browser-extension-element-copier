@@ -369,8 +369,13 @@ type CopiedSubtitleState = {
   downloadedFormatId: CopyFormatId | null;
 };
 
-function copiedFormatLabel(formatId: CopyFormatId | null, strings: Strings): string {
+function copiedFormatLabel(
+  formatId: CopyFormatId | null,
+  strings: Strings,
+  action: CopiedPanelLastAction | null = null,
+): string {
   if (formatId === null) return strings.settingsCopyDefaultNothing;
+  if (formatId === "png" && action !== "saved") return strings.formatImage;
   const format = COPY_FORMATS.find((entry) => entry.id === formatId);
   return format ? format.label(strings) : strings.settingsCopyDefaultNothing;
 }
@@ -399,13 +404,13 @@ function updateCopiedPageSubtitle(
 
   if (state.action === "saved" && state.downloadedFormatId !== null) {
     prefix.textContent = strings.copiedSubtitleDownloadPrefix;
-    what.textContent = copiedFormatLabel(state.downloadedFormatId, strings);
+    what.textContent = copiedFormatLabel(state.downloadedFormatId, strings, "saved");
     what.classList.remove("ec-copied-subtitle-what--nothing");
     return;
   }
 
   prefix.textContent = strings.copiedSubtitlePrefix;
-  what.textContent = copiedFormatLabel(state.copiedFormatId, strings);
+  what.textContent = copiedFormatLabel(state.copiedFormatId, strings, "copied");
   what.classList.toggle("ec-copied-subtitle-what--nothing", state.copiedFormatId === null);
 }
 

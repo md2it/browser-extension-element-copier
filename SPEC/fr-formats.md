@@ -13,7 +13,7 @@
 
 ---
 
-## Форматы Copy text
+## Форматы Copy
 - Text
    - text/html основной
    - text/plain вычисляется из text/html
@@ -25,12 +25,7 @@
    - bullet list `-`
    - **Bold**, *italic*, ~~strikethrough~~
    - link style [title](link)
-
----
-
-### Форматы Copy image
-- PNG
-- JPEG
+- Image
 
 ---
 

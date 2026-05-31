@@ -29,6 +29,7 @@ export type Strings = {
   formatHtml: string;
   formatPng: string;
   formatJpeg: string;
+  formatImage: string;
   tabCopied: string;
   copiedTitle: string;
   loadingDataProcessing: string;
@@ -36,9 +37,8 @@ export type Strings = {
   copiedSubtitleDownloadPrefix: string;
   copiedFormatsGroupLabel: string;
   copiedFilesLabel: string;
-  copiedCopyImagesLabel: string;
+  copiedCopyLabel: string;
   copiedImageClipboardUnsupportedTooltip: string;
-  copiedCopyTextLabel: string;
   copiedDeveloperToolsLabel: string;
   copiedStartOverButtonLabel: string;
   copiedEmptyLine1: string;

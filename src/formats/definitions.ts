@@ -18,7 +18,7 @@ export type CopyFormatId =
   | "png"
   | "jpeg";
 
-export type SettingsChipGroup = "copy-images" | "files" | "clipboard-text" | "devtools";
+export type SettingsChipGroup = "copy-images" | "files" | "clipboard-copy" | "devtools";
 
 export type FormatDefinition = {
   id: CopyFormatId;
@@ -75,19 +75,19 @@ export const COPY_FORMATS: readonly FormatDefinition[] = [
     id: "text",
     label: (s) => s.formatText,
     actionIcon: "copy",
-    settingsGroup: "clipboard-text",
+    settingsGroup: "clipboard-copy",
   },
   {
     id: "markdown",
     label: (s) => s.formatMarkdown,
     actionIcon: "copy",
-    settingsGroup: "clipboard-text",
+    settingsGroup: "clipboard-copy",
   },
   {
     id: "png",
     label: (s) => s.formatPng,
     actionIcon: "images",
-    settingsGroup: "copy-images",
+    settingsGroup: "clipboard-copy",
   },
   {
     id: "markdownFile",

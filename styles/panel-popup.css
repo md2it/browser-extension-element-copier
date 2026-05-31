@@ -697,6 +697,26 @@
   min-width: 0;
 }
 
+.ec-format-action-btn-icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+.ec-format-action-btn-icon svg {
+  display: block;
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+.ec-format-action-btn--unavailable .ec-format-action-btn-icon,
+.ec-format-action-btn--selected .ec-format-action-btn-icon {
+  color: inherit;
+}
+
 .ec-copied-other-options {
   display: flex;
   flex: 0 0 auto;

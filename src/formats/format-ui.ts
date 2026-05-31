@@ -24,7 +24,7 @@ import type {
   CopiedPanelButtonSelection,
 } from "../settings/copied-session";
 import { createToggleRow } from "../panel-popup/toggle-row";
-import { COPY } from "../../../lib/src/icons";
+import { COPY, FILE_DOWN, IMAGE_DOWN, IMAGES } from "../../../lib/src/icons";
 import {
   isPickCopyFormatAvailable,
   resolvePickCopyCacheStorageKey,
@@ -129,8 +129,7 @@ const COPIED_CHIP_GROUPS: ReadonlyArray<{
   group: SettingsChipGroup;
   label: (strings: Strings) => string;
 }> = [
-  { group: "clipboard-text", label: (strings) => strings.copiedCopyTextLabel },
-  { group: "copy-images", label: (strings) => strings.copiedCopyImagesLabel },
+  { group: "clipboard-copy", label: (strings) => strings.copiedCopyLabel },
   { group: "files", label: (strings) => strings.copiedFilesLabel },
 ];
 
@@ -218,6 +217,28 @@ function syncCopiedFormatSelection(
   }
 }
 
+function formatActionIconMarkup(
+  actionIcon: FormatDefinition["actionIcon"],
+  actionKind: CopiedPanelActionKind,
+): string {
+  if (actionIcon === "file-down") return FILE_DOWN;
+  if (actionIcon === "images") {
+    return actionKind === "download" ? IMAGE_DOWN : IMAGES;
+  }
+  return COPY;
+}
+
+function formatActionButtonLabel(
+  format: FormatDefinition,
+  strings: Strings,
+  actionKind: CopiedPanelActionKind,
+): string {
+  if (format.id === "png" && actionKind === "copy") {
+    return strings.formatImage;
+  }
+  return format.label(strings);
+}
+
 function createFormatActionButton(
   format: FormatDefinition,
   strings: Strings,
@@ -226,17 +247,24 @@ function createFormatActionButton(
   onActivate: (formatId: CopyFormatId, actionKind: CopiedPanelActionKind) => void,
   unavailableTooltip?: string,
 ): HTMLButtonElement {
+  const buttonLabel = formatActionButtonLabel(format, strings, actionKind);
   const button = document.createElement("button");
   button.type = "button";
   button.className = "ec-format-action-btn";
   button.dataset.formatId = format.id;
   button.dataset.actionKind = actionKind;
   button.setAttribute("aria-pressed", "false");
-  button.setAttribute("aria-label", format.label(strings));
+  button.setAttribute("aria-label", buttonLabel);
+
+  const icon = document.createElement("span");
+  icon.className = "ec-format-action-btn-icon";
+  icon.setAttribute("aria-hidden", "true");
+  icon.innerHTML = formatActionIconMarkup(format.actionIcon, actionKind);
+  button.append(icon);
 
   const label = document.createElement("span");
   label.className = "ec-format-action-btn-label";
-  label.textContent = format.label(strings);
+  label.textContent = buttonLabel;
   button.append(label);
 
   if (!available) {
