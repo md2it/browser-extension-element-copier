@@ -17,7 +17,10 @@ import {
 } from "../hotkeys/keys";
 import { getSkipStartPage, setSkipStartPage } from "../settings/skip-start-page";
 import { getEnabledFormats } from "../settings/format-settings";
-import { hasPickCopyCacheInStorage } from "../pick-mode/pick-copy-cache-storage";
+import {
+  hasPickCopyCacheInStorage,
+  readPickCopyCacheFromStorage,
+} from "../pick-mode/pick-copy-cache-storage";
 import { getLastCopiedFormat, setLastCopiedFormat } from "../settings/copied-session";
 import { copyPickedFormatFromPanel, savePickedFormatFromPanel } from "./lifecycle";
 import { createToggleRow } from "./toggle-row";
@@ -402,10 +405,11 @@ export async function buildCopiedPanelBody(
 ): Promise<void> {
   body.replaceChildren();
 
-  const [enabledFormats, lastCopiedFormatId, hasCache] = await Promise.all([
+  const [enabledFormats, lastCopiedFormatId, hasCache, pickCopyCacheRecord] = await Promise.all([
     getEnabledFormats(),
     getLastCopiedFormat(),
     hasPickCopyCacheInStorage(),
+    readPickCopyCacheFromStorage(),
   ]);
 
   if (!hasCache) {
@@ -423,6 +427,7 @@ export async function buildCopiedPanelBody(
 
   const otherOptions = createCopiedOtherOptionsRow(strings, {
     enabledFormats,
+    pickCopyCacheRecord,
     selectedFormatId: lastCopiedFormatId,
     onCopyFormat: (formatId) => {
       void (async () => {

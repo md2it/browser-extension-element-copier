@@ -1,3 +1,4 @@
+import { isFormattedTextCacheStorable } from "../../../lib/src/copy/formatted-text/index";
 import { ext } from "../api";
 import type { CopyFormatId } from "../formats/definitions";
 
@@ -5,6 +6,31 @@ export const PICK_COPY_CACHE_STORAGE_KEY = "pickCopyCache";
 export const PICK_COPY_CACHE_INDEX_KEY = "pickCopyCacheFormats";
 
 export type PickCopyCacheRecord = Partial<Record<CopyFormatId, string>>;
+
+export function resolvePickCopyCacheStorageKey(formatId: CopyFormatId): CopyFormatId {
+  return formatId === "markdownFile" ? "markdown" : formatId;
+}
+
+/** Whether a snapshot value should be written to pick-copy cache (SPEC: no empty values). */
+export function isPickCopyCacheValueStorable(
+  formatId: CopyFormatId,
+  value: string,
+  doc?: Document,
+): boolean {
+  if (formatId === "text") {
+    return isFormattedTextCacheStorable(value, doc);
+  }
+  return value.trim() !== "";
+}
+
+/** Whether COPIED can offer this format (derived formats use their storage key). */
+export function isPickCopyFormatAvailable(
+  formatId: CopyFormatId,
+  record: PickCopyCacheRecord | undefined,
+): boolean {
+  if (!record) return false;
+  return record[resolvePickCopyCacheStorageKey(formatId)] !== undefined;
+}
 
 export async function readPickCopyCacheFromStorage(): Promise<PickCopyCacheRecord | undefined> {
   const data = await ext.storage.local.get(PICK_COPY_CACHE_STORAGE_KEY);
@@ -35,10 +61,16 @@ export async function writePickCopyCacheIndex(
 
 export async function writePickCopyCacheToStorage(
   entries: readonly { key: CopyFormatId; value: string }[],
+  doc?: Document,
 ): Promise<void> {
   const record: PickCopyCacheRecord = {};
   for (const { key, value } of entries) {
+    if (!isPickCopyCacheValueStorable(key, value, doc)) continue;
     record[key] = value;
+  }
+  if (Object.keys(record).length === 0) {
+    await ext.storage.local.remove(PICK_COPY_CACHE_STORAGE_KEY);
+    return;
   }
   await ext.storage.local.set({ [PICK_COPY_CACHE_STORAGE_KEY]: record });
 }
@@ -52,8 +84,5 @@ export async function getPickCopyTextFromStorage(
 ): Promise<string | undefined> {
   const record = await readPickCopyCacheFromStorage();
   if (!record) return undefined;
-  if (formatId === "markdownFile") {
-    return record.markdown;
-  }
-  return record[formatId];
+  return record[resolvePickCopyCacheStorageKey(formatId)];
 }

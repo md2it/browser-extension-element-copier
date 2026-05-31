@@ -104,17 +104,17 @@ export const COPY_FORMATS: readonly FormatDefinition[] = [
     settingsGroup: "clipboard-text",
   },
   {
-    id: "markdownFile",
-    label: (s) => s.formatMarkdown,
-    icon: "markdown-file",
-    actionIcon: "file-down",
-    settingsGroup: "files",
-  },
-  {
     id: "png",
     label: (s) => s.formatPng,
     icon: "images",
     actionIcon: "image-down",
+    settingsGroup: "files",
+  },
+  {
+    id: "markdownFile",
+    label: (s) => s.formatMarkdown,
+    icon: "markdown-file",
+    actionIcon: "file-down",
     settingsGroup: "files",
   },
   {

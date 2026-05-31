@@ -9,9 +9,21 @@ import { COPY_FORMATS, type CopyFormatId } from "../formats/definitions";
 import { DEFAULT_INLINE_IMAGES_MODE, type InlineImageMode } from "../settings/inline-images";
 import {
   clearPickCopyCacheStorage,
+  isPickCopyCacheValueStorable,
   writePickCopyCacheIndex,
   writePickCopyCacheToStorage,
 } from "./pick-copy-cache-storage";
+
+function tryPushCacheEntry(
+  entries: { key: CopyFormatId; value: string }[],
+  key: CopyFormatId,
+  value: string,
+  doc: Document,
+): void {
+  if (isPickCopyCacheValueStorable(key, value, doc)) {
+    entries.push({ key, value });
+  }
+}
 
 const cache = createStringCache<CopyFormatId>();
 
@@ -29,6 +41,7 @@ export async function snapshotPickCopyCache(
 
   const formatIds = COPY_FORMATS.map((format) => format.id);
   const entries: { key: CopyFormatId; value: string }[] = [];
+  const doc = element.ownerDocument;
   let markdownText: string | undefined;
   const computedStylesText = extractElementCopyText(element, "computedStyles", inlineImages);
   const screenshotBackground = createScreenshotBackgroundSnapshot(element, computedStylesText);
@@ -37,29 +50,33 @@ export async function snapshotPickCopyCache(
     if (formatId === "markdown" || formatId === "markdownFile") {
       if (markdownText === undefined) {
         markdownText = extractElementCopyText(element, "markdown", inlineImages);
-        entries.push({ key: "markdown", value: markdownText });
+        tryPushCacheEntry(entries, "markdown", markdownText, doc);
       }
       continue;
     }
     if (isImageCopyFormat(formatId)) {
       try {
-        entries.push({
-          key: formatId,
-          value: await captureElementImage(element, formatId, screenshotBackground),
-        });
+        tryPushCacheEntry(
+          entries,
+          formatId,
+          await captureElementImage(element, formatId, screenshotBackground),
+          doc,
+        );
       } catch (error) {
         console.warn("[Element Copier] image snapshot failed:", formatId, error);
       }
       continue;
     }
     if (formatId === "computedStyles") {
-      entries.push({ key: formatId, value: computedStylesText });
+      tryPushCacheEntry(entries, formatId, computedStylesText, doc);
       continue;
     }
-    entries.push({
-      key: formatId,
-      value: extractElementCopyText(element, formatId, inlineImages),
-    });
+    tryPushCacheEntry(
+      entries,
+      formatId,
+      extractElementCopyText(element, formatId, inlineImages),
+      doc,
+    );
   }
 
   cache.snapshot(entries);
@@ -69,7 +86,7 @@ export async function snapshotPickCopyCache(
     if (entries.length === 0) {
       return;
     }
-    await writePickCopyCacheToStorage(entries);
+    await writePickCopyCacheToStorage(entries, doc);
   } catch (error) {
     console.warn("[Element Copier] pick copy cache storage write failed:", error);
   }

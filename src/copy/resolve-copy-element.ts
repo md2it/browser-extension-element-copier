@@ -1,4 +1,4 @@
-import { parseFormattedTextCache } from "../../../lib/src/copy/formatted-text/index";
+import { isFormattedTextCacheStorable } from "../../../lib/src/copy/formatted-text/index";
 import { CLIPBOARD_COPY_FORMATS, type CopyFormatId } from "../formats/definitions";
 import type { EnabledFormatsMap } from "../settings/format-settings";
 import { extractElementCopyText } from "./extract";
@@ -6,8 +6,7 @@ import { extractElementCopyText } from "./extract";
 function isFormatExtractEmpty(element: Element, formatId: CopyFormatId): boolean {
   const text = extractElementCopyText(element, formatId);
   if (formatId === "text") {
-    const payload = parseFormattedTextCache(text);
-    return !payload?.html?.trim();
+    return !isFormattedTextCacheStorable(text, element.ownerDocument);
   }
   return text.trim() === "";
 }

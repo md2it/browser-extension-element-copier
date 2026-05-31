@@ -21,6 +21,10 @@ import {
 } from "../settings/inline-images";
 import { createToggleRow } from "../panel-popup/toggle-row";
 import {
+  isPickCopyFormatAvailable,
+  type PickCopyCacheRecord,
+} from "../pick-mode/pick-copy-cache-storage";
+import {
   COPY_FORMATS,
   isClipboardCopyFormat,
   type CopyFormatId,
@@ -181,7 +185,9 @@ function syncSelectedFormatActionButton(
   for (const button of Array.from(
     container.querySelectorAll<HTMLButtonElement>(".ec-format-action-btn"),
   )) {
-    const selected = formatId !== null && button.dataset.formatId === formatId;
+    const unavailable = button.disabled;
+    const selected =
+      !unavailable && formatId !== null && button.dataset.formatId === formatId;
     button.classList.toggle("ec-format-action-btn--selected", selected);
     button.setAttribute("aria-pressed", selected ? "true" : "false");
   }
@@ -190,6 +196,7 @@ function syncSelectedFormatActionButton(
 function createFormatActionButton(
   format: FormatDefinition,
   strings: Strings,
+  available: boolean,
   onActivate: (formatId: CopyFormatId) => void,
 ): HTMLButtonElement {
   const button = document.createElement("button");
@@ -206,6 +213,12 @@ function createFormatActionButton(
   label.textContent = format.label(strings);
   button.append(label);
 
+  if (!available) {
+    button.disabled = true;
+    button.classList.add("ec-format-action-btn--unavailable");
+    return button;
+  }
+
   button.addEventListener("click", () => {
     onActivate(format.id);
   });
@@ -219,6 +232,7 @@ function isFileActionIcon(actionIcon: FormatDefinition["actionIcon"]): boolean {
 
 export type CopiedOtherOptionsOptions = {
   enabledFormats: EnabledFormatsMap;
+  pickCopyCacheRecord: PickCopyCacheRecord | undefined;
   selectedFormatId?: CopyFormatId | null;
   onCopyFormat: (formatId: CopyFormatId) => void;
   onSaveFormat?: (formatId: CopyFormatId) => void;
@@ -276,8 +290,9 @@ function createCopiedFormatInlineList(
       ? options.onSaveFormat
       : options.onCopyFormat;
     if (!onActivate) continue;
+    const available = isPickCopyFormatAvailable(format.id, options.pickCopyCacheRecord);
     row.append(
-      createFormatActionButton(format, strings, (formatId) => {
+      createFormatActionButton(format, strings, available, (formatId) => {
         onSelectFormat(formatId);
         onActivate(formatId);
       }),

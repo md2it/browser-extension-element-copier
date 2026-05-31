@@ -89,6 +89,88 @@ function getTextFromRecord(record, formatId) {
   assert.equal(entries[0].key, "markdown");
 }
 
+/** Mirrors lib formatted-text/cache.ts: isFormattedTextCacheStorable (no doc). */
+function isFormattedTextCacheStorable(serialized) {
+  try {
+    const parsed = JSON.parse(serialized);
+    if (typeof parsed !== "object" || parsed === null || typeof parsed.html !== "string") {
+      return false;
+    }
+    return parsed.html.trim() !== "";
+  } catch {
+    return false;
+  }
+}
+
+/** Mirrors pick-copy-cache-storage.ts: isPickCopyCacheValueStorable */
+function isPickCopyCacheValueStorable(formatId, value, doc) {
+  if (formatId === "text") {
+    return isFormattedTextCacheStorable(value, doc);
+  }
+  return value.trim() !== "";
+}
+
+function entriesToStorableRecord(entries, doc) {
+  const record = {};
+  for (const { key, value } of entries) {
+    if (!isPickCopyCacheValueStorable(key, value, doc)) continue;
+    record[key] = value;
+  }
+  return record;
+}
+
+// isPickCopyCacheValueStorable: blank strings skipped
+{
+  assert.equal(isPickCopyCacheValueStorable("markdown", ""), false);
+  assert.equal(isPickCopyCacheValueStorable("markdown", "   "), false);
+  assert.equal(isPickCopyCacheValueStorable("markdown", "# Hi"), true);
+}
+
+// isPickCopyCacheValueStorable: text uses html inside serialized cache
+{
+  assert.equal(isPickCopyCacheValueStorable("text", "{}"), false);
+  assert.equal(isPickCopyCacheValueStorable("text", "   "), false);
+  assert.equal(
+    isPickCopyCacheValueStorable("text", JSON.stringify({ html: "", plain: "" })),
+    false,
+  );
+  assert.equal(
+    isPickCopyCacheValueStorable("text", JSON.stringify({ html: "   ", plain: "   " })),
+    false,
+  );
+  assert.equal(
+    isPickCopyCacheValueStorable("text", JSON.stringify({ html: "<p>x</p>", plain: "x" })),
+    true,
+  );
+}
+
+// writePickCopyCacheToStorage: empty entries do not create keys
+{
+  const record = entriesToStorableRecord([
+    { key: "markdown", value: "" },
+    { key: "selector", value: "#foo" },
+  ]);
+  assert.equal(record.markdown, undefined);
+  assert.equal(record.selector, "#foo");
+}
+
+/** Mirrors pick-copy-cache-storage.ts: isPickCopyFormatAvailable */
+function resolvePickCopyCacheStorageKey(formatId) {
+  return formatId === "markdownFile" ? "markdown" : formatId;
+}
+
+function isPickCopyFormatAvailable(formatId, record) {
+  if (!record) return false;
+  return record[resolvePickCopyCacheStorageKey(formatId)] !== undefined;
+}
+
+// isPickCopyFormatAvailable: derived markdownFile uses markdown key
+{
+  assert.equal(isPickCopyFormatAvailable("markdownFile", { markdown: "# Hi" }), true);
+  assert.equal(isPickCopyFormatAvailable("markdownFile", { selector: "#x" }), false);
+  assert.equal(isPickCopyFormatAvailable("markdown", { markdown: "# Hi" }), true);
+}
+
 // ---------------------------------------------------------------------------
 // Source contracts
 // ---------------------------------------------------------------------------
@@ -131,6 +213,13 @@ assert.match(backgroundSrc, /GET_PICK_COPY_TEXT/);
 const panelBodySrc = readFileSync(join(src, "panel-popup/panel-body.ts"), "utf8");
 assert.match(panelBodySrc, /hasPickCopyCacheInStorage/,
   "COPIED page must check cache presence, not only lastCopiedFormat");
+assert.match(panelBodySrc, /readPickCopyCacheFromStorage/);
+assert.match(panelBodySrc, /pickCopyCacheRecord/);
+
+const formatUiSrc = readFileSync(join(src, "formats/format-ui.ts"), "utf8");
+assert.match(formatUiSrc, /isPickCopyFormatAvailable/);
+assert.match(formatUiSrc, /pickCopyCacheRecord/);
+assert.match(formatUiSrc, /ec-format-action-btn--unavailable/);
 
 const fetchSrc = readFileSync(join(src, "panel-popup/fetch-picked-format.ts"), "utf8");
 assert.match(fetchSrc, /payload\.text === undefined/,
@@ -139,6 +228,10 @@ assert.match(fetchSrc, /payload\.text === undefined/,
 const storageSrc = readFileSync(
   join(src, "pick-mode/pick-copy-cache-storage.ts"), "utf8",
 );
+assert.match(storageSrc, /isPickCopyCacheValueStorable/);
+assert.match(storageSrc, /isFormattedTextCacheStorable/);
+assert.match(storageSrc, /isPickCopyFormatAvailable/);
+assert.match(storageSrc, /resolvePickCopyCacheStorageKey/);
 assert.match(storageSrc, /writePickCopyCacheToStorage/);
 assert.match(storageSrc, /readPickCopyCacheFromStorage/);
 assert.match(storageSrc, /clearPickCopyCacheStorage/);
@@ -149,14 +242,17 @@ assert.doesNotMatch(storageSrc, /ext\.storage\.session/,
   "pick-copy-cache-storage must not use session storage (content script writes cache)");
 assert.match(storageSrc, /markdownFile/,
   "storage must handle markdownFile");
-assert.match(storageSrc, /record\.markdown/,
-  "storage must remap markdownFile → record.markdown");
+assert.match(storageSrc, /resolvePickCopyCacheStorageKey/,
+  "storage must remap markdownFile via resolvePickCopyCacheStorageKey");
 
 const cacheSrc = readFileSync(
   join(src, "pick-mode/pick-copy-cache.ts"), "utf8",
 );
 assert.match(cacheSrc, /COPY_FORMATS\.map\(\(format\) => format\.id\)/,
-  "snapshotPickCopyCache must cache all formats");
+  "snapshotPickCopyCache must iterate all formats");
+assert.match(cacheSrc, /isPickCopyCacheValueStorable/);
+assert.match(cacheSrc, /ownerDocument/);
+assert.match(cacheSrc, /tryPushCacheEntry/);
 assert.doesNotMatch(cacheSrc, /enabledFormats/,
   "snapshotPickCopyCache must not filter by enabledFormats");
 assert.match(cacheSrc, /async function snapshotPickCopyCache/,
