@@ -9,7 +9,10 @@ const TRANSPARENT_CANVAS_FALLBACK = "rgba(0, 0, 0, 0)";
 type ScreenshotBackground = {
   color: string | null;
   background: string | null;
+  backgroundImage: string | null;
 };
+
+export type ScreenshotBackgroundSnapshot = readonly ScreenshotBackground[];
 
 function cssAlphaIsZero(alpha: string): boolean {
   const value = alpha.trim();
@@ -61,10 +64,13 @@ function getBackgroundFromComputedStyleSnapshot(
   );
   const background = getComputedStyleSnapshotProperty(computedStyles, "background");
   const color = isTransparentBackground(backgroundColor) ? null : backgroundColor;
-  const visibleBackground = isEmptyBackgroundImage(backgroundImage) ? null : background;
+  const visibleBackgroundImage = isEmptyBackgroundImage(backgroundImage)
+    ? null
+    : backgroundImage;
+  const visibleBackground = visibleBackgroundImage ? background || null : null;
 
-  if (!color && !visibleBackground) return null;
-  return { color, background: visibleBackground };
+  if (!color && !visibleBackground && !visibleBackgroundImage) return null;
+  return { color, background: visibleBackground, backgroundImage: visibleBackgroundImage };
 }
 
 function getParentElement(element: Element): Element | null {
@@ -84,17 +90,50 @@ function getElementBackground(element: Element): ScreenshotBackground | null {
   const background = isEmptyBackgroundImage(styles.backgroundImage)
     ? null
     : styles.background;
+  const backgroundImage = isEmptyBackgroundImage(styles.backgroundImage)
+    ? null
+    : styles.backgroundImage;
 
-  if (!color && !background) return null;
-  return { color, background };
+  if (!color && !background && !backgroundImage) return null;
+  return { color, background, backgroundImage };
+}
+
+export function createScreenshotBackgroundSnapshot(
+  element: Element,
+  computedStylesSnapshot?: string,
+): ScreenshotBackgroundSnapshot {
+  const backgrounds: ScreenshotBackground[] = [];
+  const targetBackground = getBackgroundFromComputedStyleSnapshot(computedStylesSnapshot);
+  if (targetBackground) {
+    backgrounds.push(targetBackground);
+  }
+
+  let current: Element | null = element;
+  while (current) {
+    const background = getElementBackground(current);
+    if (background) backgrounds.push(background);
+    current = getParentElement(current);
+  }
+
+  const { body, documentElement } = element.ownerDocument;
+  for (const fallbackElement of [body, documentElement]) {
+    if (!fallbackElement) continue;
+    const background = getElementBackground(fallbackElement);
+    if (background) backgrounds.push(background);
+  }
+
+  return backgrounds;
 }
 
 function getEffectiveBackground(
   element: Element,
-  computedStylesSnapshot?: string,
+  backgroundSnapshot?: ScreenshotBackgroundSnapshot,
 ): ScreenshotBackground {
-  const snapshotBackground = getBackgroundFromComputedStyleSnapshot(computedStylesSnapshot);
-  if (snapshotBackground) return snapshotBackground;
+  for (const background of backgroundSnapshot ?? []) {
+    if (background.color || background.background || background.backgroundImage) {
+      return background;
+    }
+  }
 
   let current: Element | null = element;
   while (current) {
@@ -110,15 +149,25 @@ function getEffectiveBackground(
     if (background) return background;
   }
 
-  return { color: null, background: null };
+  return { color: null, background: null, backgroundImage: null };
 }
 
 function screenshotOptions(
   element: Element,
   formatId: ImageCopyFormatId,
-  computedStylesSnapshot?: string,
+  backgroundSnapshot?: ScreenshotBackgroundSnapshot,
 ): Options {
-  const background = getEffectiveBackground(element, computedStylesSnapshot);
+  const background = getEffectiveBackground(element, backgroundSnapshot);
+  const style: Partial<CSSStyleDeclaration> = {};
+  if (background.background) {
+    style.background = background.background;
+  }
+  if (background.backgroundImage) {
+    style.backgroundImage = background.backgroundImage;
+  }
+  if (background.background || background.backgroundImage) {
+    style.backgroundColor = background.color ?? TRANSPARENT_CANVAS_FALLBACK;
+  }
 
   return {
     backgroundColor:
@@ -126,12 +175,7 @@ function screenshotOptions(
     fetch: {
       requestInit: { cache: "force-cache" },
     },
-    style: background.background
-      ? {
-          background: background.background,
-          backgroundColor: background.color ?? TRANSPARENT_CANVAS_FALLBACK,
-        }
-      : null,
+    style: Object.keys(style).length > 0 ? style : null,
   };
 }
 
@@ -142,9 +186,9 @@ export function isImageCopyFormat(formatId: CopyFormatId): formatId is ImageCopy
 export function captureElementImage(
   element: Element,
   formatId: ImageCopyFormatId,
-  computedStylesSnapshot?: string,
+  backgroundSnapshot?: ScreenshotBackgroundSnapshot,
 ): Promise<string> {
-  const options = screenshotOptions(element, formatId, computedStylesSnapshot);
+  const options = screenshotOptions(element, formatId, backgroundSnapshot);
   if (formatId === "jpeg") {
     return domToJpeg(element, options);
   }

@@ -1,5 +1,9 @@
 import { extractElementCopyText } from "../copy";
-import { captureElementImage, isImageCopyFormat } from "../copy/screenshot";
+import {
+  captureElementImage,
+  createScreenshotBackgroundSnapshot,
+  isImageCopyFormat,
+} from "../copy/screenshot";
 import { createStringCache } from "../element-copy";
 import { COPY_FORMATS, type CopyFormatId } from "../formats/definitions";
 import { DEFAULT_INLINE_IMAGES_MODE, type InlineImageMode } from "../settings/inline-images";
@@ -26,7 +30,8 @@ export async function snapshotPickCopyCache(
   const formatIds = COPY_FORMATS.map((format) => format.id);
   const entries: { key: CopyFormatId; value: string }[] = [];
   let markdownText: string | undefined;
-  let computedStylesText: string | undefined;
+  const computedStylesText = extractElementCopyText(element, "computedStyles", inlineImages);
+  const screenshotBackground = createScreenshotBackgroundSnapshot(element, computedStylesText);
 
   for (const formatId of formatIds) {
     if (formatId === "markdown" || formatId === "markdownFile") {
@@ -40,7 +45,7 @@ export async function snapshotPickCopyCache(
       try {
         entries.push({
           key: formatId,
-          value: await captureElementImage(element, formatId, computedStylesText),
+          value: await captureElementImage(element, formatId, screenshotBackground),
         });
       } catch (error) {
         console.warn("[Element Copier] image snapshot failed:", formatId, error);
@@ -48,7 +53,6 @@ export async function snapshotPickCopyCache(
       continue;
     }
     if (formatId === "computedStyles") {
-      computedStylesText = extractElementCopyText(element, formatId, inlineImages);
       entries.push({ key: formatId, value: computedStylesText });
       continue;
     }
