@@ -6,7 +6,8 @@ import type { PanelPopupTab } from "./panel-popup/constants";
 export type BgToContent =
   | { type: "SET_ACTIVE"; active: boolean }
   | { type: "GET_PICK_COPY_TEXT"; formatId: CopyFormatId }
-  | { type: "SET_POPUP_TAB"; tab: PanelPopupTab };
+  | { type: "SET_POPUP_TAB"; tab: PanelPopupTab }
+  | { type: "COPY_PAGE" };
 
 export type ContentToBg =
   | { type: "ACTIVE_CHANGED"; active: boolean }
@@ -16,6 +17,7 @@ export type ContentToBg =
   | { type: "PANEL_TAB_CHANGED"; tab: PanelPopupTab }
   | { type: "PANEL_CLOSED" }
   | { type: "REQUEST_START_PICK_MODE" }
+  | { type: "REQUEST_COPY_PAGE" }
   | { type: "WATCH_PIN_STATUS" }
   | { type: "TOGGLE_REQUEST" }
   | {

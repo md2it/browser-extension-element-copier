@@ -44,6 +44,7 @@ export const PANEL_BODY_CENTERED_CLASS = "ec-panel-body--centered";
 
 export type StartPanelActions = {
   onStart: () => void;
+  onCopyPage: () => void;
 };
 
 function createPageDivider(): HTMLDivElement {
@@ -175,6 +176,14 @@ export function buildStartPanelBody(
   const center = document.createElement("div");
   center.className = "ec-start-center";
 
+  const copyPageBtn = document.createElement("button");
+  copyPageBtn.type = "button";
+  copyPageBtn.className = "ec-start-btn";
+  copyPageBtn.textContent = strings.copyPageButtonLabel;
+  copyPageBtn.addEventListener("click", () => {
+    actions.onCopyPage();
+  });
+
   const startBtn = document.createElement("button");
   startBtn.type = "button";
   startBtn.className = "ec-start-btn";
@@ -183,7 +192,7 @@ export function buildStartPanelBody(
     actions.onStart();
   });
 
-  center.append(startBtn);
+  center.append(copyPageBtn, startBtn);
   page.append(title, createPageDivider(), center);
   body.append(page);
 }
@@ -328,6 +337,7 @@ export function buildLanguagePanelBody(body: HTMLDivElement, strings: Strings): 
 
 export type CopiedPanelActions = {
   onStartOver?: () => void;
+  onNewPage?: () => void;
 };
 
 function buildCopiedEmptyPanelBody(
@@ -356,17 +366,27 @@ function buildCopiedEmptyPanelBody(
   body.append(page);
 }
 
-function createCopiedAgainBlock(strings: Strings, onStartOver: () => void): HTMLElement {
+function createCopiedAgainBlock(
+  strings: Strings,
+  onStartOver: () => void,
+  onNewPage: () => void,
+): HTMLElement {
   const again = document.createElement("div");
   again.className = "ec-copied-again";
 
-  const btn = document.createElement("button");
-  btn.type = "button";
-  btn.className = "ec-start-btn";
-  btn.textContent = strings.copiedStartOverButtonLabel;
-  btn.addEventListener("click", onStartOver);
+  const newElementBtn = document.createElement("button");
+  newElementBtn.type = "button";
+  newElementBtn.className = "ec-start-btn";
+  newElementBtn.textContent = strings.copiedStartOverButtonLabel;
+  newElementBtn.addEventListener("click", onStartOver);
 
-  again.append(btn);
+  const newPageBtn = document.createElement("button");
+  newPageBtn.type = "button";
+  newPageBtn.className = "ec-start-btn";
+  newPageBtn.textContent = strings.newPageButtonLabel;
+  newPageBtn.addEventListener("click", onNewPage);
+
+  again.append(newElementBtn, newPageBtn);
   return again;
 }
 
@@ -503,7 +523,7 @@ export async function buildCopiedPanelBodyForHeightProbe(
   page.append(
     header,
     otherOptions,
-    createCopiedAgainBlock(strings, () => {}),
+    createCopiedAgainBlock(strings, () => {}, () => {}),
   );
   body.append(page);
 }
@@ -596,7 +616,11 @@ export async function buildCopiedPanelBody(
   page.append(
     header,
     otherOptions,
-    createCopiedAgainBlock(strings, actions.onStartOver ?? (() => {})),
+    createCopiedAgainBlock(
+      strings,
+      actions.onStartOver ?? (() => {}),
+      actions.onNewPage ?? (() => {}),
+    ),
   );
   body.append(page);
 }

@@ -18,6 +18,7 @@ import type { PanelMenuHandle } from "./panel-menu";
 import {
   notifyPanelClosed,
   notifyPanelTabChanged,
+  notifyCopyPage,
   notifyStartPickMode,
 } from "./lifecycle";
 
@@ -87,7 +88,13 @@ export class CopierPanelWindow {
     notifyPanelTabChanged(tab);
   }
 
-  /** START / START OVER — enable pick mode and close the panel. */
+  /** COPY PAGE / NEW PAGE — copy full page without pick mode and close the panel. */
+  private copyPageAndClose(): void {
+    notifyCopyPage();
+    this.close();
+  }
+
+  /** COPY ELEMENT / NEW ELEMENT — enable pick mode and close the panel. */
   private startPickModeAndClose(): void {
     notifyStartPickMode();
     this.close();
@@ -107,12 +114,18 @@ export class CopierPanelWindow {
           onStart: () => {
             this.startPickModeAndClose();
           },
+          onCopyPage: () => {
+            this.copyPageAndClose();
+          },
         });
         break;
       case "copied":
         await buildCopiedPanelBody(this.body, strings, {
           onStartOver: () => {
             this.startPickModeAndClose();
+          },
+          onNewPage: () => {
+            this.copyPageAndClose();
           },
         });
         break;

@@ -152,8 +152,8 @@ function attachMessageHandler(state: ContentState): void {
   let pickCopyInFlight = false;
   let pickCopyFlowSeq = 0;
 
-  const handleElementPicked = async (element: Element): Promise<void> => {
-    if (pickCopyInFlight || !state.active) return;
+  const runPickCopyFlow = async (element: Element): Promise<void> => {
+    if (pickCopyInFlight) return;
     pickCopyInFlight = true;
     const requestId = `pick-copy-${Date.now()}-${++pickCopyFlowSeq}`;
     try {
@@ -186,6 +186,11 @@ function attachMessageHandler(state: ContentState): void {
       notifyPickCopyFlowFinished(requestId);
       pickCopyInFlight = false;
     }
+  };
+
+  const handleElementPicked = async (element: Element): Promise<void> => {
+    if (!state.active) return;
+    await runPickCopyFlow(element);
   };
 
   const ensurePick = async (): Promise<CopierPickUI> => {
@@ -298,6 +303,20 @@ function attachMessageHandler(state: ContentState): void {
         return;
       }
       void showMountedPopupTab(message.tab).then((ok) => sendResponse({ ok }));
+      return true;
+    }
+
+    if (message.type === "COPY_PAGE") {
+      if (typeof window !== "undefined" && window.top !== window) {
+        sendResponse({ ok: false });
+        return;
+      }
+      const root = document.documentElement;
+      if (!root) {
+        sendResponse({ ok: false });
+        return;
+      }
+      void runPickCopyFlow(root).then(() => sendResponse({ ok: true }));
       return true;
     }
 

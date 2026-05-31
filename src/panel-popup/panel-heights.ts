@@ -124,7 +124,7 @@ async function fillPanelTabBody(
 
   switch (tab) {
     case "start":
-      buildStartPanelBody(body, strings, { onStart: () => {} });
+      buildStartPanelBody(body, strings, { onStart: () => {}, onCopyPage: () => {} });
       break;
     case "copied":
       await buildCopiedPanelBodyForHeightProbe(body, strings);

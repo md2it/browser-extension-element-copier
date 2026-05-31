@@ -12,6 +12,11 @@ export function notifyStartPickMode(): void {
   sendToBackground({ type: "REQUEST_START_PICK_MODE" });
 }
 
+/** COPY PAGE / NEW PAGE — copy `<html>` without pick mode (popup closes separately). */
+export function notifyCopyPage(): void {
+  sendToBackground({ type: "REQUEST_COPY_PAGE" });
+}
+
 /** Notify background that popup/panel is closed. */
 export function notifyPanelClosed(): void {
   sendToBackground({ type: "PANEL_CLOSED" });

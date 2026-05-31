@@ -773,6 +773,17 @@ ext.runtime.onMessage.addListener(
         await activateTab(tabId, sender.tab?.windowId);
       })();
     }
+    if (contentMessage.type === "REQUEST_COPY_PAGE") {
+      void (async () => {
+        const tabId = await resolvePickModeTabId(sender);
+        if (tabId === undefined) return;
+        if (!(await canOperateOnTab(tabId))) {
+          await showBlockedPageFeedback(tabId, sender.tab?.windowId, "canOperateOnTab:copyPage");
+          return;
+        }
+        await sendWithInject(tabId, { type: "COPY_PAGE" }, MAIN_FRAME_ID);
+      })();
+    }
     if (contentMessage.type === "WATCH_PIN_STATUS" && sender.tab?.id !== undefined) {
       watchWelcomePinStatus(sender.tab.id);
     }
