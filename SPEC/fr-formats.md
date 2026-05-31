@@ -16,8 +16,10 @@
 
 ## Форматированные тексты
 - Text
-   - Человекочитаемый текст с форматированием для GoogleDocs / Word
    - lucide text-initial
+   - text/html основной
+   - text/plain вычисляется из text/html
+   - Человекочитаемый текст с форматированием для GoogleDocs / Word
 - Markdown
    - Иконка markdown.svg (у нас есть кастомизированная)
    - headingStyle atx
