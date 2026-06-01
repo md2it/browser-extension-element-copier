@@ -23,7 +23,6 @@ export type PanelMenuTab =
   | "copied"
   | "settings"
   | "shortcuts"
-  | "language"
   | "about";
 
 export type PanelTransientTab = "loading";
@@ -33,7 +32,6 @@ export const PANEL_MENU_TABS: readonly PanelMenuTab[] = [
   "copied",
   "settings",
   "shortcuts",
-  "language",
   "about",
 ];
 

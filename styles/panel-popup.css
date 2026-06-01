@@ -75,6 +75,7 @@
 
 .ec-panel--surface-popup > .ec-panel-main {
   align-items: stretch;
+  direction: ltr;
 }
 
 .ec-panel-menu {
@@ -116,6 +117,10 @@
 .ec-panel--surface-popup .ec-panel-content {
   flex: 1 1 0;
   min-width: 0;
+}
+
+.ec-panel[dir="rtl"] .ec-panel-content {
+  direction: rtl;
 }
 
 .ec-panel--surface-popup .ec-panel-content > .dd-panel-divider {
@@ -256,7 +261,7 @@
 }
 
 .ec-panel-page-title {
-  margin: 0 0 0.5rem;
+  margin: 0.5rem 0 0.85rem;
   font-size: 1rem;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -396,10 +401,69 @@
   --ec-settings-row-margin-top: 0.85rem;
 }
 
-.ec-panel-page--settings .ec-copy-default-row,
+.ec-lang-row {
+  display: flex;
+  width: 100%;
+  gap: 0.3rem;
+  margin-top: 0.85rem;
+  /* EN | ES | … order is fixed; panel RTL must not mirror this row. */
+  direction: ltr;
+}
+
+.ec-lang-btn {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 0.35rem 0.25rem;
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  border-radius: 0.4rem;
+  background: #fff;
+  color: #1f2937;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05), 0 0 10px rgba(0, 0, 0, 0.06);
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.ec-lang-btn.is-active {
+  background: #b91c1c;
+  border-color: #b91c1c;
+  color: #fff;
+  box-shadow: none;
+}
+
+.ec-lang-btn.is-active:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.9);
+}
+
+.ec-lang-btn:not(.is-active):hover,
+.ec-lang-btn:not(.is-active):focus-visible {
+  color: #b91c1c;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 0 14px rgba(0, 0, 0, 0.09);
+}
+
+.ec-lang-btn.is-active:hover,
+.ec-lang-btn.is-active:focus-visible {
+  color: #fff;
+}
+
+.ec-panel-page--settings .ec-copy-default-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  column-gap: var(--ec-settings-row-gap);
+  width: 100%;
+  min-width: 0;
+  margin-top: var(--ec-settings-row-margin-top);
+}
+
 .ec-panel-page--settings .ec-toggle-row {
   display: grid;
-  grid-template-columns: var(--ec-settings-label-width) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: center;
   column-gap: var(--ec-settings-row-gap);
   width: 100%;
@@ -409,16 +473,15 @@
 
 .ec-copy-default-row {
   display: grid;
-  grid-template-columns: var(--ec-settings-label-width) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: center;
-  column-gap: 0.28rem;
+  column-gap: var(--ec-settings-row-gap);
   width: 100%;
   min-width: 0;
   margin-top: 0.85rem;
 }
 
 .ec-copy-default-label {
-  grid-column: 1;
   min-width: 0;
   white-space: nowrap;
   font-size: 0.8rem;
@@ -427,24 +490,46 @@
   color: #1f2937;
 }
 
-.ec-copy-default-label-wrap {
-  grid-column: 1;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+.ec-copy-default-label--with-info {
+  display: inline-flex;
   align-items: center;
-  min-width: 0;
   gap: 0.14rem;
+  width: 100%;
+  min-width: 0;
 }
 
-.ec-copy-default-label-wrap .ec-copy-default-label {
-  grid-column: 1;
+.ec-panel-page--settings .ec-copy-default-label,
+.ec-panel-page--settings .ec-toggle-label {
+  display: flex;
+  align-items: center;
+  align-self: center;
+  justify-self: start;
+  text-align: start;
+}
+
+.ec-panel-page--settings .ec-copy-default-label--with-info {
+  justify-content: flex-start;
+}
+
+.ec-panel-page--settings .ec-copy-default-select,
+.ec-panel-page--settings .ec-toggle {
+  align-self: center;
+  justify-self: start;
+}
+
+.ec-panel-page--settings .ec-copy-default-select {
+  justify-self: stretch;
+  text-align: start;
+}
+
+.ec-copy-default-label-text {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .ec-copy-default-select {
-  grid-column: 2;
   justify-self: stretch;
   width: 100%;
   min-width: 0;
@@ -487,10 +572,6 @@
 }
 
 .ec-inline-images-info {
-  grid-column: 2;
-  justify-self: end;
-  margin-inline-start: 0;
-  margin-inline-end: 0;
   flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
@@ -618,13 +699,7 @@
 }
 
 .ec-panel-page--settings .ec-toggle-label {
-  grid-column: 1;
   white-space: nowrap;
-}
-
-.ec-panel-page--settings .ec-toggle {
-  grid-column: 2;
-  justify-self: end;
 }
 
 .ec-settings-format-inline-list {

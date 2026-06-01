@@ -1,6 +1,25 @@
-export type Locale = "en";
+export type Locale = "en" | "es" | "fr" | "de" | "ru" | "zh_CN" | "ar";
 
-export const LOCALES: readonly Locale[] = ["en"] as const;
+export const LOCALES: readonly Locale[] = [
+  "en",
+  "es",
+  "fr",
+  "de",
+  "ru",
+  "zh_CN",
+  "ar",
+] as const;
+
+/** Button labels on SETTINGS (fixed order; row stays LTR in RTL panels). */
+export const LOCALE_BUTTON_LABELS: Record<Locale, string> = {
+  en: "EN",
+  es: "ES",
+  fr: "FR",
+  de: "DE",
+  ru: "RU",
+  zh_CN: "中文",
+  ar: "عربي",
+};
 
 export type Strings = {
   restrictedPageNotice: string;
@@ -47,7 +66,6 @@ export type Strings = {
   copiedEmptyLine2: string;
   pageSettingsTitle: string;
   tabShortcuts: string;
-  tabLanguage: string;
   shortcutsRunStopHeading: string;
   shortcutsStepPress: string;
   shortcutsStepOnMac: string;
@@ -67,5 +85,5 @@ export type Strings = {
 };
 
 export function isLocale(value: unknown): value is Locale {
-  return value === "en";
+  return typeof value === "string" && (LOCALES as readonly string[]).includes(value);
 }

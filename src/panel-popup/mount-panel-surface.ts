@@ -56,6 +56,9 @@ export async function mountPanelSurface(
       window.close();
     },
     getLocale: () => locale,
+    setLocale: (next) => {
+      locale = next;
+    },
     onAfterTabRender:
       surface === "popup"
         ? () => fitActionPopupToHost(host, locale)

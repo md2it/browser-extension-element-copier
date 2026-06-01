@@ -34,6 +34,6 @@ export function createToggleRow(
     onChange(next);
   });
 
-  row.append(label, toggle);
+  row.append(toggle, label);
   return row;
 }

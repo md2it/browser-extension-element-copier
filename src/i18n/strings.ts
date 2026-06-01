@@ -1,7 +1,6 @@
 import type { Locale, Strings } from "./types";
 
-const MESSAGES: Record<Locale, Strings> = {
-  en: {
+const EN_MESSAGES: Strings = {
     restrictedPageNotice:
       "Browser extensions don't work on system pages and protected sites. Try another site.",
     panelSubtitle: "browser extension",
@@ -49,7 +48,6 @@ const MESSAGES: Record<Locale, Strings> = {
     copiedEmptyLine2: "Should we copy something?",
     pageSettingsTitle: "SETTINGS",
     tabShortcuts: "SHORTCUTS",
-    tabLanguage: "LANGUAGE",
     shortcutsRunStopHeading: "To run / stop the extension:",
     shortcutsStepPress: "Press:",
     shortcutsStepOnMac: "On Mac:",
@@ -77,9 +75,9 @@ const MESSAGES: Record<Locale, Strings> = {
     ],
     aboutProductName: "Element-Copier",
     aboutCreditAuthor: "Alex T",
-  },
 };
 
-export function t(locale: Locale): Strings {
-  return MESSAGES[locale];
+/** UI locales are selectable; translated catalogs are added per locale later. */
+export function t(_locale: Locale): Strings {
+  return EN_MESSAGES;
 }

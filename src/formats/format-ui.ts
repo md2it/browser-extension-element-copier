@@ -97,13 +97,13 @@ export async function createInlineImagesSelect(strings: Strings): Promise<HTMLEl
   const row = document.createElement("div");
   row.className = "ec-copy-default-row ec-inline-images-row";
 
-  const labelWrap = document.createElement("div");
-  labelWrap.className = "ec-copy-default-label-wrap";
-
   const label = document.createElement("label");
-  label.className = "ec-copy-default-label";
+  label.className = "ec-copy-default-label ec-copy-default-label--with-info";
   label.htmlFor = "ec-inline-images-mode";
-  label.textContent = strings.settingsInlineImagesLabel;
+
+  const labelText = document.createElement("span");
+  labelText.className = "ec-copy-default-label-text";
+  labelText.textContent = strings.settingsInlineImagesLabel;
 
   const select = document.createElement("select");
   select.id = "ec-inline-images-mode";
@@ -121,8 +121,8 @@ export async function createInlineImagesSelect(strings: Strings): Promise<HTMLEl
     void setInlineImagesMode(select.value as InlineImageMode);
   });
 
-  labelWrap.append(label, createInlineImagesInfoButton(strings));
-  row.append(labelWrap, select);
+  label.append(labelText, createInlineImagesInfoButton(strings));
+  row.append(select, label);
   return row;
 }
 
@@ -190,7 +190,7 @@ export async function createClipboardDefaultFormatSelect(strings: Strings): Prom
     void setClipboardDefaultFormat(value as CopyFormatId);
   });
 
-  row.append(label, select);
+  row.append(select, label);
   return row;
 }
 

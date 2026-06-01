@@ -8,7 +8,6 @@ import {
 import {
   buildAboutPanelBody,
   buildCopiedPanelBodyForHeightProbe,
-  buildLanguagePanelBody,
   buildLoadingPanelBody,
   buildSettingsPanelBody,
   buildStartPanelBody,
@@ -134,9 +133,6 @@ async function fillPanelTabBody(
       break;
     case "shortcuts":
       buildShortcutsPanelBody(body, strings);
-      break;
-    case "language":
-      buildLanguagePanelBody(body, strings);
       break;
     case "about":
       buildAboutPanelBody(body, strings);

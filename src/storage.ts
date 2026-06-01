@@ -34,6 +34,13 @@ export async function getLocale(): Promise<Locale> {
   return detectLocale();
 }
 
+export async function setLocale(locale: Locale): Promise<void> {
+  await ext.storage.local.set({
+    [LOCALE_STORAGE_KEY]: locale,
+    [LOCALE_USER_SELECTED_KEY]: true,
+  });
+}
+
 export async function ensureLocaleInStorage(): Promise<void> {
   const data = await ext.storage.local.get([
     LOCALE_STORAGE_KEY,

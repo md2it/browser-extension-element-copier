@@ -1,18 +1,19 @@
-import type { Locale } from "../i18n";
-import { t } from "../i18n";
+import { isRtlLocale, t, type Locale } from "../i18n";
+import { localeToHtmlLang } from "../../../lib/src/i18n/locale-code";
+import { setLocale } from "../storage";
 import { createPanelSurface } from "./build-panel-surface";
 import type { PanelMenuTab, PanelPopupTab } from "./constants";
 import { PANEL_MENU_TABS } from "./constants";
 import {
   buildAboutPanelBody,
   buildCopiedPanelBody,
-  buildLanguagePanelBody,
   buildLoadingPanelBody,
   buildSettingsPanelBody,
   buildStartPanelBody,
   buildShortcutsPanelBody,
   PANEL_BODY_CENTERED_CLASS,
 } from "./panel-body";
+import { syncLanguageSelectorRow } from "./language-selector";
 import { hasPickCopyCacheInStorage } from "../pick-mode/pick-copy-cache-storage";
 import type { PanelMenuHandle } from "./panel-menu";
 import {
@@ -27,6 +28,7 @@ export type CopierPanelHost = {
   surface?: "popup";
   onClose?: () => void;
   getLocale: () => Locale;
+  setLocale?: (locale: Locale) => void;
   onAfterTabRender?: () => void | Promise<void>;
 };
 
@@ -129,13 +131,24 @@ export class CopierPanelWindow {
         });
         break;
       case "settings":
-        await buildSettingsPanelBody(this.body, strings);
+        await buildSettingsPanelBody(this.body, strings, {
+          getLocale: () => this.host.getLocale(),
+          onLocaleSelect: async (code) => {
+            if (code === this.host.getLocale()) return;
+            await setLocale(code);
+            this.host.setLocale?.(code);
+            if (this.panelRoot) {
+              this.panelRoot.lang = localeToHtmlLang(code);
+              this.panelRoot.dir = isRtlLocale(code) ? "rtl" : "ltr";
+            }
+            const langRow = this.body?.querySelector<HTMLElement>(".ec-lang-row");
+            if (langRow) syncLanguageSelectorRow(langRow, code);
+            await this.host.onAfterTabRender?.();
+          },
+        });
         break;
       case "shortcuts":
         buildShortcutsPanelBody(this.body, strings);
-        break;
-      case "language":
-        buildLanguagePanelBody(this.body, strings);
         break;
       case "about":
         buildAboutPanelBody(this.body, strings);

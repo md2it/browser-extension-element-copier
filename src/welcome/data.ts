@@ -8,7 +8,13 @@ import {
   PUZZLE,
   toolbarWelcomeIconSvg,
 } from "../icons";
-import { isRtlLocale, t, type Locale } from "../i18n";
+import {
+  isRtlLocale,
+  LOCALE_BUTTON_LABELS,
+  LOCALES,
+  t,
+  type Locale,
+} from "../i18n";
 
 function buildWelcomeLocalePayload(locale: Locale) {
   const strings = t(locale);
@@ -23,7 +29,7 @@ function buildWelcomeLocalePayload(locale: Locale) {
     pinStep3: strings.welcomePinStep3,
     aboutHeading: strings.tabAbout,
     aboutItems: buildAboutListItems(strings),
-    langAriaLabel: "",
+    langAriaLabel: strings.pageSettingsTitle,
   };
 }
 
@@ -33,7 +39,11 @@ export function buildWelcomeData(
   options?: { isPinned?: boolean | null },
 ): WelcomeData {
   const isPinned = options?.isPinned === true;
-  const current = buildWelcomeLocalePayload(locale);
+  const perLocale = Object.fromEntries(
+    LOCALES.map((code) => [code, buildWelcomeLocalePayload(code)]),
+  ) as Record<Locale, ReturnType<typeof buildWelcomeLocalePayload>>;
+
+  const current = perLocale[locale];
 
   return {
     extensionName,
@@ -56,8 +66,11 @@ export function buildWelcomeData(
     aboutHeading: current.aboutHeading,
     aboutItems: current.aboutItems,
     hasAbout: true,
-    hasLocales: false,
-    perLocale: { [locale]: current },
+    hasLocales: true,
+    locales: [...LOCALES],
+    localeLabels: LOCALE_BUTTON_LABELS,
+    langAriaLabel: current.langAriaLabel,
+    perLocale,
   };
 }
 

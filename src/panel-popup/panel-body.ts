@@ -11,7 +11,9 @@ import {
   createInlineImagesSelect,
   syncCopiedPanelFormatSelection,
 } from "../formats/format-ui";
-import type { Strings } from "../i18n";
+import type { Locale, Strings } from "../i18n";
+import { getLocale } from "../storage";
+import { createLanguageSelectorRow } from "./language-selector";
 import { PANEL_FOOTER_LINKEDIN_URL } from "../../../lib/src/panel-footer/constants";
 import {
   ABOUT_PREFIX_CHORD_MAC_DISPLAY,
@@ -223,17 +225,33 @@ export function buildLoadingPanelBody(body: HTMLDivElement, strings: Strings): v
   body.append(page);
 }
 
+export type SettingsPanelLocaleOptions = {
+  getLocale: () => Locale;
+  onLocaleSelect: (locale: Locale) => void | Promise<void>;
+};
+
 export async function buildSettingsPanelBody(
   body: HTMLDivElement,
   strings: Strings,
+  localeOptions?: SettingsPanelLocaleOptions,
 ): Promise<void> {
   body.replaceChildren();
 
-  const [clipboardDefaultFormat, inlineImagesSelect, developerToolsToggle] = await Promise.all([
-    createClipboardDefaultFormatSelect(strings),
-    createInlineImagesSelect(strings),
-    createDeveloperToolsToggleRow(strings),
-  ]);
+  const [clipboardDefaultFormat, inlineImagesSelect, developerToolsToggle, storedLocale] =
+    await Promise.all([
+      createClipboardDefaultFormatSelect(strings),
+      createInlineImagesSelect(strings),
+      createDeveloperToolsToggleRow(strings),
+      localeOptions ? Promise.resolve(null) : getLocale(),
+    ]);
+
+  const getActiveLocale = (): Locale =>
+    localeOptions?.getLocale() ?? storedLocale ?? "en";
+
+  const languageRow = createLanguageSelectorRow(
+    getActiveLocale,
+    localeOptions?.onLocaleSelect ?? (() => {}),
+  );
 
   const page = document.createElement("div");
   page.className = "ec-panel-page ec-panel-page--settings";
@@ -245,9 +263,10 @@ export async function buildSettingsPanelBody(
   page.append(
     title,
     createPageDivider(),
-    developerToolsToggle,
+    languageRow,
     clipboardDefaultFormat,
     inlineImagesSelect,
+    developerToolsToggle,
   );
   body.append(page);
 }
@@ -321,20 +340,6 @@ export function buildShortcutsPanelBody(body: HTMLDivElement, strings: Strings):
     stopLine,
     createShortcutsSectionDivider(),
   );
-  body.append(page);
-}
-
-export function buildLanguagePanelBody(body: HTMLDivElement, strings: Strings): void {
-  body.replaceChildren();
-
-  const page = document.createElement("div");
-  page.className = "ec-panel-page";
-
-  const title = document.createElement("h2");
-  title.className = "ec-panel-page-title";
-  title.textContent = strings.tabLanguage;
-
-  page.append(title, createPageDivider());
   body.append(page);
 }
 
