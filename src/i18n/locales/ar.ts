@@ -32,6 +32,12 @@ export const AR_MESSAGES: Strings = {
   settingsInlineImagesInfoLabel: "عن الصور المضمّنة",
   settingsInlineImagesInfo:
     "تضمّن بعض الصفحات الصور في HTML كـ Base64 (شائع في Google ومواقع مشابهة). قد يبطئ ذلك النسخ ويكبّر مخرجات النص أو Markdown. الصور الصغيرة غالبًا أيقونات أو أزرار تزيد الفوضى. اضبط ما يُضمَّن من هنا.",
+  settingsFrameLabelStyleLabel: "على الإطار",
+  settingsFrameLabelNone: "بدون عنوان",
+  settingsFrameLabelClickToCopy: "انقر للنسخ",
+  settingsFrameLabelTagIdClass: "tag id class",
+  settingsFrameLabelSelector: "مُحدِّد",
+  settingsFrameLabelFullXPath: "XPath الكامل",
   infoWindowCloseLabel: "إغلاق",
   settingsDeveloperToolsToggleLabel: "أدوات المطوّر",
   settingsDarkThemeToggleLabel: "المظهر الداكن",

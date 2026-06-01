@@ -9,6 +9,7 @@ import {
   createCopiedOtherOptionsRow,
   createDarkThemeToggleRow,
   createDeveloperToolsToggleRow,
+  createFrameLabelStyleSelect,
   createInlineImagesSelect,
   syncCopiedPanelFormatSelection,
 } from "../formats/format-ui";
@@ -245,14 +246,21 @@ export async function buildSettingsPanelBody(
 ): Promise<void> {
   body.replaceChildren();
 
-  const [clipboardDefaultFormat, inlineImagesSelect, developerToolsToggle, darkThemeToggle, storedLocale] =
-    await Promise.all([
-      createClipboardDefaultFormatSelect(strings),
-      createInlineImagesSelect(strings),
-      createDeveloperToolsToggleRow(strings),
-      createDarkThemeToggleRow(strings),
-      localeOptions ? Promise.resolve(null) : getLocale(),
-    ]);
+  const [
+    clipboardDefaultFormat,
+    inlineImagesSelect,
+    frameLabelStyleSelect,
+    developerToolsToggle,
+    darkThemeToggle,
+    storedLocale,
+  ] = await Promise.all([
+    createClipboardDefaultFormatSelect(strings),
+    createInlineImagesSelect(strings),
+    createFrameLabelStyleSelect(strings),
+    createDeveloperToolsToggleRow(strings),
+    createDarkThemeToggleRow(strings),
+    localeOptions ? Promise.resolve(null) : getLocale(),
+  ]);
 
   const getActiveLocale = (): Locale =>
     localeOptions?.getLocale() ?? storedLocale ?? "en";
@@ -276,6 +284,7 @@ export async function buildSettingsPanelBody(
     createSettingsSectionDivider(),
     clipboardDefaultFormat,
     inlineImagesSelect,
+    frameLabelStyleSelect,
     createSettingsSectionDivider(),
     developerToolsToggle,
     darkThemeToggle,

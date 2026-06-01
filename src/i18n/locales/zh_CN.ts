@@ -32,6 +32,12 @@ export const ZH_CN_MESSAGES: Strings = {
   settingsInlineImagesInfoLabel: "关于内嵌图片",
   settingsInlineImagesInfo:
     "部分页面在 HTML 中以 Base64 嵌入图片（Google 等网站较常见）。这会拖慢复制并撑大文本或 Markdown 输出。小图多为图标或按钮，易造成干扰。可用此设置控制包含范围。",
+  settingsFrameLabelStyleLabel: "框上显示",
+  settingsFrameLabelNone: "无标题",
+  settingsFrameLabelClickToCopy: "点击复制",
+  settingsFrameLabelTagIdClass: "tag id class",
+  settingsFrameLabelSelector: "选择器",
+  settingsFrameLabelFullXPath: "完整 XPath",
   infoWindowCloseLabel: "关闭",
   settingsDeveloperToolsToggleLabel: "开发者工具",
   settingsDarkThemeToggleLabel: "深色主题",

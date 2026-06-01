@@ -32,6 +32,12 @@ export const DE_MESSAGES: Strings = {
   settingsInlineImagesInfoLabel: "Zu eingebetteten Bildern",
   settingsInlineImagesInfo:
     "Einige Seiten betten Bilder im HTML als Base64 ein (häufig bei Google und ähnlichen Seiten). Das kann das Kopieren verlangsamen und Text- oder Markdown-Ausgaben aufblähen. Kleine Bilder sind oft Symbole oder Schaltflächen, die stören. Steuere hier, was eingeschlossen wird.",
+  settingsFrameLabelStyleLabel: "Am Rahmen",
+  settingsFrameLabelNone: "Kein Titel",
+  settingsFrameLabelClickToCopy: "klicken zum Kopieren",
+  settingsFrameLabelTagIdClass: "tag id class",
+  settingsFrameLabelSelector: "Selektor",
+  settingsFrameLabelFullXPath: "vollständiger XPath",
   infoWindowCloseLabel: "Schließen",
   settingsDeveloperToolsToggleLabel: "Entwicklertools",
   settingsDarkThemeToggleLabel: "Dunkles Design",

@@ -32,6 +32,12 @@ export const ES_MESSAGES: Strings = {
   settingsInlineImagesInfoLabel: "Sobre imágenes incrustadas",
   settingsInlineImagesInfo:
     "Algunas páginas incrustan imágenes en el HTML como Base64 (habitual en Google y sitios similares). Esto puede ralentizar la copia e inflar la salida en texto o Markdown. Las imágenes pequeñas suelen ser iconos o botones que añaden ruido. Usa este ajuste para controlar qué se incluye.",
+  settingsFrameLabelStyleLabel: "En el marco",
+  settingsFrameLabelNone: "Sin título",
+  settingsFrameLabelClickToCopy: "clic para copiar",
+  settingsFrameLabelTagIdClass: "tag id class",
+  settingsFrameLabelSelector: "selector",
+  settingsFrameLabelFullXPath: "XPath completo",
   infoWindowCloseLabel: "Cerrar",
   settingsDeveloperToolsToggleLabel: "Herramientas para desarrolladores",
   settingsDarkThemeToggleLabel: "Tema oscuro",

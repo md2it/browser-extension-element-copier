@@ -4,7 +4,12 @@ import {
 } from "../../../lib/src/element-under-cursor";
 import { HighlightSystem } from "../../../lib/src/highlight";
 import { sendToBackground } from "../messages";
-import { formatElementLabel } from "./element-label";
+import { formatFrameElementLabel } from "./element-label";
+import {
+  getCachedFrameClickToCopyLabel,
+  getCachedFrameLabelStyle,
+  subscribeFrameLabelStyleChange,
+} from "../settings/format-settings-cache";
 import { PICK_HOST_ATTR, PICK_ROOT_ID } from "./constants";
 import { COPIER_HIGHLIGHT_PAGE_STYLE, HIGHLIGHT_UI } from "./page-styles";
 
@@ -16,6 +21,7 @@ export class CopierPickUI {
   private readonly highlight: HighlightSystem;
   private readonly onPick: OnPickFn;
   private readonly boundClick: (e: MouseEvent) => void;
+  private readonly unsubscribeFrameLabelStyle: () => void;
 
   constructor(onPick: OnPickFn) {
     this.onPick = onPick;
@@ -55,8 +61,13 @@ export class CopierPickUI {
       host: {
         shadow: this.shadow,
         isOurNode: (node) => this.isOurNode(node),
-        getElementLabelEnabled: () => true,
-        formatElementLabel,
+        getElementLabelEnabled: () => getCachedFrameLabelStyle() !== "none",
+        formatElementLabel: (target) =>
+          formatFrameElementLabel(
+            target,
+            getCachedFrameLabelStyle(),
+            getCachedFrameClickToCopyLabel(),
+          ),
         hostAttr: PICK_HOST_ATTR,
         classes: HIGHLIGHT_UI,
       },
@@ -66,6 +77,13 @@ export class CopierPickUI {
       existingLabel instanceof HTMLElement ? existingLabel : null,
       existingFrame instanceof HTMLElement ? existingFrame : null,
     );
+    this.unsubscribeFrameLabelStyle = subscribeFrameLabelStyleChange(() => {
+      this.syncFrameLabel();
+    });
+  }
+
+  syncFrameLabel(): void {
+    this.highlight.syncElementLabel();
   }
 
   isHostConnected(): boolean {
@@ -86,6 +104,11 @@ export class CopierPickUI {
   deactivate(): void {
     document.removeEventListener("click", this.boundClick, true);
     this.highlight.deactivate();
+  }
+
+  dispose(): void {
+    this.unsubscribeFrameLabelStyle();
+    this.deactivate();
   }
 
   private handleClick(e: MouseEvent): void {

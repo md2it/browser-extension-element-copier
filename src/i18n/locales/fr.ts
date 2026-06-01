@@ -32,6 +32,12 @@ export const FR_MESSAGES: Strings = {
   settingsInlineImagesInfoLabel: "À propos des images intégrées",
   settingsInlineImagesInfo:
     "Certaines pages intègrent des images dans le HTML en Base64 (fréquent sur Google et sites similaires). Cela peut ralentir la copie et alourdir le texte ou le Markdown. Les petites images sont souvent des icônes ou boutons superflus. Utilisez ce réglage pour choisir ce qui est inclus.",
+  settingsFrameLabelStyleLabel: "Sur le cadre",
+  settingsFrameLabelNone: "Sans titre",
+  settingsFrameLabelClickToCopy: "cliquer pour copier",
+  settingsFrameLabelTagIdClass: "tag id class",
+  settingsFrameLabelSelector: "sélecteur",
+  settingsFrameLabelFullXPath: "XPath complet",
   infoWindowCloseLabel: "Fermer",
   settingsDeveloperToolsToggleLabel: "Outils de développement",
   settingsDarkThemeToggleLabel: "Thème sombre",

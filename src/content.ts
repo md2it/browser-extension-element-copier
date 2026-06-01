@@ -125,7 +125,7 @@ function waitForNextFrame(): Promise<void> {
 }
 
 function tearDownPick(state: ContentState): void {
-  state.pick?.deactivate();
+  state.pick?.dispose();
   state.pick = null;
   state.pickInit = null;
   document.getElementById(PICK_ROOT_ID)?.remove();

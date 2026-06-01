@@ -66,4 +66,6 @@ export const DARK_THEME_ENABLED_KEY = "darkThemeEnabled";
 export const CLIPBOARD_DEFAULT_FORMAT_KEY = "clipboardDefaultFormat";
 /** Inline (data:) image handling for TEXT/MARKDOWN (SETTINGS dropdown). */
 export const INLINE_IMAGES_KEY = "inlineImages";
+/** Highlight frame label style in pick mode (SETTINGS dropdown). */
+export const FRAME_LABEL_STYLE_KEY = "frameLabelStyle";
 export const DEFAULT_NOTIFICATION_SECONDS = 4;

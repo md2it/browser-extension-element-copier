@@ -51,6 +51,12 @@ export type Strings = {
   settingsInlineImagesRemoveAll: string;
   settingsInlineImagesInfoLabel: string;
   settingsInlineImagesInfo: string;
+  settingsFrameLabelStyleLabel: string;
+  settingsFrameLabelNone: string;
+  settingsFrameLabelClickToCopy: string;
+  settingsFrameLabelTagIdClass: string;
+  settingsFrameLabelSelector: string;
+  settingsFrameLabelFullXPath: string;
   infoWindowCloseLabel: string;
   settingsDeveloperToolsToggleLabel: string;
   settingsDarkThemeToggleLabel: string;

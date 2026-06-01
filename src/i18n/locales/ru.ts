@@ -32,6 +32,12 @@ export const RU_MESSAGES: Strings = {
   settingsInlineImagesInfoLabel: "О встроенных изображениях",
   settingsInlineImagesInfo:
     "Некоторые страницы встраивают изображения в HTML как Base64 (часто у Google и похожих сайтов). Это может замедлить копирование и увеличить результат в текстовом формате или Markdown. Мелкие изображения часто бывают иконками или кнопками и добавляют шум. Здесь можно выбрать, что включать.",
+  settingsFrameLabelStyleLabel: "На рамке",
+  settingsFrameLabelNone: "Без подписи",
+  settingsFrameLabelClickToCopy: "нажмите, чтобы скопировать",
+  settingsFrameLabelTagIdClass: "tag id class",
+  settingsFrameLabelSelector: "селектор",
+  settingsFrameLabelFullXPath: "полный XPath",
   infoWindowCloseLabel: "Закрыть",
   settingsDeveloperToolsToggleLabel: "Инструменты разработчика",
   settingsDarkThemeToggleLabel: "Тёмная тема",

@@ -23,6 +23,12 @@ import {
   setInlineImagesMode,
   type InlineImageMode,
 } from "../settings/inline-images";
+import {
+  FRAME_LABEL_STYLES,
+  getFrameLabelStyle,
+  setFrameLabelStyle,
+  type FrameLabelStyle,
+} from "../settings/frame-label-style";
 import type {
   CopiedPanelActionKind,
   CopiedPanelButtonSelection,
@@ -122,6 +128,52 @@ export async function createInlineImagesSelect(strings: Strings): Promise<HTMLEl
   });
 
   label.append(labelText, createInlineImagesInfoButton(strings));
+  row.append(label, select);
+  return row;
+}
+
+function frameLabelStyleOptionLabel(style: FrameLabelStyle, strings: Strings): string {
+  switch (style) {
+    case "none":
+      return strings.settingsFrameLabelNone;
+    case "click-to-copy":
+      return strings.settingsFrameLabelClickToCopy;
+    case "tag-id-class":
+      return strings.settingsFrameLabelTagIdClass;
+    case "selector":
+      return strings.settingsFrameLabelSelector;
+    case "full-xpath":
+      return strings.settingsFrameLabelFullXPath;
+  }
+}
+
+export async function createFrameLabelStyleSelect(strings: Strings): Promise<HTMLElement> {
+  const selectedStyle = await getFrameLabelStyle();
+
+  const row = document.createElement("div");
+  row.className = "ec-copy-default-row ec-frame-label-style-row";
+
+  const label = document.createElement("label");
+  label.className = "ec-copy-default-label";
+  label.htmlFor = "ec-frame-label-style";
+  label.textContent = strings.settingsFrameLabelStyleLabel;
+
+  const select = document.createElement("select");
+  select.id = "ec-frame-label-style";
+  select.className = "ec-copy-default-select";
+
+  for (const style of FRAME_LABEL_STYLES) {
+    const option = document.createElement("option");
+    option.value = style;
+    option.textContent = frameLabelStyleOptionLabel(style, strings);
+    option.selected = style === selectedStyle;
+    select.append(option);
+  }
+
+  select.addEventListener("change", () => {
+    void setFrameLabelStyle(select.value as FrameLabelStyle);
+  });
+
   row.append(label, select);
   return row;
 }

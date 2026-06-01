@@ -38,6 +38,12 @@ const EN_MESSAGES: Strings = {
     settingsInlineImagesInfoLabel: "About inline images",
     settingsInlineImagesInfo:
       "Some pages embed images in the HTML as Base64 (common on Google and similar sites). This can slow copying and bloat Text or Markdown output. Small images are often icons or buttons that add clutter. Use this setting to control what is included.",
+    settingsFrameLabelStyleLabel: "On the frame",
+    settingsFrameLabelNone: "No title",
+    settingsFrameLabelClickToCopy: "click to copy",
+    settingsFrameLabelTagIdClass: "tag id class",
+    settingsFrameLabelSelector: "selector",
+    settingsFrameLabelFullXPath: "full XPath",
     infoWindowCloseLabel: "Close",
     settingsDeveloperToolsToggleLabel: "Developer tools",
     settingsDarkThemeToggleLabel: "Dark theme",
