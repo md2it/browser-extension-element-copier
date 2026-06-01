@@ -70,8 +70,4 @@ export const INLINE_IMAGES_KEY = "inlineImages";
 export const FRAME_LABEL_STYLE_KEY = "frameLabelStyle";
 /** Skip image formats during snapshot when false (SETTINGS toggler). Default on. */
 export const COMPUTE_IMAGES_ENABLED_KEY = "computeImagesEnabled";
-/** Skip markdown formats during snapshot when false (SETTINGS toggler). Default on. */
-export const COMPUTE_MARKDOWN_ENABLED_KEY = "computeMarkdownEnabled";
-/** Skip text format during snapshot when false (SETTINGS toggler). Default on. */
-export const COMPUTE_TEXT_ENABLED_KEY = "computeTextEnabled";
 export const DEFAULT_NOTIFICATION_SECONDS = 4;

@@ -285,6 +285,10 @@ export async function buildSettingsPanelBody(
     localeOptions?.onLocaleSelect ?? (() => {}),
   );
 
+  const togglers = document.createElement("div");
+  togglers.className = "ec-settings-togglers";
+  togglers.append(computeFormatsSection, developerToolsToggle, darkThemeToggle);
+
   const page = document.createElement("div");
   page.className = "ec-panel-page ec-panel-page--settings";
 
@@ -301,10 +305,7 @@ export async function buildSettingsPanelBody(
     inlineImagesSelect,
     frameLabelStyleSelect,
     createSettingsSectionDivider(),
-    computeFormatsSection,
-    createSettingsSectionDivider(),
-    developerToolsToggle,
-    darkThemeToggle,
+    togglers,
   );
   body.append(page);
 }

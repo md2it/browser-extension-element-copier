@@ -4,8 +4,6 @@ import { getLocale } from "../storage";
 import {
   CLIPBOARD_DEFAULT_FORMAT_KEY,
   COMPUTE_IMAGES_ENABLED_KEY,
-  COMPUTE_MARKDOWN_ENABLED_KEY,
-  COMPUTE_TEXT_ENABLED_KEY,
   DEVELOPER_TOOLS_ENABLED_KEY,
   ENABLED_FORMATS_KEY,
   FRAME_LABEL_STYLE_KEY,
@@ -14,6 +12,7 @@ import {
 } from "../messages";
 import {
   defaultEnabledFormats,
+  ensureDefaultActionAllowsComputeImages,
   getDefaultAction,
   getEnabledFormats,
   isActiveDefaultAction,
@@ -78,7 +77,7 @@ export async function refreshFormatSettingsCache(): Promise<void> {
   const previousFrameLabelStyle = cachedFrameLabelStyle;
   const previousClickToCopyLabel = cachedFrameClickToCopyLabel;
   cachedEnabledFormats = await getEnabledFormats();
-  const stored = await getDefaultAction();
+  const stored = await ensureDefaultActionAllowsComputeImages();
   cachedDefaultAction = isActiveDefaultAction(stored) ? stored : null;
   cachedInlineImagesMode = await getInlineImagesMode();
   cachedFrameLabelStyle = await getFrameLabelStyle();
@@ -103,8 +102,6 @@ export function bindFormatSettingsCache(): void {
       changes[DEVELOPER_TOOLS_ENABLED_KEY] ||
       changes[ENABLED_FORMATS_KEY] ||
       changes[COMPUTE_IMAGES_ENABLED_KEY] ||
-      changes[COMPUTE_MARKDOWN_ENABLED_KEY] ||
-      changes[COMPUTE_TEXT_ENABLED_KEY] ||
       changes[CLIPBOARD_DEFAULT_FORMAT_KEY] ||
       changes[INLINE_IMAGES_KEY] ||
       changes[FRAME_LABEL_STYLE_KEY] ||

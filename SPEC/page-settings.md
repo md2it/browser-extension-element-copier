@@ -36,7 +36,7 @@
    - Remove large // remove imgs over 2kb
    - Remove small // remove imgs less 2kb
    - Remove all
-- Между заголовком и полем есть иконка lucide info. По нажатию выходит информационное окно:
+- Рядом с лейблом есть иконка lucide info. По нажатию выходит информационное окно:
    - Some pages embed images in the HTML as Base64 (common on Google and similar sites). This can slow copying and bloat Text or Markdown output. Small images are often icons or buttons that add clutter. Use this setting to control what is included.
 
 ### Стиль подписи выделения
@@ -50,23 +50,19 @@
 
 ---
 
-## Turn formats on off
+## Togglers
 
-- Togglers
-- По умолчанию все On
-- Есть строка "Turn off to reduce processing time:"
-- Список:
-   - Generate images
-      - Выключает три формата: IMG to clipboard, скачивание JPEG, PMG
-   - Generate markdown
-      - Выключает оба markdown: и текст, и файл
-   - Compute text
+### Generate images
+- Default on
+- Рядом с лейблом есть иконка lucide info. По нажатию выходит информационное окно:
+   - On large pages, images take a lot of time to generate. If you don't need them, turn them off to run way faster.
+- Если эта настройка выключена, то из "Default action" пропадают:
+   - Copy Image
+   - Download PNG
+   - Download JPEG
+   - Если в "Default action" было выбрано одно из этих действий, то происходит сброс "Default action" к дефолту
 
----
-
-## Togglers for developers
-
-### Developer tools
+### Display developer tools
 - Default on
 - Если off, то скрывает из страницы COPIED соответствующий блок кнопок
 

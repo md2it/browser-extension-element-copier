@@ -7,14 +7,12 @@ import type { Strings } from "../i18n";
 import {
   getComputeFormatsSettings,
   setComputeImagesEnabled,
-  setComputeMarkdownEnabled,
-  setComputeTextEnabled,
 } from "../settings/compute-formats";
 import {
   CLIPBOARD_DEFAULT_NOTHING,
-  DEFAULT_ACTION_STORAGE_OPTIONS,
+  defaultActionStorageOptionsForComputeImages,
+  ensureDefaultActionAllowsComputeImages,
   encodeDefaultAction,
-  getDefaultAction,
   getDeveloperToolsEnabled,
   isComputeControlledFormat,
   isDeveloperToolsGroup,
@@ -76,12 +74,12 @@ function infoWindowContainer(anchor: HTMLElement): HTMLElement {
   return anchor.closest<HTMLElement>(".ec-panel") ?? document.body;
 }
 
-function openInlineImagesInfo(anchor: HTMLElement, strings: Strings): void {
+function openSettingsInfoWindow(anchor: HTMLElement, strings: Strings, message: string): void {
   const container = infoWindowContainer(anchor);
   container.querySelector(`.${INFO_WINDOW_CLASSES.overlay}`)?.remove();
 
   const para = document.createElement("p");
-  para.textContent = strings.settingsInlineImagesInfo;
+  para.textContent = message;
 
   const { root } = createInfoWindow({
     classes: INFO_WINDOW_CLASSES,
@@ -91,17 +89,42 @@ function openInlineImagesInfo(anchor: HTMLElement, strings: Strings): void {
   container.appendChild(root);
 }
 
-function createInlineImagesInfoButton(strings: Strings): HTMLButtonElement {
+function createSettingsInfoButton(
+  ariaLabel: string,
+  onOpen: (anchor: HTMLElement) => void,
+): HTMLButtonElement {
   const button = document.createElement("button");
   button.type = "button";
   button.className = "ec-inline-images-info";
-  button.setAttribute("aria-label", strings.settingsInlineImagesInfoLabel);
+  button.setAttribute("aria-label", ariaLabel);
   button.innerHTML = INFO;
   button.addEventListener("click", (event) => {
     event.stopPropagation();
-    openInlineImagesInfo(button, strings);
+    onOpen(button);
   });
   return button;
+}
+
+function attachInfoToToggleLabel(
+  row: HTMLElement,
+  labelText: string,
+  infoAriaLabel: string,
+  infoMessage: string,
+  strings: Strings,
+): void {
+  const label = row.querySelector<HTMLLabelElement>(".ec-toggle-label");
+  if (!label) return;
+
+  label.classList.add("ec-toggle-label--with-info");
+  const labelTextEl = document.createElement("span");
+  labelTextEl.className = "ec-toggle-label-text";
+  labelTextEl.textContent = labelText;
+  label.replaceChildren(
+    labelTextEl,
+    createSettingsInfoButton(infoAriaLabel, (anchor) => {
+      openSettingsInfoWindow(anchor, strings, infoMessage);
+    }),
+  );
 }
 
 export async function createInlineImagesSelect(strings: Strings): Promise<HTMLElement> {
@@ -134,7 +157,12 @@ export async function createInlineImagesSelect(strings: Strings): Promise<HTMLEl
     void setInlineImagesMode(select.value as InlineImageMode);
   });
 
-  label.append(labelText, createInlineImagesInfoButton(strings));
+  label.append(
+    labelText,
+    createSettingsInfoButton(strings.settingsInlineImagesInfoLabel, (anchor) => {
+      openSettingsInfoWindow(anchor, strings, strings.settingsInlineImagesInfo);
+    }),
+  );
   row.append(label, select);
   return row;
 }
@@ -186,35 +214,27 @@ export async function createFrameLabelStyleSelect(strings: Strings): Promise<HTM
 }
 
 export async function createComputeFormatsSection(strings: Strings): Promise<HTMLElement> {
-  const [settings] = await Promise.all([getComputeFormatsSettings()]);
+  const settings = await getComputeFormatsSettings();
 
   const section = document.createElement("div");
   section.className = "ec-compute-formats-section";
 
-  const hint = document.createElement("p");
-  hint.className = "ec-compute-formats-hint";
-  hint.textContent = strings.settingsComputeFormatsHint;
-
   const imagesRow = createToggleRow(strings.settingsComputeImagesLabel, settings.computeImages, (next) => {
-    void setComputeImagesEnabled(next);
+    void (async () => {
+      await setComputeImagesEnabled(next);
+      await syncDefaultActionSelect(strings);
+    })();
   });
   imagesRow.classList.add("ec-compute-formats-toggle");
-
-  const markdownRow = createToggleRow(
-    strings.settingsComputeMarkdownLabel,
-    settings.computeMarkdown,
-    (next) => {
-      void setComputeMarkdownEnabled(next);
-    },
+  attachInfoToToggleLabel(
+    imagesRow,
+    strings.settingsComputeImagesLabel,
+    strings.settingsComputeImagesInfoLabel,
+    strings.settingsComputeImagesInfo,
+    strings,
   );
-  markdownRow.classList.add("ec-compute-formats-toggle");
 
-  const textRow = createToggleRow(strings.settingsComputeTextLabel, settings.computeText, (next) => {
-    void setComputeTextEnabled(next);
-  });
-  textRow.classList.add("ec-compute-formats-toggle");
-
-  section.append(hint, imagesRow, markdownRow, textRow);
+  section.append(imagesRow);
   return section;
 }
 
@@ -283,10 +303,42 @@ function defaultActionOptionLabel(
   }
 }
 
-export async function createClipboardDefaultFormatSelect(strings: Strings): Promise<HTMLElement> {
-  const selectedAction = await getDefaultAction();
-  const selectedValue = encodeDefaultAction(selectedAction);
+function applyDefaultActionNothingStyle(select: HTMLSelectElement): void {
+  select.classList.toggle("ec-copy-default-select--nothing", select.value === CLIPBOARD_DEFAULT_NOTHING);
+}
 
+async function populateDefaultActionSelect(
+  select: HTMLSelectElement,
+  strings: Strings,
+): Promise<void> {
+  const computeImages = (await getComputeFormatsSettings()).computeImages;
+  const selectedAction = await ensureDefaultActionAllowsComputeImages();
+  const selectedValue = encodeDefaultAction(selectedAction);
+  const options = defaultActionStorageOptionsForComputeImages(computeImages);
+
+  select.replaceChildren();
+  for (const storageValue of options) {
+    const option = document.createElement("option");
+    option.value = storageValue;
+    option.textContent = defaultActionOptionLabel(storageValue, strings);
+    option.selected = storageValue === selectedValue;
+    if (storageValue === CLIPBOARD_DEFAULT_NOTHING) {
+      option.className = "ec-copy-default-option-nothing";
+    }
+    select.append(option);
+  }
+
+  select.value = selectedValue;
+  applyDefaultActionNothingStyle(select);
+}
+
+export async function syncDefaultActionSelect(strings: Strings): Promise<void> {
+  const select = document.getElementById("ec-clipboard-default-format");
+  if (!(select instanceof HTMLSelectElement)) return;
+  await populateDefaultActionSelect(select, strings);
+}
+
+export async function createClipboardDefaultFormatSelect(strings: Strings): Promise<HTMLElement> {
   const row = document.createElement("div");
   row.className = "ec-copy-default-row";
 
@@ -299,25 +351,10 @@ export async function createClipboardDefaultFormatSelect(strings: Strings): Prom
   select.id = "ec-clipboard-default-format";
   select.className = "ec-copy-default-select";
 
-  const syncNothingSelectedStyle = (): void => {
-    select.classList.toggle("ec-copy-default-select--nothing", select.value === CLIPBOARD_DEFAULT_NOTHING);
-  };
-
-  for (const storageValue of DEFAULT_ACTION_STORAGE_OPTIONS) {
-    const option = document.createElement("option");
-    option.value = storageValue;
-    option.textContent = defaultActionOptionLabel(storageValue, strings);
-    option.selected = storageValue === selectedValue;
-    if (storageValue === CLIPBOARD_DEFAULT_NOTHING) {
-      option.className = "ec-copy-default-option-nothing";
-    }
-    select.append(option);
-  }
-
-  syncNothingSelectedStyle();
+  await populateDefaultActionSelect(select, strings);
 
   select.addEventListener("change", () => {
-    syncNothingSelectedStyle();
+    applyDefaultActionNothingStyle(select);
     void setDefaultAction(parseStoredDefaultAction(select.value));
   });
 

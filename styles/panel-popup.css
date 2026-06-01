@@ -687,9 +687,28 @@
   outline-offset: 1px;
 }
 
-.ec-panel-page--settings .ec-developer-tools-toggle,
-.ec-panel-page--settings .ec-dark-theme-toggle {
+.ec-settings-togglers {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
   margin-top: var(--ec-settings-row-margin-top);
+}
+
+.ec-settings-togglers .ec-compute-formats-section {
+  padding-top: 0;
+}
+
+.ec-settings-togglers .ec-compute-formats-section .ec-toggle-row {
+  margin-top: 0;
+}
+
+.ec-settings-togglers .ec-compute-formats-section + .ec-toggle-row,
+.ec-settings-togglers .ec-toggle-row + .ec-toggle-row {
+  margin-top: var(--ec-settings-row-margin-top);
+}
+
+.ec-panel-page--settings .ec-settings-togglers .ec-developer-tools-toggle,
+.ec-panel-page--settings .ec-settings-togglers .ec-dark-theme-toggle {
   width: 100%;
 }
 
@@ -845,22 +864,25 @@
   flex-direction: column;
   gap: 0;
   width: 100%;
-  padding-top: var(--ec-settings-row-margin-top);
 }
 
-.ec-compute-formats-hint {
-  margin: 0 0 0.15rem;
-  font-size: 0.78rem;
-  line-height: 1.35;
-  color: #4b5563;
+.ec-toggle-label--with-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.14rem;
+  min-width: 0;
 }
 
-.ec-panel-page--settings .ec-compute-formats-section .ec-compute-formats-toggle {
-  margin-top: 0.35rem;
+.ec-toggle-label-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.ec-panel-page--settings .ec-compute-formats-section .ec-compute-formats-toggle:first-of-type {
-  margin-top: 0.15rem;
+.ec-panel-page--settings .ec-toggle-label--with-info {
+  justify-content: flex-start;
+  width: auto;
 }
 
 .ec-compute-formats-toggle {

@@ -58,10 +58,9 @@ export type Strings = {
   settingsFrameLabelSelector: string;
   settingsFrameLabelFullXPath: string;
   infoWindowCloseLabel: string;
-  settingsComputeFormatsHint: string;
   settingsComputeImagesLabel: string;
-  settingsComputeMarkdownLabel: string;
-  settingsComputeTextLabel: string;
+  settingsComputeImagesInfoLabel: string;
+  settingsComputeImagesInfo: string;
   settingsDeveloperToolsToggleLabel: string;
   settingsDarkThemeToggleLabel: string;
   copiedFormatTurnedOffInSettings: string;

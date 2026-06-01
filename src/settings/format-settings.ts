@@ -40,8 +40,6 @@ function buildEnabledFormatsMap(
 export function defaultEnabledFormats(): EnabledFormatsMap {
   return buildEnabledFormatsMap(true, {
     computeImages: true,
-    computeMarkdown: true,
-    computeText: true,
   });
 }
 
@@ -133,6 +131,27 @@ export const DEFAULT_ACTION_STORAGE_OPTIONS = [
 
 export type DefaultActionStorageValue = (typeof DEFAULT_ACTION_STORAGE_OPTIONS)[number];
 
+const IMAGE_DEFAULT_ACTION_STORAGE_VALUES: readonly DefaultActionStorageValue[] = [
+  "copy:png",
+  "download:png",
+  "download:jpeg",
+];
+
+export function isImageDefaultActionStorageValue(value: string): boolean {
+  return (IMAGE_DEFAULT_ACTION_STORAGE_VALUES as readonly string[]).includes(value);
+}
+
+export function isImageDefaultAction(action: DefaultAction): boolean {
+  return isImageDefaultActionStorageValue(encodeDefaultAction(action));
+}
+
+export function defaultActionStorageOptionsForComputeImages(
+  computeImagesEnabled: boolean,
+): readonly DefaultActionStorageValue[] {
+  if (computeImagesEnabled) return DEFAULT_ACTION_STORAGE_OPTIONS;
+  return DEFAULT_ACTION_STORAGE_OPTIONS.filter((value) => !isImageDefaultActionStorageValue(value));
+}
+
 export function isActiveDefaultAction(
   action: DefaultAction,
 ): action is ActiveDefaultAction {
@@ -182,4 +201,18 @@ export async function setDefaultAction(action: DefaultAction): Promise<void> {
   await ext.storage.local.set({
     [CLIPBOARD_DEFAULT_FORMAT_KEY]: encodeDefaultAction(action),
   });
+}
+
+/** Reset default action to Copy Text when image actions are unavailable. */
+export async function ensureDefaultActionAllowsComputeImages(): Promise<DefaultAction> {
+  const [compute, action] = await Promise.all([
+    getComputeFormatsSettings(),
+    getDefaultAction(),
+  ]);
+  if (compute.computeImages || !isImageDefaultAction(action)) {
+    return action;
+  }
+  const reset = defaultDefaultAction();
+  await setDefaultAction(reset);
+  return reset;
 }
