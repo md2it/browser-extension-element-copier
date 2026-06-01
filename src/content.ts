@@ -10,6 +10,7 @@ import { isPanelTabMode } from "./panel-tab";
 import { showMountedPopupTab } from "./panel-popup/mount-panel-surface";
 import { bootstrapPanelTabPageIfNeeded } from "./panel-tab";
 import { copyToClipboardForFormat } from "./element-copy";
+import { downloadTextAsFile } from "./element-copy/download";
 import {
   CopierPickUI,
   getCachedCopyText,
@@ -19,10 +20,12 @@ import {
 } from "./pick-mode";
 import {
   bindFormatSettingsCache,
-  getCachedClipboardDefaultFormat,
+  getCachedDefaultAction,
   getCachedInlineImagesMode,
   refreshFormatSettingsCache,
 } from "./settings/format-settings-cache";
+import { readPickCopyMetaFromStorage } from "./pick-mode/pick-copy-cache-storage";
+import type { CopiedPanelActionKind } from "./settings/copied-session";
 import type { CopyFormatId } from "./formats/definitions";
 import {
   sendToBackground,
@@ -73,8 +76,11 @@ function requestToggle(): void {
   sendToBackground({ type: "TOGGLE_REQUEST" });
 }
 
-function requestCopiedPanel(formatId: CopyFormatId | null): void {
-  sendToBackground({ type: "OPEN_PANEL", tab: "copied", formatId });
+function requestCopiedPanel(
+  formatId: CopyFormatId | null,
+  panelAction?: CopiedPanelActionKind,
+): void {
+  sendToBackground({ type: "OPEN_PANEL", tab: "copied", formatId, panelAction });
 }
 
 function notifyPickCopyFlowStarted(requestId: string, startedAtMs: number): void {
@@ -163,17 +169,31 @@ function attachMessageHandler(state: ContentState): void {
       await refreshFormatSettingsCache();
       await snapshotPickCopyCache(element, getCachedInlineImagesMode());
 
-      const defaultFormatId = getCachedClipboardDefaultFormat();
+      const defaultAction = getCachedDefaultAction();
       let copiedFormatId: CopyFormatId | null = null;
+      let panelAction: CopiedPanelActionKind | undefined;
 
-      if (defaultFormatId !== null) {
-        const defaultText = getCachedCopyText(defaultFormatId);
+      if (defaultAction !== null) {
+        const { formatId, action } = defaultAction;
+        const defaultText = getCachedCopyText(formatId);
         if (defaultText !== undefined) {
-          const copied = await copyToClipboardForFormat(defaultFormatId, defaultText);
-          if (copied) {
-            copiedFormatId = defaultFormatId;
+          if (action === "copy") {
+            const copied = await copyToClipboardForFormat(formatId, defaultText);
+            if (copied) {
+              copiedFormatId = formatId;
+              panelAction = "copy";
+            } else {
+              console.warn("[Element Copier] clipboard copy failed");
+            }
           } else {
-            console.warn("[Element Copier] clipboard copy failed");
+            const meta = await readPickCopyMetaFromStorage();
+            const saved = downloadTextAsFile(formatId, defaultText, meta);
+            if (saved) {
+              copiedFormatId = formatId;
+              panelAction = "download";
+            } else {
+              console.warn("[Element Copier] default download failed");
+            }
           }
         } else {
           console.warn("[Element Copier] default format not cached (disabled?)");
@@ -181,7 +201,7 @@ function attachMessageHandler(state: ContentState): void {
       }
 
       notifyElementPicked(element);
-      requestCopiedPanel(copiedFormatId);
+      requestCopiedPanel(copiedFormatId, panelAction);
     } finally {
       notifyPickCopyFlowFinished(requestId);
       pickCopyInFlight = false;

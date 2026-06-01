@@ -21,9 +21,9 @@ import {
 } from "../hotkeys/keys";
 import {
   defaultEnabledFormats,
-  getClipboardDefaultFormat,
+  getDefaultAction,
   getEnabledFormats,
-  isActiveCopyDefault,
+  isActiveDefaultAction,
 } from "../settings/format-settings";
 import {
   hasPickCopyCacheInStorage,
@@ -552,7 +552,7 @@ export async function buildCopiedPanelBody(
     lastDownloadedFormatId,
     hasCache,
     pickCopyCacheRecord,
-    clipboardDefaultFormat,
+    defaultActionSetting,
     showCopiedStatus,
   ] = await Promise.all([
     getEnabledFormats(),
@@ -561,7 +561,7 @@ export async function buildCopiedPanelBody(
     getLastDownloadedFormat(),
     hasPickCopyCacheInStorage(),
     readPickCopyCacheFromStorage(),
-    getClipboardDefaultFormat(),
+    getDefaultAction(),
     shouldShowCopiedPanelStatus(),
   ]);
 
@@ -586,15 +586,15 @@ export async function buildCopiedPanelBody(
       };
   const header = createCopiedPageHeader(subtitleState, strings);
 
-  const clipboardDefaultFormatId = isActiveCopyDefault(clipboardDefaultFormat)
-    ? clipboardDefaultFormat
+  const defaultActionForHighlight = isActiveDefaultAction(defaultActionSetting)
+    ? defaultActionSetting
     : null;
   const selectedSelection = showCopiedStatus
     ? resolveCopiedPanelSelection(
         lastCopiedPanelAction,
         lastCopiedFormatId,
         lastDownloadedFormatId,
-        clipboardDefaultFormatId,
+        defaultActionForHighlight,
       )
     : null;
 

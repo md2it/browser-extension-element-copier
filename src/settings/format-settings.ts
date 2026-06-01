@@ -84,25 +84,83 @@ export function isDeveloperToolsGroup(group: SettingsChipGroup): boolean {
 
 export const CLIPBOARD_DEFAULT_NOTHING = "nothing";
 
-export type ClipboardDefaultFormatId = CopyFormatId | typeof CLIPBOARD_DEFAULT_NOTHING;
+export type DefaultActionKind = "copy" | "download";
 
-export function isActiveCopyDefault(
-  formatId: ClipboardDefaultFormatId,
-): formatId is CopyFormatId {
-  return formatId !== CLIPBOARD_DEFAULT_NOTHING;
+export type ActiveDefaultAction = {
+  formatId: CopyFormatId;
+  action: DefaultActionKind;
+};
+
+export type DefaultAction = typeof CLIPBOARD_DEFAULT_NOTHING | ActiveDefaultAction;
+
+/** Spec order for SETTINGS "Default action" dropdown (storage-encoded values). */
+export const DEFAULT_ACTION_STORAGE_OPTIONS = [
+  CLIPBOARD_DEFAULT_NOTHING,
+  "copy:text",
+  "copy:markdown",
+  "copy:png",
+  "download:markdownFile",
+  "download:htmlFile",
+  "download:png",
+  "download:jpeg",
+  "copy:outerHTML",
+  "copy:selector",
+  "copy:jsPath",
+  "copy:xpath",
+  "copy:fullXPath",
+  "copy:styles",
+  "copy:computedStyles",
+] as const;
+
+export type DefaultActionStorageValue = (typeof DEFAULT_ACTION_STORAGE_OPTIONS)[number];
+
+export function isActiveDefaultAction(
+  action: DefaultAction,
+): action is ActiveDefaultAction {
+  return action !== CLIPBOARD_DEFAULT_NOTHING;
 }
 
-export async function getClipboardDefaultFormat(): Promise<ClipboardDefaultFormatId> {
-  const data = await ext.storage.local.get(CLIPBOARD_DEFAULT_FORMAT_KEY);
-  const raw = data[CLIPBOARD_DEFAULT_FORMAT_KEY];
+export function encodeDefaultAction(action: DefaultAction): string {
+  if (action === CLIPBOARD_DEFAULT_NOTHING) return CLIPBOARD_DEFAULT_NOTHING;
+  return `${action.action}:${action.formatId}`;
+}
+
+export function parseStoredDefaultAction(raw: unknown): DefaultAction {
   if (raw === CLIPBOARD_DEFAULT_NOTHING) {
     return CLIPBOARD_DEFAULT_NOTHING;
   }
-  return normalizeCopyFormatId(raw) ?? DEFAULT_CLIPBOARD_FORMAT_ID;
+  if (typeof raw === "string") {
+    const colon = raw.indexOf(":");
+    if (colon > 0) {
+      const kind = raw.slice(0, colon);
+      const formatId = normalizeCopyFormatId(raw.slice(colon + 1));
+      if (formatId && (kind === "copy" || kind === "download")) {
+        return { formatId, action: kind };
+      }
+    }
+    const legacyFormatId = normalizeCopyFormatId(raw);
+    if (legacyFormatId) {
+      return { formatId: legacyFormatId, action: "copy" };
+    }
+  }
+  return { formatId: DEFAULT_CLIPBOARD_FORMAT_ID, action: "copy" };
 }
 
-export async function setClipboardDefaultFormat(
-  formatId: ClipboardDefaultFormatId,
-): Promise<void> {
-  await ext.storage.local.set({ [CLIPBOARD_DEFAULT_FORMAT_KEY]: formatId });
+export function defaultDefaultAction(): ActiveDefaultAction {
+  return { formatId: DEFAULT_CLIPBOARD_FORMAT_ID, action: "copy" };
+}
+
+export async function getDefaultAction(): Promise<DefaultAction> {
+  const data = await ext.storage.local.get(CLIPBOARD_DEFAULT_FORMAT_KEY);
+  const raw = data[CLIPBOARD_DEFAULT_FORMAT_KEY];
+  if (raw === undefined) {
+    return defaultDefaultAction();
+  }
+  return parseStoredDefaultAction(raw);
+}
+
+export async function setDefaultAction(action: DefaultAction): Promise<void> {
+  await ext.storage.local.set({
+    [CLIPBOARD_DEFAULT_FORMAT_KEY]: encodeDefaultAction(action),
+  });
 }

@@ -6,12 +6,25 @@
 - Простые кнопки: EN | ES | FR | DE | RU | 中文 | عربي
 - Блок контента: именно этот список не меняет ориентацию при смене LTR / RTL
 
-## Копирование по дефолту
-- Заголовок "Copy default"
+## Дефолтное действие
+- Заголовок "Default action"
 - Выпадающий список
-- Поле позволяет выбрать из имеющихся форматов, что именно сохранять в буфер обмена при копировании
-- Есть вариант "nothing", если выбран этот вариант. Этот вариант первый в списке, серый
-- Дефолтный "Text"
+- Поле позволяет выбрать из имеющихся форматов:
+   - NOTHING // Этот вариант первый в списке, серый
+   - Copy Text // дефолтный
+   - Copy Markdown
+   - Copy Image
+   - Download Markdown
+   - Download HTML
+   - Download PNG
+   - Download JPEG
+   - Copy code
+   - Copy selector
+   - Copy JS path
+   - Copy XPath
+   - Copy full XPath
+   - Copy styles
+   - Copy computed styles
 
 ## Inline изображения
 - Заголовок "Inline images in text"

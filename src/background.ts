@@ -61,6 +61,7 @@ import {
   clearCopiedPanelShowStatus,
   markCopiedPanelShowStatus,
   setLastCopiedFormat,
+  setLastDownloadedFormat,
 } from "./settings/copied-session";
 import { ensureLocaleInStorage, getLocale } from "./storage";
 import { showWelcome, stopWelcomePinWatcher, watchWelcomePinStatus } from "./welcome";
@@ -736,7 +737,15 @@ ext.runtime.onMessage.addListener(
     if (contentMessage.type === "OPEN_PANEL") {
       if (contentMessage.tab === "copied") {
         void (async () => {
-          await setLastCopiedFormat(contentMessage.formatId);
+          if (contentMessage.formatId !== null) {
+            if (contentMessage.panelAction === "download") {
+              await setLastDownloadedFormat(contentMessage.formatId);
+            } else {
+              await setLastCopiedFormat(contentMessage.formatId);
+            }
+          } else {
+            await setLastCopiedFormat(null);
+          }
           await markCopiedPanelShowStatus();
           if (sender.tab?.id !== undefined) {
             clearPickCopyLoadingTimer(sender.tab.id);

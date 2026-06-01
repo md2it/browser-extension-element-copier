@@ -1,5 +1,6 @@
 import { ext } from "../api";
 import { normalizeCopyFormatId, type CopyFormatId } from "../formats/definitions";
+import type { ActiveDefaultAction } from "./format-settings";
 
 export const LAST_COPIED_FORMAT_KEY = "lastCopiedFormat";
 export const LAST_DOWNLOADED_FORMAT_KEY = "lastDownloadedFormat";
@@ -73,13 +74,17 @@ export function resolveCopiedPanelSelection(
   lastAction: CopiedPanelLastAction | null,
   lastCopiedFormatId: CopyFormatId | null,
   lastDownloadedFormatId: CopyFormatId | null,
-  clipboardDefaultFormatId: CopyFormatId | null = null,
+  defaultAction: ActiveDefaultAction | null = null,
 ): CopiedPanelButtonSelection | null {
   if (lastAction === "saved") {
     return lastDownloadedFormatId
       ? { formatId: lastDownloadedFormatId, action: "download" }
       : null;
   }
-  const copiedFormatId = lastCopiedFormatId ?? clipboardDefaultFormatId;
-  return copiedFormatId ? { formatId: copiedFormatId, action: "copy" } : null;
+  if (lastAction === "copied" && lastCopiedFormatId) {
+    return { formatId: lastCopiedFormatId, action: "copy" };
+  }
+  return defaultAction
+    ? { formatId: defaultAction.formatId, action: defaultAction.action }
+    : null;
 }

@@ -1,5 +1,4 @@
 import { ext } from "../api";
-import type { CopyFormatId } from "../formats/definitions";
 import {
   CLIPBOARD_DEFAULT_FORMAT_KEY,
   DEVELOPER_TOOLS_ENABLED_KEY,
@@ -8,9 +7,10 @@ import {
 } from "../messages";
 import {
   defaultEnabledFormats,
-  getClipboardDefaultFormat,
+  getDefaultAction,
   getEnabledFormats,
-  isActiveCopyDefault,
+  isActiveDefaultAction,
+  type ActiveDefaultAction,
   type EnabledFormatsMap,
 } from "./format-settings";
 import {
@@ -20,7 +20,7 @@ import {
 } from "./inline-images";
 
 let cachedEnabledFormats: EnabledFormatsMap = defaultEnabledFormats();
-let cachedDefaultFormat: CopyFormatId | null = null;
+let cachedDefaultAction: ActiveDefaultAction | null = null;
 let cachedInlineImagesMode: InlineImageMode = DEFAULT_INLINE_IMAGES_MODE;
 let bound = false;
 
@@ -28,8 +28,8 @@ export function getCachedEnabledFormats(): EnabledFormatsMap {
   return cachedEnabledFormats;
 }
 
-export function getCachedClipboardDefaultFormat(): CopyFormatId | null {
-  return cachedDefaultFormat;
+export function getCachedDefaultAction(): ActiveDefaultAction | null {
+  return cachedDefaultAction;
 }
 
 export function getCachedInlineImagesMode(): InlineImageMode {
@@ -38,8 +38,8 @@ export function getCachedInlineImagesMode(): InlineImageMode {
 
 export async function refreshFormatSettingsCache(): Promise<void> {
   cachedEnabledFormats = await getEnabledFormats();
-  const stored = await getClipboardDefaultFormat();
-  cachedDefaultFormat = isActiveCopyDefault(stored) ? stored : null;
+  const stored = await getDefaultAction();
+  cachedDefaultAction = isActiveDefaultAction(stored) ? stored : null;
   cachedInlineImagesMode = await getInlineImagesMode();
 }
 

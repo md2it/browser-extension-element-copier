@@ -6,11 +6,15 @@ import {
 import type { Strings } from "../i18n";
 import {
   CLIPBOARD_DEFAULT_NOTHING,
-  getClipboardDefaultFormat,
+  DEFAULT_ACTION_STORAGE_OPTIONS,
+  encodeDefaultAction,
+  getDefaultAction,
   getDeveloperToolsEnabled,
   isDeveloperToolsGroup,
-  setClipboardDefaultFormat,
+  parseStoredDefaultAction,
+  setDefaultAction,
   setDeveloperToolsEnabled,
+  type DefaultActionStorageValue,
   type EnabledFormatsMap,
 } from "../settings/format-settings";
 import {
@@ -38,7 +42,6 @@ import {
 } from "../pick-mode/pick-copy-cache-storage";
 import {
   COPY_FORMATS,
-  isClipboardCopyFormat,
   type CopyFormatId,
   type FormatDefinition,
   type SettingsChipGroup,
@@ -145,8 +148,47 @@ const COPIED_CHIP_GROUPS: ReadonlyArray<{
   { group: "files", label: (strings) => strings.copiedFilesLabel },
 ];
 
+function defaultActionOptionLabel(
+  storageValue: DefaultActionStorageValue,
+  strings: Strings,
+): string {
+  switch (storageValue) {
+    case CLIPBOARD_DEFAULT_NOTHING:
+      return strings.settingsDefaultActionNothing;
+    case "copy:text":
+      return strings.settingsDefaultActionCopyText;
+    case "copy:markdown":
+      return strings.settingsDefaultActionCopyMarkdown;
+    case "copy:png":
+      return strings.settingsDefaultActionCopyImage;
+    case "download:markdownFile":
+      return strings.settingsDefaultActionDownloadMarkdown;
+    case "download:htmlFile":
+      return strings.settingsDefaultActionDownloadHtml;
+    case "download:png":
+      return strings.settingsDefaultActionDownloadPng;
+    case "download:jpeg":
+      return strings.settingsDefaultActionDownloadJpeg;
+    case "copy:outerHTML":
+      return strings.settingsDefaultActionCopyCode;
+    case "copy:selector":
+      return strings.settingsDefaultActionCopySelector;
+    case "copy:jsPath":
+      return strings.settingsDefaultActionCopyJsPath;
+    case "copy:xpath":
+      return strings.settingsDefaultActionCopyXPath;
+    case "copy:fullXPath":
+      return strings.settingsDefaultActionCopyFullXPath;
+    case "copy:styles":
+      return strings.settingsDefaultActionCopyStyles;
+    case "copy:computedStyles":
+      return strings.settingsDefaultActionCopyComputedStyles;
+  }
+}
+
 export async function createClipboardDefaultFormatSelect(strings: Strings): Promise<HTMLElement> {
-  const selectedFormatId = await getClipboardDefaultFormat();
+  const selectedAction = await getDefaultAction();
+  const selectedValue = encodeDefaultAction(selectedAction);
 
   const row = document.createElement("div");
   row.className = "ec-copy-default-row";
@@ -154,7 +196,7 @@ export async function createClipboardDefaultFormatSelect(strings: Strings): Prom
   const label = document.createElement("label");
   label.className = "ec-copy-default-label";
   label.htmlFor = "ec-clipboard-default-format";
-  label.textContent = strings.settingsCopyDefaultLabel;
+  label.textContent = strings.settingsDefaultActionLabel;
 
   const select = document.createElement("select");
   select.id = "ec-clipboard-default-format";
@@ -164,19 +206,14 @@ export async function createClipboardDefaultFormatSelect(strings: Strings): Prom
     select.classList.toggle("ec-copy-default-select--nothing", select.value === CLIPBOARD_DEFAULT_NOTHING);
   };
 
-  const nothingOption = document.createElement("option");
-  nothingOption.className = "ec-copy-default-option-nothing";
-  nothingOption.value = CLIPBOARD_DEFAULT_NOTHING;
-  nothingOption.textContent = strings.settingsCopyDefaultNothing;
-  nothingOption.selected = selectedFormatId === CLIPBOARD_DEFAULT_NOTHING;
-  select.append(nothingOption);
-
-  for (const format of COPY_FORMATS) {
-    if (!isClipboardCopyFormat(format)) continue;
+  for (const storageValue of DEFAULT_ACTION_STORAGE_OPTIONS) {
     const option = document.createElement("option");
-    option.value = format.id;
-    option.textContent = format.label(strings);
-    option.selected = format.id === selectedFormatId;
+    option.value = storageValue;
+    option.textContent = defaultActionOptionLabel(storageValue, strings);
+    option.selected = storageValue === selectedValue;
+    if (storageValue === CLIPBOARD_DEFAULT_NOTHING) {
+      option.className = "ec-copy-default-option-nothing";
+    }
     select.append(option);
   }
 
@@ -184,12 +221,7 @@ export async function createClipboardDefaultFormatSelect(strings: Strings): Prom
 
   select.addEventListener("change", () => {
     syncNothingSelectedStyle();
-    const value = select.value;
-    if (value === CLIPBOARD_DEFAULT_NOTHING) {
-      void setClipboardDefaultFormat(CLIPBOARD_DEFAULT_NOTHING);
-      return;
-    }
-    void setClipboardDefaultFormat(value as CopyFormatId);
+    void setDefaultAction(parseStoredDefaultAction(select.value));
   });
 
   row.append(select, label);

@@ -1,6 +1,7 @@
 import type { PrefixHintContentToBg } from "../../lib/src/hotkeys/prefix-hint-messages";
 import { ext } from "./api";
 import type { CopyFormatId } from "./formats/definitions";
+import type { CopiedPanelActionKind } from "./settings/copied-session";
 import type { PanelPopupTab } from "./panel-popup/constants";
 
 export type BgToContent =
@@ -13,7 +14,7 @@ export type ContentToBg =
   | { type: "ACTIVE_CHANGED"; active: boolean }
   | { type: "OPEN_PANEL"; tab: "start" }
   | { type: "OPEN_PANEL"; tab: "loading" }
-  | { type: "OPEN_PANEL"; tab: "copied"; formatId: CopyFormatId | null }
+  | { type: "OPEN_PANEL"; tab: "copied"; formatId: CopyFormatId | null; panelAction?: CopiedPanelActionKind }
   | { type: "PANEL_TAB_CHANGED"; tab: PanelPopupTab }
   | { type: "PANEL_CLOSED" }
   | { type: "REQUEST_START_PICK_MODE" }
@@ -59,7 +60,7 @@ export const ESC_HOTKEY_ENABLED_KEY = "escHotkeyEnabled";
 /** Per-format enable flags for SETTINGS chips and COPIED buttons. */
 export const ENABLED_FORMATS_KEY = "enabledFormats";
 export const DEVELOPER_TOOLS_ENABLED_KEY = "developerToolsEnabled";
-/** Default format saved to clipboard on copy (SETTINGS dropdown). */
+/** Default action on pick/capture (SETTINGS dropdown). Encoded as nothing | copy:formatId | download:formatId. */
 export const CLIPBOARD_DEFAULT_FORMAT_KEY = "clipboardDefaultFormat";
 /** Inline (data:) image handling for TEXT/MARKDOWN (SETTINGS dropdown). */
 export const INLINE_IMAGES_KEY = "inlineImages";
