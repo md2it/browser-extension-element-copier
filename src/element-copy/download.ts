@@ -18,7 +18,8 @@ export function isDownloadFileFormat(formatId: CopyFormatId): boolean {
 
 function domainWithDashes(hostname: string): string {
   const normalized = hostname.trim() || "unknown";
-  return normalized.replace(/\./g, "-");
+  const dashed = normalized.replace(/\./g, "-");
+  return `-${dashed}`.replace(/-www-/g, "-").slice(1);
 }
 
 function extensionForDownloadFormat(formatId: CopyFormatId): string {
