@@ -4,7 +4,6 @@ import {
   type PanelPageOpenTarget,
 } from "../../../lib/src/panel-popup";
 import { hasPickCopyCachePresentSync } from "../pick-mode/pick-copy-cache-storage";
-import { openPanelInTab } from "../panel-tab";
 import { PANEL_PAGE_CONFIG, type PanelPopupTab } from "./constants";
 import { rememberPanelTargetTab } from "./panel-target-tab";
 import { markPanelSessionOpened } from "./panel-session";
@@ -28,7 +27,10 @@ export function openPanelInActionPopup(
     PANEL_PAGE_CONFIG,
     panelTab,
     target,
-    openPanelInTab,
+    async () => {
+      // Keep panel flow in action popup only.
+      // We intentionally avoid opening a regular tab here (except welcome flow).
+    },
   );
 }
 

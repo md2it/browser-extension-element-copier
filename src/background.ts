@@ -502,7 +502,12 @@ function schedulePickCopyLoadingPanel(
     const current = pickCopyLoadingTimers.get(tabId);
     if (!current || current.requestId !== requestId) return;
     pickCopyLoadingTimers.delete(tabId);
-    openPanelFromSender("loading", sender.tab);
+    void (async () => {
+      const switched = await switchOpenPopupTab("loading");
+      if (!switched) {
+        openPanelFromSender("loading", sender.tab);
+      }
+    })();
   }, delayMs);
   pickCopyLoadingTimers.set(tabId, { requestId, timer });
 }

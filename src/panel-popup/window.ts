@@ -88,13 +88,12 @@ export class CopierPanelWindow {
     notifyPanelTabChanged(tab);
   }
 
-  /** COPY PAGE / NEW PAGE — copy full page without pick mode and close the panel. */
-  private copyPageAndClose(): void {
+  /** COPY PAGE / NEW PAGE — copy full page without pick mode, keep popup open. */
+  private copyPageInPopup(): void {
     notifyCopyPage();
-    this.close();
   }
 
-  /** COPY ELEMENT / NEW ELEMENT — enable pick mode and close the panel. */
+  /** COPY ELEMENT / SCAN ELEMENT — enable pick mode and close the panel. */
   private startPickModeAndClose(): void {
     notifyStartPickMode();
     this.close();
@@ -115,7 +114,7 @@ export class CopierPanelWindow {
             this.startPickModeAndClose();
           },
           onCopyPage: () => {
-            this.copyPageAndClose();
+            this.copyPageInPopup();
           },
         });
         break;
@@ -125,7 +124,7 @@ export class CopierPanelWindow {
             this.startPickModeAndClose();
           },
           onNewPage: () => {
-            this.copyPageAndClose();
+            this.copyPageInPopup();
           },
         });
         break;
