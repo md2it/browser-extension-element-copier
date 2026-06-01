@@ -3,8 +3,7 @@
 ## Всегда
 - Избегать оверинженеринга!
 - Не коммитить без запроса
-- Сборка после каждой итерации кода
-   - Из корня `browser-extensions/`: `cd element-copier && npm run build` → stdout: `build ok`
+- После правок кода сборка Dev: из корня `browser-extensions/` / `cd element-copier && npm run build` → stdout: `build ok`
 
 ## Если нет lib/node_modules
 Из корня `browser-extensions/`: `cd lib && npm install`
