@@ -17,6 +17,25 @@ import {
   writePickCopyCacheToStorage,
 } from "./pick-copy-cache-storage";
 
+const SNAPSHOT_PERF_LOCAL_STORAGE_KEY = "ec:perf:snapshot";
+
+function nowMs(doc: Document): number {
+  const perfNow = doc.defaultView?.performance?.now;
+  return typeof perfNow === "function" ? perfNow.call(doc.defaultView.performance) : Date.now();
+}
+
+function isSnapshotPerfEnabled(doc: Document): boolean {
+  try {
+    return doc.defaultView?.localStorage?.getItem(SNAPSHOT_PERF_LOCAL_STORAGE_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function formatMs(ms: number): string {
+  return `${ms.toFixed(1)}ms`;
+}
+
 function tryPushCacheEntry(
   entries: { key: CopyFormatId; value: string }[],
   key: CopyFormatId,
@@ -61,6 +80,12 @@ export async function snapshotPickCopyCache(
   const enabledFormats = getCachedEnabledFormats();
   const entries: { key: CopyFormatId; value: string }[] = [];
   const doc = element.ownerDocument;
+  const perfEnabled = isSnapshotPerfEnabled(doc);
+  const snapshotStartedAt = perfEnabled ? nowMs(doc) : 0;
+  let extractTimeMs = 0;
+  let imageTimeMs = 0;
+  let storageTimeMs = 0;
+  let imageRenderCount = 0;
   let markdownText: string | undefined;
   let outerHtmlText: string | undefined;
   const needsImageSnapshot = enabledFormats.png || enabledFormats.jpeg;
@@ -94,11 +119,15 @@ export async function snapshotPickCopyCache(
       continue;
     }
     if (formatId === "computedStyles") {
+      const extractStartedAt = perfEnabled ? nowMs(doc) : 0;
       const computedStylesText = await extractElementCopyText(
         element,
         "computedStyles",
         inlineImages,
       );
+      if (perfEnabled) {
+        extractTimeMs += nowMs(doc) - extractStartedAt;
+      }
       tryPushCacheEntry(entries, formatId, computedStylesText, doc);
       if (needsImageSnapshot) {
         screenshotBackground = createScreenshotBackgroundSnapshot(element, computedStylesText);
@@ -115,7 +144,12 @@ export async function snapshotPickCopyCache(
           const imageFormats: ImageCopyFormatId[] = [];
           if (enabledFormats.png) imageFormats.push("png");
           if (enabledFormats.jpeg) imageFormats.push("jpeg");
+          const imageStartedAt = perfEnabled ? nowMs(doc) : 0;
           cachedImages = await captureElementImages(element, imageFormats, screenshotBackground);
+          if (perfEnabled) {
+            imageTimeMs += nowMs(doc) - imageStartedAt;
+            imageRenderCount += 1;
+          }
         }
         const capturedImage = cachedImages[formatId];
         if (capturedImage) {
@@ -126,10 +160,15 @@ export async function snapshotPickCopyCache(
       }
       continue;
     }
+    const extractStartedAt = perfEnabled ? nowMs(doc) : 0;
+    const extracted = await extractElementCopyText(element, formatId, inlineImages);
+    if (perfEnabled) {
+      extractTimeMs += nowMs(doc) - extractStartedAt;
+    }
     tryPushCacheEntry(
       entries,
       formatId,
-      await extractElementCopyText(element, formatId, inlineImages),
+      extracted,
       doc,
     );
   }
@@ -137,8 +176,12 @@ export async function snapshotPickCopyCache(
   cache.snapshot(entries);
 
   try {
+    const storageStartedAt = perfEnabled ? nowMs(doc) : 0;
     await writePickCopyCacheIndex(entries.map((entry) => entry.key));
     if (entries.length === 0) {
+      if (perfEnabled) {
+        storageTimeMs += nowMs(doc) - storageStartedAt;
+      }
       return;
     }
     const hostname = doc.location?.hostname?.trim() || "unknown";
@@ -147,8 +190,28 @@ export async function snapshotPickCopyCache(
       hostname,
     });
     await writePickCopyCacheToStorage(entries, doc);
+    if (perfEnabled) {
+      storageTimeMs += nowMs(doc) - storageStartedAt;
+    }
   } catch (error) {
     console.warn("[Element Copier] pick copy cache storage write failed:", error);
+  } finally {
+    if (perfEnabled) {
+      const totalMs = nowMs(doc) - snapshotStartedAt;
+      console.info(
+        "[Element Copier][perf] snapshot",
+        {
+          total: formatMs(totalMs),
+          extract: formatMs(extractTimeMs),
+          images: formatMs(imageTimeMs),
+          storage: formatMs(storageTimeMs),
+          imageRenders: imageRenderCount,
+          cachedEntries: entries.length,
+          enabledPng: Boolean(enabledFormats.png),
+          enabledJpeg: Boolean(enabledFormats.jpeg),
+        },
+      );
+    }
   }
 }
 
