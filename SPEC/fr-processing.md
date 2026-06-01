@@ -25,28 +25,28 @@
 10. styles
 11. text
 12. markdown
-13. images
+13. images // см. ### Images
 
 ### Images
 
-**Выполняются один** раз для обоих форматов изображений:
+**Один раз**, если включён png и/или jpeg (ветки 6 и/или 7 — только по включённым форматам):
 1. clone node — обход и клонирование DOM
 2. embed web font — fetch CSS/шрифтов
 3. embed node — fetch картинок, инлайн CSS URL (самый тяжёлый шаг на сложных элементах)
 4. foreignObject SVG
-5. SVG → canvas — растеризация браузером (прозрачные области — прозрачный canvas)
+5. SVG → canvas — растеризация браузером
+   - backgroundColor canvas: effective `background-color` с alpha > 0 (в т.ч. 0 < alpha < 1); иначе прозрачный — как для PNG сейчас (без JPEG-fallback `#ffffff`)
+   - на клон перед рендером — effective background как для PNG сейчас: `background-color` с alpha > 0, либо непустые `background` / `background-image`
 
-**Далее ветки PNG и JPEG отличаются**:
-6. canvas.toDataURL(type) — кодирование PNG
-   - toDataURL('image/png') с этого canvas
-   - Детали не расписываю, так как у нас до этого уже было сделано хорошо
+**Далее ветки PNG и JPEG отличаются** (без повторного domTo*):
+6. PNG — `toDataURL('image/png')` с canvas шага 5
+   - остальное поведение PNG без изменений (filter, fetch placeholder, …)
 7. JPEG
-   1. Фон
-      - Если у элемента непрозрачный фон (alpha > 0, computed styles), то применить фон элемента
-      - Если фон прозрачный (alpha = 0, computed styles), то идём по цепочке родителей до первого непрозрачного и берём этот фон
-      - Если фон по цепочке не найден, то fallback на белый
-   2. quality для JPEG = 0.92
-   3. canvas.toDataURL(type) — кодирование JPEG
+   1. Фон заливки под снимок берётся из `computedStyles`, который уже есть в кэше (не из live DOM)
+      - Если элемент непрозрачный `background-color` (alpha > 0) или непустые `background` / `background-image` — этот фон
+      - иначе цепочка родителей, `documentElement` — первый подходящий
+      - иначе белый #ffffff
+   2. Композит на втором canvas: заливка фона → `drawImage` (canvas шага 5) → `toDataURL('image/jpeg', 0.92)`
 
 ---
 
