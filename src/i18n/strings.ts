@@ -42,12 +42,10 @@ const MESSAGES: Record<Locale, Strings> = {
     copiedFormatsGroupLabel: "Options:",
     copiedFilesLabel: "Download",
     copiedCopyLabel: "Copy",
-    copiedUrlLabel: "URL",
     copiedOpenUrlLabel: "Open URL",
     copiedOpenUrlIconLabel: "Open URL in a new tab",
     copiedImageClipboardUnsupportedTooltip:
       "Your browser can't copy this image format to the clipboard. Use Download instead.",
-    copiedDeveloperToolsLabel: "Developer tools:",
     copiedStartOverButtonLabel: "NEW ELEMENT",
     copiedEmptyLine1: "I don't have anything saved in my memory.",
     copiedEmptyLine2: "Should we copy something?",

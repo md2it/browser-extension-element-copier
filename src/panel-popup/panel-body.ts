@@ -9,6 +9,7 @@ import {
   createCopiedOtherOptionsRow,
   createDeveloperToolsToggleRow,
   createInlineImagesSelect,
+  syncCopiedPanelFormatSelection,
 } from "../formats/format-ui";
 import type { Strings } from "../i18n";
 import { PANEL_FOOTER_LINKEDIN_URL } from "../../../lib/src/panel-footer/constants";
@@ -511,10 +512,10 @@ export async function buildCopiedPanelBodyForHeightProbe(
   };
   const header = createCopiedPageHeader(subtitleState, strings);
 
-  const { root: otherOptions } = createCopiedOtherOptionsRow(strings, {
+  const { root: otherOptions, urlBlock } = createCopiedOtherOptionsRow(strings, {
     enabledFormats: defaultEnabledFormats(),
     pickCopyCacheRecord: buildCopiedHeightProbeCacheRecord(),
-    selectedSelection: { formatId: "text", action: "copy" },
+    selectionSyncRoot: page,
     onCopyFormat: () => {},
     onSaveFormat: () => {},
     onOpenUrl: () => {},
@@ -522,9 +523,11 @@ export async function buildCopiedPanelBodyForHeightProbe(
 
   page.append(
     header,
+    urlBlock,
     otherOptions,
     createCopiedAgainBlock(strings, () => {}, () => {}),
   );
+  syncCopiedPanelFormatSelection(page, { formatId: "text", action: "copy" });
   body.append(page);
 }
 
@@ -578,10 +581,10 @@ export async function buildCopiedPanelBody(
     clipboardDefaultFormatId,
   );
 
-  const { root: otherOptions, selectFormat } = createCopiedOtherOptionsRow(strings, {
+  const { root: otherOptions, urlBlock, selectFormat } = createCopiedOtherOptionsRow(strings, {
     enabledFormats,
     pickCopyCacheRecord,
-    selectedSelection,
+    selectionSyncRoot: page,
     onCopyFormat: async (formatId) => {
       const copied = await copyPickedFormatFromPanel(formatId);
       if (!copied) return false;
@@ -615,6 +618,7 @@ export async function buildCopiedPanelBody(
 
   page.append(
     header,
+    urlBlock,
     otherOptions,
     createCopiedAgainBlock(
       strings,
@@ -622,5 +626,6 @@ export async function buildCopiedPanelBody(
       actions.onNewPage ?? (() => {}),
     ),
   );
+  syncCopiedPanelFormatSelection(page, selectedSelection);
   body.append(page);
 }

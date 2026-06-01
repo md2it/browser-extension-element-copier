@@ -41,11 +41,9 @@ export type Strings = {
   copiedFormatsGroupLabel: string;
   copiedFilesLabel: string;
   copiedCopyLabel: string;
-  copiedUrlLabel: string;
   copiedOpenUrlLabel: string;
   copiedOpenUrlIconLabel: string;
   copiedImageClipboardUnsupportedTooltip: string;
-  copiedDeveloperToolsLabel: string;
   copiedStartOverButtonLabel: string;
   copiedEmptyLine1: string;
   copiedEmptyLine2: string;

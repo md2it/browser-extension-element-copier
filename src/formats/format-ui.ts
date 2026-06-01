@@ -202,7 +202,7 @@ function isCopiedButtonSelected(
   );
 }
 
-function syncCopiedFormatSelection(
+export function syncCopiedPanelFormatSelection(
   container: HTMLElement,
   selection: CopiedPanelButtonSelection | null,
 ): void {
@@ -311,7 +311,8 @@ function copiedGroupHasImageDownloads(options: CopiedOtherOptionsOptions): boole
 export type CopiedOtherOptionsOptions = {
   enabledFormats: EnabledFormatsMap;
   pickCopyCacheRecord: PickCopyCacheRecord | undefined;
-  selectedSelection?: CopiedPanelButtonSelection | null;
+  /** COPIED page root; sync format highlights within this subtree after the page is assembled. */
+  selectionSyncRoot?: HTMLElement;
   onCopyFormat: (formatId: CopyFormatId) => void | boolean | Promise<boolean>;
   onSaveFormat?: (formatId: CopyFormatId) => void | boolean | Promise<boolean>;
   onOpenUrl?: (url: string) => void | Promise<void>;
@@ -443,10 +444,7 @@ function createCopiedUrlInlineRow(
   const row = document.createElement("div");
   row.className = "ec-settings-format-inline-list ec-copied-url-inline";
   row.setAttribute("role", "group");
-
-  const label = document.createElement("span");
-  label.className = "ec-settings-format-inline-list-label";
-  label.textContent = strings.copiedUrlLabel;
+  row.setAttribute("aria-label", strings.formatUrl);
 
   const available = isPickCopyFormatAvailable("url", options.pickCopyCacheRecord, document);
   const urlValue = options.pickCopyCacheRecord?.url ?? "";
@@ -497,7 +495,7 @@ function createCopiedUrlInlineRow(
     void options.onOpenUrl(urlValue);
   });
 
-  row.append(label, openUrlButton, copyButton);
+  row.append(openUrlButton, copyButton);
   return row;
 }
 
@@ -515,7 +513,6 @@ function createCopiedDeveloperToolsRows(
   if (formats.length === 0) return null;
 
   const block = createCopiedBlock();
-  block.classList.add("ec-copied-block--devtools");
 
   const rows = document.createElement("div");
   rows.className = "ec-copied-devtools-rows";
@@ -575,6 +572,7 @@ function createCopiedDeveloperToolsRows(
 
 export type CopiedOtherOptionsRow = {
   root: HTMLElement;
+  urlBlock: HTMLDivElement;
   selectFormat: (formatId: CopyFormatId, actionKind: CopiedPanelActionKind) => void;
 };
 
@@ -587,12 +585,22 @@ export function createCopiedOtherOptionsRow(
   section.setAttribute("role", "group");
   section.setAttribute("aria-label", strings.copiedFormatsGroupLabel);
 
+  const urlBlock = document.createElement("div");
+  urlBlock.className = "ec-copied-url-block";
+
+  const selectionSyncRoot = options.selectionSyncRoot ?? section;
+
   const selectFormat = (
     formatId: CopyFormatId,
     actionKind: CopiedPanelActionKind,
   ): void => {
-    syncCopiedFormatSelection(section, { formatId, action: actionKind });
+    syncCopiedPanelFormatSelection(selectionSyncRoot, {
+      formatId,
+      action: actionKind,
+    });
   };
+
+  urlBlock.append(createCopiedUrlInlineRow(strings, options, selectFormat));
 
   for (const { group, label: groupLabel } of COPIED_CHIP_GROUPS) {
     if (!copiedGroupHasFormats(group, options)) continue;
@@ -603,17 +611,10 @@ export function createCopiedOtherOptionsRow(
     section.append(block);
   }
 
-  const urlBlock = createCopiedBlock();
-  urlBlock.classList.add("ec-copied-block--url");
-  urlBlock.append(createCopiedUrlInlineRow(strings, options, selectFormat));
-  section.append(urlBlock);
-
   const devtoolsBlock = createCopiedDeveloperToolsRows(strings, options, selectFormat);
   if (devtoolsBlock) {
     section.append(devtoolsBlock);
   }
 
-  syncCopiedFormatSelection(section, options.selectedSelection ?? null);
-
-  return { root: section, selectFormat };
+  return { root: section, urlBlock, selectFormat };
 }
