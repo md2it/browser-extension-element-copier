@@ -58,6 +58,13 @@ function createPageDivider(): HTMLDivElement {
   return divider;
 }
 
+function createSettingsSectionDivider(): HTMLDivElement {
+  const divider = document.createElement("div");
+  divider.className = "ec-settings-section-divider";
+  divider.setAttribute("aria-hidden", "true");
+  return divider;
+}
+
 function createAboutIcon(iconHtml: string): HTMLSpanElement {
   const mark = document.createElement("span");
   mark.className = "ec-about-icon";
@@ -264,8 +271,10 @@ export async function buildSettingsPanelBody(
     title,
     createPageDivider(),
     languageRow,
+    createSettingsSectionDivider(),
     clipboardDefaultFormat,
     inlineImagesSelect,
+    createSettingsSectionDivider(),
     developerToolsToggle,
   );
   body.append(page);

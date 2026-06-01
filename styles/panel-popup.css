@@ -396,8 +396,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  --ec-settings-label-width: 8.8rem;
-  --ec-settings-row-gap: 0.5rem;
+  --ec-settings-row-gap: 0.35rem;
   --ec-settings-row-margin-top: 0.85rem;
 }
 
@@ -451,24 +450,19 @@
   color: #fff;
 }
 
-.ec-panel-page--settings .ec-copy-default-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+.ec-panel-page--settings .ec-copy-default-row,
+.ec-panel-page--settings .ec-toggle-row {
+  display: flex;
+  flex-direction: row-reverse;
   align-items: center;
-  column-gap: var(--ec-settings-row-gap);
+  gap: 0.75rem;
   width: 100%;
   min-width: 0;
   margin-top: var(--ec-settings-row-margin-top);
 }
 
 .ec-panel-page--settings .ec-toggle-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  align-items: center;
-  column-gap: var(--ec-settings-row-gap);
-  width: 100%;
-  min-width: 0;
-  margin-top: var(--ec-settings-row-margin-top);
+  justify-content: space-between;
 }
 
 .ec-copy-default-row {
@@ -502,24 +496,24 @@
 .ec-panel-page--settings .ec-toggle-label {
   display: flex;
   align-items: center;
-  align-self: center;
-  justify-self: start;
   text-align: start;
+  flex: 1 1 0;
+  min-width: 0;
 }
 
 .ec-panel-page--settings .ec-copy-default-label--with-info {
   justify-content: flex-start;
-}
-
-.ec-panel-page--settings .ec-copy-default-select,
-.ec-panel-page--settings .ec-toggle {
-  align-self: center;
-  justify-self: start;
+  width: auto;
 }
 
 .ec-panel-page--settings .ec-copy-default-select {
-  justify-self: stretch;
-  text-align: start;
+  flex: 0 0 50%;
+  width: 50%;
+  min-width: 0;
+}
+
+.ec-panel-page--settings .ec-toggle {
+  flex: 0 0 auto;
 }
 
 .ec-copy-default-label-text {
@@ -725,6 +719,17 @@
   margin-top: 0.85rem;
 }
 
+.ec-settings-section-divider,
+.ec-copied-block {
+  border-top: 1px solid rgba(1, 34, 146, 0.14);
+}
+
+.ec-settings-section-divider {
+  flex: 0 0 auto;
+  width: 100%;
+  margin-top: var(--ec-settings-row-margin-top);
+}
+
 .ec-format-chip-list {
   display: flex;
   flex-wrap: wrap;
@@ -832,30 +837,6 @@
   background: rgba(107, 114, 128, 0.08);
 }
 
-.ec-format-action-btn-label {
-  min-width: 0;
-}
-
-.ec-format-action-btn-icon {
-  flex: 0 0 auto;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 0.9rem;
-  height: 0.9rem;
-}
-
-.ec-format-action-btn-icon svg {
-  display: block;
-  width: 0.9rem;
-  height: 0.9rem;
-}
-
-.ec-format-action-btn--unavailable .ec-format-action-btn-icon,
-.ec-format-action-btn--selected .ec-format-action-btn-icon {
-  color: inherit;
-}
-
 .ec-copied-other-options {
   display: flex;
   flex: 0 0 auto;
@@ -929,10 +910,6 @@
   color: #15803d;
 }
 
-.ec-copied-url-copy--selected .ec-copied-devtools-row-copy-icon {
-  color: #15803d;
-}
-
 .ec-copied-url-copy--selected:hover .ec-copied-devtools-row-field,
 .ec-copied-url-copy--selected:focus-visible .ec-copied-devtools-row-field {
   background: #bbf7d0;
@@ -943,14 +920,15 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1.2rem;
-  height: 1.2rem;
   margin: 0;
-  padding: 0;
-  border: none;
-  border-radius: 0.25rem;
-  background: transparent;
+  padding: 0.38rem 0.65rem;
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  border-radius: 0.45rem;
+  background: rgba(37, 99, 235, 0.06);
   color: #2563eb;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.2;
   cursor: pointer;
 }
 
@@ -961,22 +939,17 @@
 }
 
 .ec-copied-url-open:disabled {
+  border-color: rgba(107, 114, 128, 0.2);
+  background: rgba(107, 114, 128, 0.08);
   color: #9ca3af;
   cursor: default;
   pointer-events: none;
-}
-
-.ec-copied-url-open svg {
-  display: block;
-  width: 0.95rem;
-  height: 0.95rem;
 }
 
 .ec-copied-block {
   flex: 0 0 auto;
   width: 100%;
   padding-block: 2mm;
-  border-top: 1px solid rgba(1, 34, 146, 0.14);
 }
 
 .ec-copied-devtools-rows {
@@ -1042,22 +1015,6 @@
   white-space: nowrap;
 }
 
-.ec-copied-devtools-row-copy-icon {
-  flex: 0 0 auto;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 0.9rem;
-  height: 0.9rem;
-  color: #012292;
-}
-
-.ec-copied-devtools-row-copy-icon svg {
-  display: block;
-  width: 0.9rem;
-  height: 0.9rem;
-}
-
 .ec-copied-devtools-row:hover .ec-copied-devtools-row-field,
 .ec-copied-devtools-row:focus-visible .ec-copied-devtools-row-field {
   background: rgba(1, 34, 146, 0.12);
@@ -1077,10 +1034,6 @@
 .ec-copied-devtools-row--selected .ec-copied-devtools-row-field {
   background: #dcfce7;
   border-color: #86efac;
-  color: #15803d;
-}
-
-.ec-copied-devtools-row--selected .ec-copied-devtools-row-copy-icon {
   color: #15803d;
 }
 
@@ -1154,6 +1107,12 @@
   align-items: stretch;
 }
 
+/* Bottom inset lives only on `.ec-copied-again` — avoid stacking with panel-body padding. */
+.ec-panel--surface-popup
+  .ec-panel-body:has(.ec-panel-page--copied:not(.ec-panel-page--copied-empty)) {
+  padding-bottom: 0;
+}
+
 .ec-panel-page--copied {
   display: flex;
   flex-direction: column;
@@ -1219,7 +1178,7 @@
   align-items: stretch;
   gap: 0.65rem;
   width: 100%;
-  padding-block: 2mm;
+  padding-block: 0.9rem;
   border-top: 1px solid rgba(1, 34, 146, 0.14);
 }
 

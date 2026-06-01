@@ -22,7 +22,6 @@ import {
   FILES,
   HEART,
   HISTORY,
-  IMAGE_DOWN,
   IMAGES,
   KEYBOARD,
   SHIELD_CHECK,

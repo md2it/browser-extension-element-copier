@@ -29,13 +29,6 @@ import type {
 } from "../settings/copied-session";
 import { createToggleRow } from "../panel-popup/toggle-row";
 import {
-  COPY,
-  EXTERNAL_LINK,
-  FILE_DOWN,
-  IMAGE_DOWN,
-  IMAGES,
-} from "../../../lib/src/icons";
-import {
   isPickCopyFormatAvailable,
   resolvePickCopyCacheStorageKey,
   type PickCopyCacheRecord,
@@ -127,7 +120,7 @@ export async function createInlineImagesSelect(strings: Strings): Promise<HTMLEl
   });
 
   label.append(labelText, createInlineImagesInfoButton(strings));
-  row.append(select, label);
+  row.append(label, select);
   return row;
 }
 
@@ -224,7 +217,7 @@ export async function createClipboardDefaultFormatSelect(strings: Strings): Prom
     void setDefaultAction(parseStoredDefaultAction(select.value));
   });
 
-  row.append(select, label);
+  row.append(label, select);
   return row;
 }
 
@@ -269,17 +262,6 @@ export function syncCopiedPanelFormatSelection(
   }
 }
 
-function formatActionIconMarkup(
-  actionIcon: FormatDefinition["actionIcon"],
-  actionKind: CopiedPanelActionKind,
-): string {
-  if (actionIcon === "file-down") return FILE_DOWN;
-  if (actionIcon === "images") {
-    return actionKind === "download" ? IMAGE_DOWN : IMAGES;
-  }
-  return COPY;
-}
-
 function formatActionButtonLabel(
   format: FormatDefinition,
   strings: Strings,
@@ -307,17 +289,7 @@ function createFormatActionButton(
   button.dataset.actionKind = actionKind;
   button.setAttribute("aria-pressed", "false");
   button.setAttribute("aria-label", buttonLabel);
-
-  const icon = document.createElement("span");
-  icon.className = "ec-format-action-btn-icon";
-  icon.setAttribute("aria-hidden", "true");
-  icon.innerHTML = formatActionIconMarkup(format.actionIcon, actionKind);
-  button.append(icon);
-
-  const label = document.createElement("span");
-  label.className = "ec-format-action-btn-label";
-  label.textContent = buttonLabel;
-  button.append(label);
+  button.textContent = buttonLabel;
 
   if (!available) {
     button.disabled = true;
@@ -507,12 +479,6 @@ function createCopiedUrlInlineRow(
   value.textContent = urlValue;
   field.append(value);
 
-  const copyIcon = document.createElement("span");
-  copyIcon.className = "ec-copied-devtools-row-copy-icon";
-  copyIcon.setAttribute("aria-hidden", "true");
-  copyIcon.innerHTML = COPY;
-  field.append(copyIcon);
-
   copyButton.append(field);
   copyButton.addEventListener("click", () => {
     if (!available) return;
@@ -524,9 +490,8 @@ function createCopiedUrlInlineRow(
   const openUrlButton = document.createElement("button");
   openUrlButton.type = "button";
   openUrlButton.className = "ec-copied-url-open";
-  openUrlButton.innerHTML = EXTERNAL_LINK;
+  openUrlButton.textContent = strings.copiedOpenUrlLabel;
   openUrlButton.setAttribute("aria-label", strings.copiedOpenUrlIconLabel);
-  openUrlButton.title = strings.copiedOpenUrlLabel;
   openUrlButton.disabled = !available || !options.onOpenUrl;
   openUrlButton.addEventListener("click", () => {
     if (!available || !options.onOpenUrl) return;
@@ -585,12 +550,6 @@ function createCopiedDeveloperToolsRows(
     value.className = "ec-copied-devtools-row-value";
     value.textContent = preview;
     field.append(value);
-
-    const copyIcon = document.createElement("span");
-    copyIcon.className = "ec-copied-devtools-row-copy-icon";
-    copyIcon.setAttribute("aria-hidden", "true");
-    copyIcon.innerHTML = COPY;
-    field.append(copyIcon);
 
     row.append(label, field);
     row.dataset.actionKind = "copy";
