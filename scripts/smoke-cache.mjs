@@ -323,6 +323,10 @@ assert.match(formatUiSrc, /isPickCopyFormatAvailable/);
 assert.match(formatUiSrc, /isPickCopyFormatAvailable\([\s\S]*document/);
 assert.match(formatUiSrc, /pickCopyCacheRecord/);
 assert.match(formatUiSrc, /ec-format-action-btn--unavailable/);
+assert.match(formatUiSrc, /findDefaultActionSelect/);
+assert.match(formatUiSrc, /PANEL_POPUP_ROOT_ID[\s\S]*shadowRoot[\s\S]*ec-clipboard-default-format/,
+  "Default action select sync must query inside panel shadow root");
+assert.match(formatUiSrc, /syncDefaultActionSelect/);
 
 const fetchSrc = readFileSync(join(src, "panel-popup/fetch-picked-format.ts"), "utf8");
 assert.match(fetchSrc, /payload\.text === undefined/,

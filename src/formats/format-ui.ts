@@ -38,6 +38,7 @@ import type {
   CopiedPanelActionKind,
   CopiedPanelButtonSelection,
 } from "../settings/copied-session";
+import { PANEL_POPUP_ROOT_ID } from "../panel-popup/constants";
 import { applyPanelTheme } from "../panel-popup/panel-theme";
 import { createToggleRow } from "../panel-popup/toggle-row";
 import { getDarkThemeEnabled, setDarkThemeEnabled } from "../settings/theme-settings";
@@ -307,6 +308,13 @@ function applyDefaultActionNothingStyle(select: HTMLSelectElement): void {
   select.classList.toggle("ec-copy-default-select--nothing", select.value === CLIPBOARD_DEFAULT_NOTHING);
 }
 
+function findDefaultActionSelect(): HTMLSelectElement | null {
+  const select = document
+    .getElementById(PANEL_POPUP_ROOT_ID)
+    ?.shadowRoot?.querySelector("#ec-clipboard-default-format");
+  return select instanceof HTMLSelectElement ? select : null;
+}
+
 async function populateDefaultActionSelect(
   select: HTMLSelectElement,
   strings: Strings,
@@ -333,8 +341,8 @@ async function populateDefaultActionSelect(
 }
 
 export async function syncDefaultActionSelect(strings: Strings): Promise<void> {
-  const select = document.getElementById("ec-clipboard-default-format");
-  if (!(select instanceof HTMLSelectElement)) return;
+  const select = findDefaultActionSelect();
+  if (!select) return;
   await populateDefaultActionSelect(select, strings);
 }
 
@@ -369,13 +377,49 @@ function isInactiveFormatActionButton(element: HTMLButtonElement): boolean {
   );
 }
 
+const FORMAT_ACTION_TOOLTIP_VISIBLE_CLASS = "ec-format-action-btn--show-tooltip";
+
+let visibleFormatActionTooltipButton: HTMLButtonElement | null = null;
+let formatActionTooltipDismissBound = false;
+
+function hideAllFormatActionTooltips(): void {
+  visibleFormatActionTooltipButton?.classList.remove(FORMAT_ACTION_TOOLTIP_VISIBLE_CLASS);
+  visibleFormatActionTooltipButton = null;
+}
+
+function isInactiveFormatActionButtonElement(element: EventTarget | null): element is HTMLButtonElement {
+  return (
+    element instanceof HTMLButtonElement &&
+    isInactiveFormatActionButton(element)
+  );
+}
+
+function bindFormatActionTooltipDismiss(): void {
+  if (formatActionTooltipDismissBound) return;
+  formatActionTooltipDismissBound = true;
+
+  window.addEventListener(
+    "click",
+    (event) => {
+      const inactiveButton =
+        event.composedPath().find(isInactiveFormatActionButtonElement) ?? null;
+      const wasSameButton =
+        inactiveButton !== null && inactiveButton === visibleFormatActionTooltipButton;
+
+      hideAllFormatActionTooltips();
+
+      if (inactiveButton && !wasSameButton) {
+        inactiveButton.classList.add(FORMAT_ACTION_TOOLTIP_VISIBLE_CLASS);
+        visibleFormatActionTooltipButton = inactiveButton;
+      }
+    },
+    true,
+  );
+}
+
 function bindInactiveFormatButtonTooltip(button: HTMLButtonElement, tooltip: string): void {
-  button.title = tooltip;
-  button.addEventListener("click", (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    button.title = tooltip;
-  });
+  button.dataset.tooltip = tooltip;
+  bindFormatActionTooltipDismiss();
 }
 
 function isCopiedButtonSelected(
