@@ -8,6 +8,7 @@ import {
 } from "./constants";
 import { fitActionPopupToHost } from "./fit-popup-height";
 import { bindPanelSessionPort, notifyPanelClosed } from "./lifecycle";
+import { bindPanelThemeSync } from "./panel-theme";
 import { CopierPanelWindow } from "./window";
 
 export type PanelMountSurface = {
@@ -69,6 +70,7 @@ export async function mountPanelSurface(
     activePopupWindow = panelWindow;
   }
 
+  bindPanelThemeSync();
   await panelWindow.openPanel(initialTab);
   bindPanelSessionPort();
   window.addEventListener(

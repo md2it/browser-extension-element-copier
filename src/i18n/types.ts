@@ -53,6 +53,7 @@ export type Strings = {
   settingsInlineImagesInfo: string;
   infoWindowCloseLabel: string;
   settingsDeveloperToolsToggleLabel: string;
+  settingsDarkThemeToggleLabel: string;
   formatCode: string;
   formatSelector: string;
   formatJsPath: string;

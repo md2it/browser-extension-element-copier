@@ -22,6 +22,7 @@ import {
   notifyCopyPage,
   notifyStartPickMode,
 } from "./lifecycle";
+import { syncPanelThemeFromStorage } from "./panel-theme";
 
 export type CopierPanelHost = {
   shadow: ShadowRoot;
@@ -64,6 +65,7 @@ export class CopierPanelWindow {
     }
 
     this.host.shadow.appendChild(panelRoot);
+    await syncPanelThemeFromStorage();
     await this.renderTab(tab);
   }
 

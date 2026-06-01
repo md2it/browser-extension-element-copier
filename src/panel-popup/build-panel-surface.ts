@@ -7,7 +7,10 @@ import { isRtlLocale, t, type Locale } from "../i18n";
 import { PANEL_FOOTER_CONFIG } from "../ui-config";
 import { PANEL_POPUP_HOST_ATTR } from "./constants";
 import { hasPickCopyCacheInStorage } from "../pick-mode/pick-copy-cache-storage";
+import { getDarkThemeEnabled } from "../settings/theme-settings";
 import { createPanelMenu, type PanelMenuHandle } from "./panel-menu";
+
+const PANEL_DARK_CLASS = "ec-panel--dark";
 
 export type PanelSurfaceParts = {
   panelRoot: HTMLDivElement;
@@ -60,6 +63,10 @@ export async function createPanelSurface(
   }
 
   panelRoot.setAttribute(PANEL_POPUP_HOST_ATTR, "true");
+
+  if (await getDarkThemeEnabled()) {
+    panelRoot.classList.add(PANEL_DARK_CLASS);
+  }
 
   return { panelRoot, body, menu };
 }

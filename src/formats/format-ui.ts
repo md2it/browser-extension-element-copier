@@ -27,7 +27,9 @@ import type {
   CopiedPanelActionKind,
   CopiedPanelButtonSelection,
 } from "../settings/copied-session";
+import { applyPanelTheme } from "../panel-popup/panel-theme";
 import { createToggleRow } from "../panel-popup/toggle-row";
+import { getDarkThemeEnabled, setDarkThemeEnabled } from "../settings/theme-settings";
 import {
   isPickCopyFormatAvailable,
   resolvePickCopyCacheStorageKey,
@@ -130,6 +132,16 @@ export async function createDeveloperToolsToggleRow(strings: Strings): Promise<H
     void setDeveloperToolsEnabled(next);
   });
   row.classList.add("ec-developer-tools-toggle");
+  return row;
+}
+
+export async function createDarkThemeToggleRow(strings: Strings): Promise<HTMLElement> {
+  const enabled = await getDarkThemeEnabled();
+  const row = createToggleRow(strings.settingsDarkThemeToggleLabel, enabled, (next) => {
+    void setDarkThemeEnabled(next);
+    applyPanelTheme(next);
+  });
+  row.classList.add("ec-dark-theme-toggle");
   return row;
 }
 

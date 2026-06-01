@@ -60,6 +60,8 @@ export const ESC_HOTKEY_ENABLED_KEY = "escHotkeyEnabled";
 /** Per-format enable flags for SETTINGS chips and COPIED buttons. */
 export const ENABLED_FORMATS_KEY = "enabledFormats";
 export const DEVELOPER_TOOLS_ENABLED_KEY = "developerToolsEnabled";
+/** Dark theme for extension panel UI (SETTINGS toggler). Default off. */
+export const DARK_THEME_ENABLED_KEY = "darkThemeEnabled";
 /** Default action on pick/capture (SETTINGS dropdown). Encoded as nothing | copy:formatId | download:formatId. */
 export const CLIPBOARD_DEFAULT_FORMAT_KEY = "clipboardDefaultFormat";
 /** Inline (data:) image handling for TEXT/MARKDOWN (SETTINGS dropdown). */

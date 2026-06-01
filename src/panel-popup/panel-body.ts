@@ -7,6 +7,7 @@ import {
 import {
   createClipboardDefaultFormatSelect,
   createCopiedOtherOptionsRow,
+  createDarkThemeToggleRow,
   createDeveloperToolsToggleRow,
   createInlineImagesSelect,
   syncCopiedPanelFormatSelection,
@@ -244,11 +245,12 @@ export async function buildSettingsPanelBody(
 ): Promise<void> {
   body.replaceChildren();
 
-  const [clipboardDefaultFormat, inlineImagesSelect, developerToolsToggle, storedLocale] =
+  const [clipboardDefaultFormat, inlineImagesSelect, developerToolsToggle, darkThemeToggle, storedLocale] =
     await Promise.all([
       createClipboardDefaultFormatSelect(strings),
       createInlineImagesSelect(strings),
       createDeveloperToolsToggleRow(strings),
+      createDarkThemeToggleRow(strings),
       localeOptions ? Promise.resolve(null) : getLocale(),
     ]);
 
@@ -276,6 +278,7 @@ export async function buildSettingsPanelBody(
     inlineImagesSelect,
     createSettingsSectionDivider(),
     developerToolsToggle,
+    darkThemeToggle,
   );
   body.append(page);
 }
