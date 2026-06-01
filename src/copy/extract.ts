@@ -31,8 +31,8 @@ function getPrepareOptions(
   };
 }
 
-function getFormattedTextHtml(element: Element, inlineImages: InlineImageMode): string {
-  const container = prepareElementForCopy(
+async function getFormattedTextHtml(element: Element, inlineImages: InlineImageMode): Promise<string> {
+  const container = await prepareElementForCopy(
     element,
     getPrepareOptions(element, inlineImages, true),
   );
@@ -40,8 +40,8 @@ function getFormattedTextHtml(element: Element, inlineImages: InlineImageMode): 
   return finalizeFormattedHtml(element, html);
 }
 
-function getElementMarkdown(element: Element, inlineImages: InlineImageMode): string {
-  const prepared = prepareElementForCopy(
+async function getElementMarkdown(element: Element, inlineImages: InlineImageMode): Promise<string> {
+  const prepared = await prepareElementForCopy(
     element,
     getPrepareOptions(element, inlineImages, true),
   );
@@ -64,11 +64,11 @@ export function getOuterHtml(element: Element): string {
   return wrapper.innerHTML;
 }
 
-export function extractElementCopyText(
+export async function extractElementCopyText(
   element: Element,
   format: string,
   inlineImages: InlineImageMode = "all",
-): string {
+): Promise<string> {
   switch (format) {
     case "outerHTML":
     case "htmlFile":
@@ -87,11 +87,11 @@ export function extractElementCopyText(
       return getFullXPath(element);
     case "text":
       return serializeFormattedTextCache({
-        html: getFormattedTextHtml(element, inlineImages),
+        html: await getFormattedTextHtml(element, inlineImages),
       });
     case "markdown":
     case "markdownFile":
-      return getElementMarkdown(element, inlineImages);
+      return await getElementMarkdown(element, inlineImages);
     case "url":
       return element.ownerDocument.location?.href || "";
     default:

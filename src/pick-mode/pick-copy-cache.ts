@@ -48,20 +48,20 @@ export async function snapshotPickCopyCache(
   const doc = element.ownerDocument;
   let markdownText: string | undefined;
   let outerHtmlText: string | undefined;
-  const computedStylesText = extractElementCopyText(element, "computedStyles", inlineImages);
+  const computedStylesText = await extractElementCopyText(element, "computedStyles", inlineImages);
   const screenshotBackground = createScreenshotBackgroundSnapshot(element, computedStylesText);
 
   for (const formatId of formatIds) {
     if (formatId === "markdown" || formatId === "markdownFile") {
       if (markdownText === undefined) {
-        markdownText = extractElementCopyText(element, "markdown", inlineImages);
+        markdownText = await extractElementCopyText(element, "markdown", inlineImages);
         tryPushCacheEntry(entries, "markdown", markdownText, doc);
       }
       continue;
     }
     if (formatId === "outerHTML" || formatId === "htmlFile") {
       if (outerHtmlText === undefined) {
-        outerHtmlText = extractElementCopyText(element, "outerHTML", inlineImages);
+        outerHtmlText = await extractElementCopyText(element, "outerHTML", inlineImages);
         tryPushCacheEntry(entries, "outerHTML", outerHtmlText, doc);
       }
       continue;
@@ -86,7 +86,7 @@ export async function snapshotPickCopyCache(
     tryPushCacheEntry(
       entries,
       formatId,
-      extractElementCopyText(element, formatId, inlineImages),
+      await extractElementCopyText(element, formatId, inlineImages),
       doc,
     );
   }

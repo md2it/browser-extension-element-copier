@@ -3,8 +3,8 @@ import { CLIPBOARD_COPY_FORMATS, type CopyFormatId } from "../formats/definition
 import type { EnabledFormatsMap } from "../settings/format-settings";
 import { extractElementCopyText } from "./extract";
 
-function isFormatExtractEmpty(element: Element, formatId: CopyFormatId): boolean {
-  const text = extractElementCopyText(element, formatId);
+async function isFormatExtractEmpty(element: Element, formatId: CopyFormatId): Promise<boolean> {
+  const text = await extractElementCopyText(element, formatId);
   if (formatId === "text") {
     return !isFormattedTextCacheStorable(text, element.ownerDocument);
   }
@@ -24,17 +24,17 @@ function pickCheckFormat(
 }
 
 /** Walk up to parent when the picked element has nothing to copy for the active format. */
-export function resolveCopyElement(
+export async function resolveCopyElement(
   element: Element,
   enabledFormats: EnabledFormatsMap,
   defaultFormatId: CopyFormatId | null,
-): Element {
+): Promise<Element> {
   const checkFormat = pickCheckFormat(enabledFormats, defaultFormatId);
   if (!checkFormat) return element;
 
   let current: Element | null = element;
   while (current) {
-    if (!isFormatExtractEmpty(current, checkFormat)) {
+    if (!(await isFormatExtractEmpty(current, checkFormat))) {
       return current;
     }
     if (current.tagName === "HTML") break;
