@@ -357,8 +357,8 @@ assert.match(storageSrc, /resolvePickCopyCacheStorageKey/,
 const cacheSrc = readFileSync(
   join(src, "pick-mode/pick-copy-cache.ts"), "utf8",
 );
-assert.match(cacheSrc, /COPY_FORMATS\.map\(\(format\) => format\.id\)/,
-  "snapshotPickCopyCache must iterate all formats");
+assert.match(cacheSrc, /SNAPSHOT_CACHE_FORMAT_IDS/,
+  "snapshotPickCopyCache must iterate formats in snapshot processing order");
 assert.match(cacheSrc, /isPickCopyCacheValueStorable/);
 assert.match(cacheSrc, /ownerDocument/);
 assert.match(cacheSrc, /tryPushCacheEntry/);

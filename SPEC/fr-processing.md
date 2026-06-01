@@ -14,20 +14,18 @@
 
 1. Пользователь делает snapshot (клик по элементу, снимок всей страницы, хоткей)
 2. Смотрятся настройки пользователя. Далее те форматы, которые выключены, не генерируются (пропускаем шаги ниже)
-
-Далее для каждого не выключенного происходит формирование и сохранение в кэш:
-3. outerHTML // ГОТ ВКЭШ
-4. selector
-5. jsPath
-6. xpath
-7. fullXPath
-8. styles
-9. computedStyles // ГОТ ВКЭШ
-10. text
-11. markdown
-12. png
-13. jpeg
-14. url // ГОТ ВКЭШ
+3. url // ГОТ ВКЭШ
+4. outerHTML // ГОТ ВКЭШ
+5. computedStyles // ГОТ ВКЭШ
+6. selector
+7. jsPath
+8. xpath
+9. fullXPath
+10. styles
+11. text
+12. markdown
+13. png
+14. jpeg
 
 ---
 
