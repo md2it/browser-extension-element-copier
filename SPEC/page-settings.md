@@ -6,29 +6,24 @@
 - Простые кнопки: EN | ES | FR | DE | RU | 中文 | عربي
 - Блок контента: именно этот список не меняет ориентацию при смене LTR / RTL
 
----
-
-## Функциональные настройки
-
-- отделены от языка разделительной чертой
-
-### Копирование по дефолту
+## Копирование по дефолту
 - Заголовок "Copy default"
 - Выпадающий список
 - Поле позволяет выбрать из имеющихся форматов, что именно сохранять в буфер обмена при копировании
 - Есть вариант "nothing", если выбран этот вариант. Этот вариант первый в списке, серый
 - Дефолтный "Text"
 
-### Inline изображения
+## Inline изображения
 - Заголовок "Inline images in text"
 - Выпадающий список
 - Варианты:
    - Use all // default
    - Remove large // remove imgs over 2kb
+   - Remove small // remove imgs less 2kb
    - Remove all
 - Между заголовком и полем есть иконка lucide info. По нажатию выходит информационное окно:
-   - Some images are stored inline within the page code itself. For example, Base64 (which is often used by Google and many other sites). Sometimes these images make the page very heavy. Even large inline images likely won't cause any problems. However, if the size of the resulting TEXT or MARKDOWN is important to you, use this setting.
+   - Some pages embed images in the HTML as Base64 (common on Google and similar sites). This can slow copying and bloat Text or Markdown output. Small images are often icons or buttons that add clutter. Use this setting to control what is included.
 
-### Developer tools
+## Developer tools
 - Toggler, default on
 - Если off, то скрывает из страницы COPIED соответствующий блок кнопок
