@@ -1,4 +1,4 @@
-Element Copier
+ELEMENT COPIER
 快速、方便地从网页复制和下载内容。
 
 功能

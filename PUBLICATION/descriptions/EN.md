@@ -1,4 +1,4 @@
-Element Copier
+ELEMENT COPIER
 Copy and download content from web pages quickly in a convenient format.
 
 FEATURES
