@@ -1,15 +1,10 @@
-# AGENT
-
-## Всегда
-- Избегать оверинженеринга!
-- Не коммитить без запроса
-- Рабочее расширение для браузера: `element-copier/extension/`
-- После правок кода сборка Dev: из корня `browser-extensions/` / `cd element-copier && npm run build` → stdout: `build ok`
-
-## Архитектура
-- `extension/` — самодостаточное расширение для Load unpacked / AMO
-- `src/` — TypeScript-исходники приложения
-- `src/lib/` — локальная копия переиспользуемых модулей и vendor-кода для сборки
-
-## Сборка прод строго по запросу
-Из корня `browser-extensions/`: `cd element-copier && npm run dist` → `.zip` в `PUBLICATION/`
+- Ответы кратко, если не запрошено иное
+- Не делать то, чего не просили
+- Коммиты только по запросу пользователя
+- Разработка и Git только локально
+- Обязательные требования `../ALL-PRJ-REQ/`:
+	- architecture.md
+	- lib.md
+	- license-rules.md
+	- manifest.md
+	- nfr.md
