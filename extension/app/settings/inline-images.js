@@ -1,7 +1,7 @@
 import { INLINE_IMAGES_KEY } from "../messages.js";
 import { ext } from "../../lib/our/api.js";
 
-var DEFAULT_INLINE_IMAGES_MODE = "all";
+var DEFAULT_INLINE_IMAGES_MODE = "remove-small";
 
 var INLINE_IMAGES_MODES = [
   "all",
