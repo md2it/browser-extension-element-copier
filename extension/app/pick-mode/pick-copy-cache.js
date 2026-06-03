@@ -1,6 +1,6 @@
 import { DEFAULT_INLINE_IMAGES_MODE } from "../settings/inline-images.js";
 import { captureElementImages, createScreenshotBackgroundSnapshot, isImageCopyFormat } from "../copy/screenshot.js";
-import { clearPickCopyCacheStorage, isPickCopyCacheValueStorable, writePickCopyCacheIndex, writePickCopyCacheToStorage, writePickCopyMetaToStorage } from "./pick-copy-cache-storage.js";
+import { clearPickCopyCacheStorage, isPickCopyCacheValueStorable, resolvePickCopyCacheStorageKey, writePickCopyCacheIndex, writePickCopyCacheToStorage, writePickCopyMetaToStorage } from "./pick-copy-cache-storage.js";
 import { createStringCache } from "../element-copy/cache.js";
 import { extractElementCopyText } from "../copy/extract.js";
 import { getCachedEnabledFormats } from "../settings/format-settings-cache.js";
@@ -28,7 +28,9 @@ function formatMs(ms) {
 function tryPushCacheEntry(entries, key, value, doc) {
   if (isPickCopyCacheValueStorable(key, value, doc)) {
     entries.push({ key, value });
+    return true;
   }
+  return false;
 }
 
 var SNAPSHOT_CACHE_FORMAT_IDS = [
@@ -48,7 +50,22 @@ var SNAPSHOT_CACHE_FORMAT_IDS = [
 
 var cache = createStringCache();
 
-async function snapshotPickCopyCache(element, inlineImages = DEFAULT_INLINE_IMAGES_MODE) {
+function snapshotFormatFor(formatId) {
+  const key = resolvePickCopyCacheStorageKey(formatId);
+  if (key === "markdown" || key === "outerHTML") return key;
+  return SNAPSHOT_CACHE_FORMAT_IDS.includes(key) ? key : null;
+}
+
+function prioritizeSnapshotFormats(priorityFormatId) {
+  const priority = priorityFormatId ? snapshotFormatFor(priorityFormatId) : null;
+  if (!priority) return SNAPSHOT_CACHE_FORMAT_IDS;
+  return [
+    priority,
+    ...SNAPSHOT_CACHE_FORMAT_IDS.filter((formatId) => formatId !== priority)
+  ];
+}
+
+async function snapshotPickCopyCache(element, inlineImages = DEFAULT_INLINE_IMAGES_MODE, options = {}) {
   cache.clear();
   try {
     await clearPickCopyCacheStorage();
@@ -69,6 +86,10 @@ async function snapshotPickCopyCache(element, inlineImages = DEFAULT_INLINE_IMAG
   const needsImageSnapshot = enabledFormats.png || enabledFormats.jpeg;
   let screenshotBackground;
   let cachedImages;
+  async function cacheEntry(key, value) {
+    if (!tryPushCacheEntry(entries, key, value, doc)) return;
+    await options.onCacheEntry?.(key, value);
+  }
   async function ensureScreenshotBackground() {
     if (!needsImageSnapshot || screenshotBackground) return;
     const computedStylesText = await extractElementCopyText(
@@ -78,19 +99,19 @@ async function snapshotPickCopyCache(element, inlineImages = DEFAULT_INLINE_IMAG
     );
     screenshotBackground = createScreenshotBackgroundSnapshot(element, computedStylesText);
   }
-  for (const formatId of SNAPSHOT_CACHE_FORMAT_IDS) {
+  for (const formatId of prioritizeSnapshotFormats(options.priorityFormatId)) {
     if (formatId !== "url" && !enabledFormats[formatId]) continue;
     if (formatId === "markdown" || formatId === "markdownFile") {
       if (markdownText === void 0) {
         markdownText = await extractElementCopyText(element, "markdown", inlineImages);
-        tryPushCacheEntry(entries, "markdown", markdownText, doc);
+        await cacheEntry("markdown", markdownText);
       }
       continue;
     }
     if (formatId === "outerHTML" || formatId === "htmlFile") {
       if (outerHtmlText === void 0) {
         outerHtmlText = await extractElementCopyText(element, "outerHTML", inlineImages);
-        tryPushCacheEntry(entries, "outerHTML", outerHtmlText, doc);
+        await cacheEntry("outerHTML", outerHtmlText);
       }
       continue;
     }
@@ -104,7 +125,7 @@ async function snapshotPickCopyCache(element, inlineImages = DEFAULT_INLINE_IMAG
       if (perfEnabled) {
         extractTimeMs += nowMs(doc) - extractStartedAt2;
       }
-      tryPushCacheEntry(entries, formatId, computedStylesText, doc);
+      await cacheEntry(formatId, computedStylesText);
       if (needsImageSnapshot) {
         screenshotBackground = createScreenshotBackgroundSnapshot(element, computedStylesText);
       }
@@ -129,7 +150,7 @@ async function snapshotPickCopyCache(element, inlineImages = DEFAULT_INLINE_IMAG
         }
         const capturedImage = cachedImages[formatId];
         if (capturedImage) {
-          tryPushCacheEntry(entries, formatId, capturedImage, doc);
+          await cacheEntry(formatId, capturedImage);
         }
       } catch (error) {
         console.warn("[Element Copier] image snapshot failed:", formatId, error);
@@ -141,12 +162,7 @@ async function snapshotPickCopyCache(element, inlineImages = DEFAULT_INLINE_IMAG
     if (perfEnabled) {
       extractTimeMs += nowMs(doc) - extractStartedAt;
     }
-    tryPushCacheEntry(
-      entries,
-      formatId,
-      extracted,
-      doc
-    );
+    await cacheEntry(formatId, extracted);
   }
   cache.snapshot(entries);
   try {

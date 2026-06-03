@@ -9,7 +9,7 @@ import { ext } from "../../lib/our/api.js";
 import { getCachedCopyText, snapshotPickCopyCache } from "../pick-mode/pick-copy-cache.js";
 import { isPanelTabMode } from "../../lib/our/panel-tab/index.js";
 import { mountCopierContentHotkeys, registerCopierStartHotkey, unmountCopierContentHotkeys } from "../hotkeys/copier-content.js";
-import { readPickCopyMetaFromStorage } from "../pick-mode/pick-copy-cache-storage.js";
+import { resolvePickCopyCacheStorageKey } from "../pick-mode/pick-copy-cache-storage.js";
 import { registerDocumentOperabilityProbeListener } from "../../lib/our/page-operability/content-probe.js";
 import { sendToBackground } from "../messages.js";
 import { showMountedPopupTab } from "../panel-popup/mount-panel-surface.js";
@@ -41,6 +41,11 @@ function requestCopyPage() {
 
 function requestCopiedPanel(formatId, panelAction) {
   sendToBackground({ type: "OPEN_PANEL", tab: "copied", formatId, panelAction });
+}
+
+function createPickCopyMeta(element) {
+  const hostname = element.ownerDocument.location?.hostname?.trim() || "unknown";
+  return { tagName: element.tagName.toLowerCase(), hostname };
 }
 
 function notifyPickCopyFlowStarted(requestId, startedAtMs) {
@@ -121,32 +126,43 @@ function attachMessageHandler(state2) {
       notifyPickCopyFlowStarted(requestId, Date.now());
       deactivate();
       await refreshFormatSettingsCache();
-      await snapshotPickCopyCache(element, getCachedInlineImagesMode());
       const defaultAction = getCachedDefaultAction();
       let copiedFormatId = null;
       let panelAction;
-      if (defaultAction !== null) {
+      let defaultActionAttempted = false;
+      const defaultCacheKey = defaultAction ? resolvePickCopyCacheStorageKey(defaultAction.formatId) : null;
+      const meta = createPickCopyMeta(element);
+      const performDefaultAction = async (key, value) => {
+        if (defaultAction === null || defaultActionAttempted || key !== defaultCacheKey) return;
+        defaultActionAttempted = true;
         const { formatId, action } = defaultAction;
+        if (action === "copy") {
+          const copied = await copyToClipboardForFormat(formatId, value);
+          if (copied) {
+            copiedFormatId = formatId;
+            panelAction = "copy";
+          } else {
+            console.warn("[Element Copier] clipboard copy failed");
+          }
+        } else {
+          const saved = downloadTextAsFile(formatId, value, meta);
+          if (saved) {
+            copiedFormatId = formatId;
+            panelAction = "download";
+          } else {
+            console.warn("[Element Copier] default download failed");
+          }
+        }
+      };
+      await snapshotPickCopyCache(element, getCachedInlineImagesMode(), {
+        onCacheEntry: performDefaultAction,
+        priorityFormatId: defaultAction?.formatId
+      });
+      if (defaultAction !== null && !defaultActionAttempted) {
+        const { formatId } = defaultAction;
         const defaultText = getCachedCopyText(formatId);
         if (defaultText !== void 0) {
-          if (action === "copy") {
-            const copied = await copyToClipboardForFormat(formatId, defaultText);
-            if (copied) {
-              copiedFormatId = formatId;
-              panelAction = "copy";
-            } else {
-              console.warn("[Element Copier] clipboard copy failed");
-            }
-          } else {
-            const meta = await readPickCopyMetaFromStorage();
-            const saved = downloadTextAsFile(formatId, defaultText, meta);
-            if (saved) {
-              copiedFormatId = formatId;
-              panelAction = "download";
-            } else {
-              console.warn("[Element Copier] default download failed");
-            }
-          }
+          await performDefaultAction(defaultCacheKey, defaultText);
         } else {
           console.warn("[Element Copier] default format not cached (disabled?)");
         }
