@@ -21,15 +21,22 @@
     }
   },
   "background": {
-    "service_worker": "background.js",
-    "scripts": ["background.js"]
+    "service_worker": "app/background/main.js",
+    "scripts": ["app/background/main.js"],
+    "type": "module"
   },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content.js"],
+      "js": ["app/content/loader.js"],
       "run_at": "document_start",
       "all_frames": true
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "matches": ["<all_urls>"],
+      "resources": ["app/*", "lib/*"]
     }
   ],
   "commands": {
