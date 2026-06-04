@@ -16,7 +16,7 @@ UNTERSTÜTZTE FORMATE
 - Seitenquellcode,
 - Viele Formate für Entwickler und Tester:
    - HTML,
-   - CSS-Selektor,
+   - Selektor,
    - JS-Pfad,
    - XPath,
    - vollständiger XPath,

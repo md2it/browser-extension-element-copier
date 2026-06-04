@@ -16,7 +16,7 @@ FORMATOS COMPATIBLES
 - Código fuente de la página,
 - Muchos formatos para desarrolladores y testers:
    - HTML,
-   - Selector CSS,
+   - Selector,
    - Ruta JS,
    - XPath,
    - XPath completo,

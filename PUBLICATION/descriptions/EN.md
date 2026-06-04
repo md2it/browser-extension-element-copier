@@ -16,7 +16,7 @@ SUPPORTED FORMATS
 - Page source code,
 - Many formats for developers and testers:
    - HTML,
-   - CSS selector,
+   - Selector,
    - JS path,
    - XPath,
    - full XPath,

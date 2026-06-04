@@ -16,7 +16,7 @@ FORMATS PRIS EN CHARGE
 - Code source de la page,
 - De nombreux formats pour les développeurs et les testeurs :
    - HTML,
-   - Sélecteur CSS,
+   - Sélecteur,
    - Chemin JS,
    - XPath,
    - XPath complet,

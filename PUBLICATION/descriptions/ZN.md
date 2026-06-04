@@ -16,7 +16,7 @@ ELEMENT COPIER
 - 页面源码，
 - 面向开发者和测试人员的多种格式：
    - HTML 代码，
-   - CSS 选择器，
+   - 选择器，
    - JS 路径，
    - XPath，
    - 完整 XPath，
