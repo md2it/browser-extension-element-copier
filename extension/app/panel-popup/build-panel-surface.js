@@ -1,8 +1,6 @@
-import { PANEL_FOOTER_CONFIG } from "../ui-config.js";
 import { PANEL_POPUP_HOST_ATTR } from "./constants.js";
 import { PANEL_TITLE } from "../brand.js";
 import { createPanelDivider, createPanelHeader } from "../../lib/our/panel-header/header.js";
-import { createPanelFooter } from "../../lib/our/panel-footer/footer.js";
 import { createPanelMenu } from "./panel-menu.js";
 import { getDarkThemeEnabled } from "../settings/theme-settings.js";
 import { hasPickCopyCacheInStorage } from "../pick-mode/pick-copy-cache-storage.js";
@@ -29,9 +27,7 @@ async function createPanelSurface(locale, surface) {
   });
   const body = document.createElement("div");
   body.className = "ec-panel-body";
-  const footer = createPanelFooter(PANEL_FOOTER_CONFIG);
   const topDivider = createPanelDivider();
-  const bottomDivider = createPanelDivider();
   let menu = null;
   if (surface === "popup") {
     const hasCache = await hasPickCopyCacheInStorage();
@@ -40,11 +36,11 @@ async function createPanelSurface(locale, surface) {
     main.className = "ec-panel-main";
     const content = document.createElement("div");
     content.className = "ec-panel-content";
-    content.append(topDivider, body, bottomDivider);
+    content.append(topDivider, body);
     main.append(menu.root, content);
-    panelRoot.append(header, main, footer);
+    panelRoot.append(header, main);
   } else {
-    panelRoot.append(header, topDivider, body, bottomDivider, footer);
+    panelRoot.append(header, topDivider, body);
   }
   panelRoot.setAttribute(PANEL_POPUP_HOST_ATTR, "true");
   if (await getDarkThemeEnabled()) {

@@ -1,6 +1,5 @@
 import { ABOUT_PREFIX_CHORD_MAC_DISPLAY, ABOUT_PREFIX_CHORD_WIN_DISPLAY, getStartHotkeyActionLabel } from "../hotkeys/keys.js";
 import { COPY_FORMATS } from "../formats/definitions.js";
-import { PANEL_FOOTER_LINKEDIN_URL } from "../../lib/our/panel-footer/constants.js";
 import { buildAboutListItems } from "../about.js";
 import { copyPickedFormatFromPanel } from "./copy-picked-format.js";
 import { createClipboardDefaultFormatSelect, createComputeFormatsSection, createCopiedOtherOptionsRow, createDarkThemeToggleRow, createDeveloperToolsToggleRow, createFrameLabelStyleSelect, createInlineImagesSelect, syncCopiedPanelFormatSelection } from "../formats/format-ui.js";
@@ -13,6 +12,7 @@ import { hasPickCopyCacheInStorage, readPickCopyCacheFromStorage, resolvePickCop
 import { savePickedFormatFromPanel } from "./save-picked-format.js";
 
 var PANEL_BODY_CENTERED_CLASS = "ec-panel-body--centered";
+var ABOUT_AUTHOR_URL = "https://www.linkedin.com/in/alex-terekhov/";
 
 function createPageDivider() {
   const divider = document.createElement("div");
@@ -117,7 +117,7 @@ function createAboutCredit(strings) {
   const copyrightLine = document.createElement("p");
   copyrightLine.className = "ec-about-credit-line";
   const link = document.createElement("a");
-  link.href = PANEL_FOOTER_LINKEDIN_URL;
+  link.href = ABOUT_AUTHOR_URL;
   link.target = "_blank";
   link.rel = "noopener noreferrer";
   link.textContent = strings.aboutCreditAuthor;

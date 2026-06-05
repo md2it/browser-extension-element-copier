@@ -11,7 +11,6 @@ import { image_down_default } from "./lucide/image-down.js";
 import { images_default } from "./lucide/images.js";
 import { info_default } from "./lucide/info.js";
 import { keyboard_default } from "./lucide/keyboard.js";
-import { linkedin_default } from "./brands/linkedin.js";
 import { pin_default } from "./lucide/pin.js";
 import { play_default } from "./lucide/play.js";
 import { puzzle_default } from "./lucide/puzzle.js";
@@ -25,10 +24,6 @@ function stripComment(svg) {
 
 function lucideUiIcon(raw) {
   return stripComment(raw);
-}
-
-function brandIcon(raw) {
-  return stripComment(raw).replace(/fill="#000000"/g, 'fill="currentColor"');
 }
 
 var ARROW_UP = lucideUiIcon(arrow_up_default);
@@ -69,6 +64,4 @@ var PUZZLE = lucideUiIcon(puzzle_default);
 
 var ROTATE_CW = lucideUiIcon(rotate_cw_default);
 
-var LINKEDIN = brandIcon(linkedin_default);
-
-export { ARROW_UP, CIRCLE_POWER, COG, COPY, EXTERNAL_LINK, FILES, FILE_DOWN, HEART, HISTORY, IMAGES, IMAGE_DOWN, INFO, KEYBOARD, LINKEDIN, PIN, PLAY, PUZZLE, ROTATE_CW, SETTINGS, SHIELD_CHECK, brandIcon, lucideUiIcon, stripComment };
+export { ARROW_UP, CIRCLE_POWER, COG, COPY, EXTERNAL_LINK, FILES, FILE_DOWN, HEART, HISTORY, IMAGES, IMAGE_DOWN, INFO, KEYBOARD, PIN, PLAY, PUZZLE, ROTATE_CW, SETTINGS, SHIELD_CHECK, lucideUiIcon, stripComment };

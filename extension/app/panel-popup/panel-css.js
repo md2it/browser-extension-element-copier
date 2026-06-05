@@ -76,39 +76,6 @@ export const PANEL_CSS = `.ec-panel-header,
   color: #666666;
 }
 
-.ec-panel-footer {
-  flex: 0 0 auto;
-  display: flex;
-  justify-content: center;
-  gap: 0.55rem;
-  margin-top: auto;
-  padding: 1.125rem;
-}
-
-.ec-panel-footer a {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  color: #999;
-  border-radius: 0.35rem;
-  text-decoration: none;
-  background: transparent;
-}
-
-.ec-panel-footer a:hover,
-.ec-panel-footer a:focus-visible {
-  color: #012292;
-}
-
-.ec-panel-footer svg {
-  display: block;
-  width: 1.1rem;
-  height: 1.1rem;
-  flex-shrink: 0;
-}
-
 :host(.ec-panel-popup) {
   display: flex;
   flex-direction: column;
@@ -172,7 +139,6 @@ export const PANEL_CSS = `.ec-panel-header,
 }
 
 .ec-panel--surface-popup > .dd-panel-header,
-.ec-panel--surface-popup > .ec-panel-footer,
 .ec-panel--surface-popup > .dd-panel-divider {
   display: none;
 }
@@ -1885,15 +1851,6 @@ export const PANEL_CSS = `.ec-panel-header,
   border-color: rgba(96, 165, 250, 0.35);
   background: rgba(37, 99, 235, 0.2);
   color: #bfdbfe;
-}
-
-:host(.ec-panel-popup--dark) .ec-panel-footer a {
-  color: #9ca3af;
-}
-
-:host(.ec-panel-popup--dark) .ec-panel-footer a:hover,
-:host(.ec-panel-popup--dark) .ec-panel-footer a:focus-visible {
-  color: #93c5fd;
 }
 
 :host(.ec-panel-popup--dark) .ec-about-kbd {
