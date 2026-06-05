@@ -38,6 +38,9 @@
 - The grand refactoring: bandles split to chunks, removed dependencies
 - Fixed bugs and errors
 
+### 1.0.2
+- Removed dead code
+
 ---
 
 ## NOT RELEASED LIST
