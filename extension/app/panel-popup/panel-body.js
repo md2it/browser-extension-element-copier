@@ -12,7 +12,7 @@ import { hasPickCopyCacheInStorage, readPickCopyCacheFromStorage, resolvePickCop
 import { savePickedFormatFromPanel } from "./save-picked-format.js";
 
 var PANEL_BODY_CENTERED_CLASS = "ec-panel-body--centered";
-var ABOUT_AUTHOR_URL = "https://www.linkedin.com/in/alex-terekhov/";
+var ABOUT_AUTHOR_URL = "https://www.md2it.com/";
 
 function createPageDivider() {
   const divider = document.createElement("div");
@@ -235,9 +235,16 @@ function buildAboutPanelBody(body, strings) {
   for (const item of buildAboutListItems(strings)) {
     const li = document.createElement("li");
     li.className = "ec-about-item";
-    const label = document.createElement("span");
+    const label = document.createElement(item.href ? "a" : "span");
     label.className = "ec-about-text";
     label.textContent = item.text;
+    if (item.href) {
+      label.href = item.href;
+      label.target = "_blank";
+      label.rel = "noopener noreferrer";
+      label.style.color = "inherit";
+      label.addEventListener("click", (e) => e.stopPropagation());
+    }
     li.append(createAboutIcon(item.iconHtml), label);
     list.appendChild(li);
   }

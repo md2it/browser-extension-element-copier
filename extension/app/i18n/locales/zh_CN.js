@@ -95,10 +95,11 @@ var ZH_CN_MESSAGES = {
     "代码样式：声明、计算",
     "不使用网络",
     "不收集数据",
+    "GitHub 上的代码",
     "致谢 (MIT): Lucide, Modern-Screenshot, Turndown"
   ],
   aboutProductName: "Element-Copier",
-  aboutCreditAuthor: "Alex T"
+  aboutCreditAuthor: "md2it"
 };
 
 export { ZH_CN_MESSAGES };

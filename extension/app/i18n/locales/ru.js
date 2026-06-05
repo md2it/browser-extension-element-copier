@@ -95,10 +95,11 @@ var RU_MESSAGES = {
     "Стили кода: объявленные, вычисленные",
     "Не использует сеть",
     "Без сбора данных",
+    "Код на GitHub",
     "Благодарности (MIT): Lucide, Modern-Screenshot, Turndown"
   ],
   aboutProductName: "Element-Copier",
-  aboutCreditAuthor: "Alex T"
+  aboutCreditAuthor: "md2it"
 };
 
 export { RU_MESSAGES };

@@ -95,10 +95,11 @@ var ES_MESSAGES = {
     "Estilos de código: declarados, calculados",
     "No usa la red",
     "No recopila datos",
+    "Código en GitHub",
     "Créditos (MIT): Lucide, Modern-Screenshot, Turndown"
   ],
   aboutProductName: "Element-Copier",
-  aboutCreditAuthor: "Alex T"
+  aboutCreditAuthor: "md2it"
 };
 
 export { ES_MESSAGES };

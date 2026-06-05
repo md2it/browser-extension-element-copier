@@ -1,4 +1,4 @@
-import { COPY, FILES, FILE_DOWN, HEART, HISTORY, IMAGES, SHIELD_CHECK } from "../lib/icons/index.js";
+import { COPY, FILES, FILE_DOWN, GIT_FORK, HEART, HISTORY, IMAGES, SHIELD_CHECK } from "../lib/icons/index.js";
 import { files_default } from "../lib/icons/lucide/files.js";
 
 var INACTIVE_BG = "#012292";
@@ -30,6 +30,7 @@ var ABOUT_BULLET_ICONS = [
   FILES,
   SHIELD_CHECK,
   SHIELD_CHECK,
+  GIT_FORK,
   HEART
 ];
 

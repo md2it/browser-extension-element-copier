@@ -9,5 +9,6 @@
 - (code) Code styles: declared, computed
 - (shield-check) Doesn't use the network
 - (shield-check) Doesn't collect data
+- (git-fork) Code on GitHub // https://github.com/md2it/browser-extension-element-copier
 - (heart) Credits (MIT): [Lucide](https://github.com/lucide-icons/lucide), [Modern-Screenshot](https://github.com/qq15725/modern-screenshot), [Turndown](https://github.com/mixmark-io/turndown)
 - Стандартный минифутер внизу под чертой

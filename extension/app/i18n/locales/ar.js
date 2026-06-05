@@ -95,10 +95,11 @@ var AR_MESSAGES = {
     "أنماط الكود: المعلنة، المحسوبة",
     "بلا شبكة",
     "بلا جمع بيانات",
+    "الكود على GitHub",
     "شكر وتقدير (MIT): Lucide, Modern-Screenshot, Turndown"
   ],
   aboutProductName: "Element-Copier",
-  aboutCreditAuthor: "Alex T"
+  aboutCreditAuthor: "md2it"
 };
 
 export { AR_MESSAGES };

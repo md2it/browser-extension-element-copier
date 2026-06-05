@@ -95,10 +95,11 @@ var DE_MESSAGES = {
     "Code-Stile: deklariert, berechnet",
     "Nutzt kein Netzwerk",
     "Keine Datenerfassung",
+    "Code auf GitHub",
     "Danksagung (MIT): Lucide, Modern-Screenshot, Turndown"
   ],
   aboutProductName: "Element-Copier",
-  aboutCreditAuthor: "Alex T"
+  aboutCreditAuthor: "md2it"
 };
 
 export { DE_MESSAGES };

@@ -102,10 +102,11 @@ var EN_MESSAGES = {
     "Code styles: declared, computed",
     "Doesn't use the network",
     "Doesn't collect data",
+    "Code on GitHub",
     "Credits (MIT): Lucide, Modern-Screenshot, Turndown"
   ],
   aboutProductName: "Element-Copier",
-  aboutCreditAuthor: "Alex T"
+  aboutCreditAuthor: "md2it"
 };
 
 var LOCALE_MESSAGES = {

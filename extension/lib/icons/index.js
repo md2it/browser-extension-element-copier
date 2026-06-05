@@ -5,6 +5,7 @@ import { copy_default } from "./lucide/copy.js";
 import { external_link_default } from "./lucide/external-link.js";
 import { file_down_default } from "./lucide/file-down.js";
 import { files_default } from "./lucide/files.js";
+import { git_fork_default } from "./lucide/git-fork.js";
 import { heart_default } from "./lucide/heart.js";
 import { history_default } from "./lucide/history.js";
 import { image_down_default } from "./lucide/image-down.js";
@@ -40,6 +41,8 @@ var FILE_DOWN = lucideUiIcon(file_down_default);
 
 var FILES = lucideUiIcon(files_default);
 
+var GIT_FORK = lucideUiIcon(git_fork_default);
+
 var IMAGE_DOWN = lucideUiIcon(image_down_default);
 
 var IMAGES = lucideUiIcon(images_default);
@@ -64,4 +67,4 @@ var PUZZLE = lucideUiIcon(puzzle_default);
 
 var ROTATE_CW = lucideUiIcon(rotate_cw_default);
 
-export { ARROW_UP, CIRCLE_POWER, COG, COPY, EXTERNAL_LINK, FILES, FILE_DOWN, HEART, HISTORY, IMAGES, IMAGE_DOWN, INFO, KEYBOARD, PIN, PLAY, PUZZLE, ROTATE_CW, SETTINGS, SHIELD_CHECK, lucideUiIcon, stripComment };
+export { ARROW_UP, CIRCLE_POWER, COG, COPY, EXTERNAL_LINK, FILES, FILE_DOWN, GIT_FORK, HEART, HISTORY, IMAGES, IMAGE_DOWN, INFO, KEYBOARD, PIN, PLAY, PUZZLE, ROTATE_CW, SETTINGS, SHIELD_CHECK, lucideUiIcon, stripComment };
