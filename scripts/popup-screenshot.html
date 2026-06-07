@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: transparent; }
+  </style>
+</head>
+<body>
+
+<!-- Classic script: runs synchronously before any ES module evaluates,
+     so api.js sees globalThis.chrome when it initialises ext. -->
+<script>
+  (function() {
+    var LOCAL = {
+      pickCopyCache: {
+        text:           '<article id="article-body" class="content">How to Get Started</article>',
+        selector:       '#article-body',
+        outerHTML:      '<article id="article-body" class="content">…</article>',
+        markdown:       '# How to Get Started\n\nPublished · 5 min read\n\nLorem ipsum dolor sit amet…',
+        jsPath:         'document.querySelector("#article-body")',
+        xpath:          '//*[@id="article-body"]',
+        fullXPath:      '/html/body/div[3]/main/article',
+        declaredStyles: '--accent-color-base: #36c; --color-fg-default: #1f2328;',
+        computedStyles: 'accent-color: auto; align-content: normal; align-items: normal;',
+        url:            'https://example.com/article',
+      },
+      pickCopyCacheFormats: [
+        'text','richText','png','jpeg','markdown',
+        'outerHTML','selector','jsPath','xpath','fullXPath',
+        'declaredStyles','computedStyles',
+      ],
+      pickCopyMeta: { tagName: 'article', hostname: 'example.com', url: 'https://example.com/article' },
+      locale: 'en',
+      darkThemeEnabled: false,
+      developerToolsEnabled: true,
+    };
+
+    var SESSION = {
+      lastCopiedFormat:      'text',
+      lastCopiedPanelAction: 'copied',
+      copiedPanelShowStatus: true,
+    };
+
+    function makeStore(data) {
+      return {
+        get: function(keys, callback) {
+          var result = {};
+          var ks = Array.isArray(keys) ? keys
+            : (typeof keys === 'string' ? [keys] : Object.keys(keys || {}));
+          for (var i = 0; i < ks.length; i++) {
+            var k = ks[i]; if (k in data) result[k] = data[k];
+          }
+          if (callback) { callback(result); return; }
+          return Promise.resolve(result);
+        },
+        set: function(items, callback) {
+          Object.assign(data, items);
+          if (callback) callback(); return Promise.resolve();
+        },
+        remove: function(keys, callback) {
+          var ks = Array.isArray(keys) ? keys : [keys];
+          for (var i = 0; i < ks.length; i++) delete data[ks[i]];
+          if (callback) callback(); return Promise.resolve();
+        },
+      };
+    }
+
+    var mockPort = { onDisconnect: { addListener: function() {} }, disconnect: function() {} };
+    var pageBase = location.href.replace(/scripts\/popup-screenshot.*$/, 'extension/');
+
+    globalThis.chrome = {
+      runtime: {
+        id: 'ec-promo-mock',
+        getURL: function(p) { return pageBase + p; },
+        sendMessage: function(_msg, cb) {
+          if (cb) setTimeout(function() { cb({ ok: false }); }, 0);
+          return Promise.resolve({ ok: false });
+        },
+        onMessage:   { addListener: function() {}, removeListener: function() {} },
+        onConnect:   { addListener: function() {}, removeListener: function() {} },
+        onInstalled: { addListener: function() {}, removeListener: function() {} },
+        onStartup:   { addListener: function() {}, removeListener: function() {} },
+        connect:     function() { return mockPort; },
+        lastError:   null,
+      },
+      storage: { local: makeStore(LOCAL), session: makeStore(SESSION) },
+      tabs: {
+        query: function(_o, cb) {
+          var tabs = [{ id: 1, url: 'https://example.com/article' }];
+          if (cb) { cb(tabs); return; } return Promise.resolve(tabs);
+        },
+      },
+      commands: { onCommand: { addListener: function() {}, removeListener: function() {} } },
+    };
+    globalThis.browser = undefined;
+  })();
+</script>
+
+<!-- Mount the COPIED panel directly, bypassing the getActionPopupWidthPx probe
+     which hangs when the DOM is not in a full browser context. -->
+<script type="module">
+  import { PANEL_CSS }          from '../extension/app/panel-popup/panel-css.js';
+  import { createPanelSurface } from '../extension/app/panel-popup/build-panel-surface.js';
+  import { buildCopiedPanelBody } from '../extension/app/panel-popup/panel-body.js';
+  import { t }                  from '../extension/app/i18n/strings.js';
+
+  const WIDTH_PX = 445;   // measured fallback width (matches real popup)
+
+  // Apply popup width to document so CSS calc() works correctly
+  document.documentElement.style.setProperty('--ec-popup-width', WIDTH_PX + 'px');
+
+  // Create shadow host (mirrors mountPanelShadowHost)
+  const host = document.createElement('div');
+  host.id = 'element-copier-root';
+  host.className = 'ec-panel-popup';
+  host.setAttribute('data-element-copier-ui', 'true');
+  host.style.cssText =
+    `display:block;width:${WIDTH_PX}px;min-height:0;height:auto;` +
+    'position:relative;pointer-events:auto;';
+  document.body.appendChild(host);
+  const shadow = host.attachShadow({ mode: 'open' });
+
+  // Inject panel CSS into shadow
+  const styleEl = document.createElement('style');
+  styleEl.textContent = PANEL_CSS;
+  shadow.appendChild(styleEl);
+
+  // Build panel surface and render COPIED tab
+  const locale = 'en';
+  const strings = t(locale);
+  const { panelRoot, body } = await createPanelSurface(locale, 'popup');
+  shadow.appendChild(panelRoot);
+  await buildCopiedPanelBody(body, strings, {
+    onStartOver: () => {},
+    onPickElement: () => {},
+    onCopyPage: () => {},
+  });
+
+  // Signal readiness for Playwright
+  document.documentElement.dataset.ready = 'true';
+</script>
+</body>
+</html>
