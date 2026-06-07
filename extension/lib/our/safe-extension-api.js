@@ -1,4 +1,3 @@
-// ../lib/our/safe-extension-api.ts
 function normalizeSafeExtensionApiIgnoredErrors(sources) {
   const sourceList = Array.isArray(sources) ? sources : [sources];
   const normalized = {};

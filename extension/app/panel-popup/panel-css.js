@@ -408,7 +408,7 @@ export const PANEL_CSS = `.ec-panel-header,
   margin-top: 0.5rem;
 }
 
-/* Как в welcome: --welcome-gap (12px) между header и разделителем */
+/* Match the welcome page's 12px gap between the header and divider. */
 .ec-panel > .dd-panel-divider {
   margin-top: 0.75rem;
 }
